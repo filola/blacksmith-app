@@ -1,0 +1,92 @@
+{
+  "copper_sword": {
+    "name": "구리 검",
+    "type": "weapon",
+    "subtype": "sword",
+    "materials": {"copper": 3},
+    "base_price": 10,
+    "tier": 1,
+    "unlocked": true
+  },
+  "copper_shield": {
+    "name": "구리 방패",
+    "type": "armor",
+    "subtype": "shield",
+    "materials": {"copper": 4},
+    "base_price": 12,
+    "tier": 1,
+    "unlocked": true
+  },
+  "tin_dagger": {
+    "name": "주석 단검",
+    "type": "weapon",
+    "subtype": "dagger",
+    "materials": {"tin": 2},
+    "base_price": 8,
+    "tier": 1,
+    "unlocked": true
+  },
+  "bronze_sword": {
+    "name": "청동 검",
+    "type": "weapon",
+    "subtype": "sword",
+    "materials": {"copper": 2, "tin": 2},
+    "base_price": 25,
+    "tier": 1,
+    "unlocked": true
+  },
+  "iron_sword": {
+    "name": "철 검",
+    "type": "weapon",
+    "subtype": "sword",
+    "materials": {"iron": 4},
+    "base_price": 50,
+    "tier": 2,
+    "unlocked": false
+  },
+  "iron_armor": {
+    "name": "철 갑옷",
+    "type": "armor",
+    "subtype": "chest",
+    "materials": {"iron": 6},
+    "base_price": 80,
+    "tier": 2,
+    "unlocked": false
+  },
+  "silver_bow": {
+    "name": "은 활",
+    "type": "weapon",
+    "subtype": "bow",
+    "materials": {"silver": 4, "iron": 2},
+    "base_price": 100,
+    "tier": 2,
+    "unlocked": false
+  },
+  "gold_staff": {
+    "name": "금 지팡이",
+    "type": "weapon",
+    "subtype": "staff",
+    "materials": {"gold": 5, "silver": 3},
+    "base_price": 250,
+    "tier": 3,
+    "unlocked": false
+  },
+  "mithril_sword": {
+    "name": "미스릴 검",
+    "type": "weapon",
+    "subtype": "sword",
+    "materials": {"mithril": 6, "gold": 2},
+    "base_price": 600,
+    "tier": 4,
+    "unlocked": false
+  },
+  "orichalcum_blade": {
+    "name": "오리할콘 대검",
+    "type": "weapon",
+    "subtype": "sword",
+    "materials": {"orichalcum": 8, "mithril": 4},
+    "base_price": 1500,
+    "tier": 5,
+    "unlocked": false
+  }
+}
