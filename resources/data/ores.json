@@ -5,7 +5,9 @@
     "base_time": 1.0,
     "color": "#b87333",
     "bar_name": "구리 주괴",
-    "ore_per_bar": 3
+    "ore_per_bar": 3,
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/copper_ore.png",
+    "bar_icon": "res://resources/assets/dungeon-crawl/bars/copper_bar.png"
   },
   "tin": {
     "name": "주석 광석",
@@ -13,7 +15,9 @@
     "base_time": 1.2,
     "color": "#d3d3d3",
     "bar_name": "주석 주괴",
-    "ore_per_bar": 3
+    "ore_per_bar": 3,
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/tin_ore.png",
+    "bar_icon": "res://resources/assets/dungeon-crawl/bars/tin_bar.png"
   },
   "iron": {
     "name": "철 광석",
@@ -21,7 +25,9 @@
     "base_time": 2.0,
     "color": "#a0a0a0",
     "bar_name": "철 주괴",
-    "ore_per_bar": 5
+    "ore_per_bar": 5,
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/iron_ore.png",
+    "bar_icon": "res://resources/assets/dungeon-crawl/bars/iron_bar.png"
   },
   "silver": {
     "name": "은 광석",
@@ -29,7 +35,9 @@
     "base_time": 2.5,
     "color": "#c0c0c0",
     "bar_name": "은 주괴",
-    "ore_per_bar": 5
+    "ore_per_bar": 5,
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/silver_ore.png",
+    "bar_icon": "res://resources/assets/dungeon-crawl/bars/silver_bar.png"
   },
   "gold": {
     "name": "금 광석",
@@ -37,7 +45,9 @@
     "base_time": 3.0,
     "color": "#ffd700",
     "bar_name": "금 주괴",
-    "ore_per_bar": 8
+    "ore_per_bar": 8,
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/gold_ore.png",
+    "bar_icon": "res://resources/assets/dungeon-crawl/bars/gold_bar.png"
   },
   "mithril": {
     "name": "미스릴 광석",
@@ -45,7 +55,9 @@
     "base_time": 4.0,
     "color": "#4fc3f7",
     "bar_name": "미스릴 주괴",
-    "ore_per_bar": 10
+    "ore_per_bar": 10,
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/mithril_ore.png",
+    "bar_icon": "res://resources/assets/dungeon-crawl/bars/mithril_bar.png"
   },
   "orichalcum": {
     "name": "오리할콘 광석",
@@ -53,6 +65,8 @@
     "base_time": 5.0,
     "color": "#ff6f00",
     "bar_name": "오리할콘 주괴",
-    "ore_per_bar": 15
+    "ore_per_bar": 15,
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/orichalcum_ore.png",
+    "bar_icon": "res://resources/assets/dungeon-crawl/bars/orichalcum_bar.png"
   }
 }

@@ -93,12 +93,27 @@ func _update_ore_buttons() -> void:
 		if data["tier"] > GameManager.max_unlocked_tier:
 			continue
 
+		var hbox = HBoxContainer.new()
+		hbox.theme_override_constants = {}
+
+		# 광석 아이콘
+		var icon = TextureRect.new()
+		var icon_path = data.get("ore_icon", "")
+		if icon_path != "" and ResourceLoader.exists(icon_path):
+			icon.texture = load(icon_path)
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.custom_minimum_size = Vector2(32, 32)
+		hbox.add_child(icon)
+
 		var btn = Button.new()
 		btn.text = "%s (%d)" % [data["name"], GameManager.ores.get(ore_id, 0)]
 		btn.name = ore_id
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.add_theme_color_override("font_color", Color(data["color"]))
 		btn.pressed.connect(select_ore.bind(ore_id))
-		ore_list.add_child(btn)
+		hbox.add_child(btn)
+
+		ore_list.add_child(hbox)
 
 
 func _on_ore_changed(_ore_id: String, _amount: int) -> void:

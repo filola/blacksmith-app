@@ -22,6 +22,29 @@ func _update_list() -> void:
 
 		var hbox = HBoxContainer.new()
 
+		# 광석 아이콘
+		var ore_icon = TextureRect.new()
+		var ore_icon_path = data.get("ore_icon", "")
+		if ore_icon_path != "" and ResourceLoader.exists(ore_icon_path):
+			ore_icon.texture = load(ore_icon_path)
+		ore_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		ore_icon.custom_minimum_size = Vector2(32, 32)
+		hbox.add_child(ore_icon)
+
+		# 화살표
+		var arrow = Label.new()
+		arrow.text = " → "
+		hbox.add_child(arrow)
+
+		# 주괴 아이콘
+		var bar_icon = TextureRect.new()
+		var bar_icon_path = data.get("bar_icon", "")
+		if bar_icon_path != "" and ResourceLoader.exists(bar_icon_path):
+			bar_icon.texture = load(bar_icon_path)
+		bar_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		bar_icon.custom_minimum_size = Vector2(32, 32)
+		hbox.add_child(bar_icon)
+
 		var info = Label.new()
 		info.text = "%s: %d개 → %s: %d개 (필요: %d)" % [
 			data["name"], GameManager.ores.get(ore_id, 0),

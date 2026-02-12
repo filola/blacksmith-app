@@ -25,6 +25,15 @@ func _update_recipes() -> void:
 
 		var hbox = HBoxContainer.new()
 
+		# 아이템 아이콘
+		var item_icon = TextureRect.new()
+		var icon_path = recipe.get("icon", "")
+		if icon_path != "" and ResourceLoader.exists(icon_path):
+			item_icon.texture = load(icon_path)
+		item_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		item_icon.custom_minimum_size = Vector2(48, 48)
+		hbox.add_child(item_icon)
+
 		# 레시피 정보
 		var info = VBoxContainer.new()
 		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL

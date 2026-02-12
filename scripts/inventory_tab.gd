@@ -31,6 +31,15 @@ func _update_list() -> void:
 		var item = GameManager.inventory[i]
 		var hbox = HBoxContainer.new()
 
+		# 아이템 아이콘
+		var item_icon = TextureRect.new()
+		var icon_path = GameManager.recipe_data.get(item["recipe_id"], {}).get("icon", "")
+		if icon_path != "" and ResourceLoader.exists(icon_path):
+			item_icon.texture = load(icon_path)
+		item_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		item_icon.custom_minimum_size = Vector2(32, 32)
+		hbox.add_child(item_icon)
+
 		# 등급 이모지 + 이름
 		var name_label = Label.new()
 		name_label.text = "%s %s [%s]" % [item["grade_emoji"], item["name"], item["grade_name"]]
