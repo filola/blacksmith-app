@@ -44,16 +44,20 @@ func _update_list() -> void:
 		price_label.custom_minimum_size.x = 80
 		hbox.add_child(price_label)
 
-		# 판매 버튼
+		# 판매 버튼 — 인덱스 대신 아이템 참조 사용
 		var btn = Button.new()
 		btn.text = "판매"
-		btn.pressed.connect(_on_sell.bind(i))
+		var item_ref = item
+		btn.pressed.connect(func(): _on_sell_item(item_ref))
 		hbox.add_child(btn)
 
 		item_list.add_child(hbox)
 
 
-func _on_sell(index: int) -> void:
+func _on_sell_item(item: Dictionary) -> void:
+	var index = GameManager.inventory.find(item)
+	if index == -1:
+		return
 	var price = GameManager.sell_item(index)
 	if price > 0:
 		sell_result.text = "💰 %d Gold 획득!" % price
