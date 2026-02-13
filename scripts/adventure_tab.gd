@@ -39,6 +39,9 @@ func _ready() -> void:
 	dungeon_tier_spinbox.max_value = 5
 	dungeon_tier_spinbox.value = 1
 	
+	# 인벤토리 신호
+	inventory_list.item_selected.connect(_on_inventory_item_selected)
+	
 	_refresh_adventure_list()
 
 
@@ -78,6 +81,9 @@ func _update_detail_view(adv) -> void:
 	var speed_text = "속도: %.2f배" % adv.get_speed_multiplier()
 	if exploration_status_label:
 		exploration_status_label.text = speed_text
+	
+	# 인벤토리 표시 (장착 가능한 아이템만)
+	_refresh_inventory_list()
 
 
 func _refresh_equipped_items(adv) -> void:
@@ -86,11 +92,29 @@ func _refresh_equipped_items(adv) -> void:
 		child.queue_free()
 	
 	# 장착 아이템 표시
-	for item in adv.equipped_items:
+	for i in range(adv.equipped_items.size()):
+		var item = adv.equipped_items[i]
+		var hbox = HBoxContainer.new()
+		
+		# 아이템 정보
 		var item_label = Label.new()
-		var item_text = "%s (%s)" % [item["name"], item.get("type", "?")]
-		item_label.text = item_text
-		equipped_items_container.add_child(item_label)
+		var speed_bonus = ""
+		if item.has("speed_bonus"):
+			speed_bonus = " [속도: ×%.2f]" % item["speed_bonus"]
+		var artifact_marker = " 🔮" if item.get("is_artifact", false) else ""
+		item_label.text = "%s (%s)%s%s" % [item["name"], item.get("type", "?"), speed_bonus, artifact_marker]
+		item_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		hbox.add_child(item_label)
+		
+		# 해제 버튼
+		var unequip_btn = Button.new()
+		unequip_btn.text = "해제"
+		unequip_btn.custom_minimum_size.x = 50
+		var item_index = i
+		unequip_btn.pressed.connect(func(): _on_unequip_item(item_index))
+		hbox.add_child(unequip_btn)
+		
+		equipped_items_container.add_child(hbox)
 	
 	if adv.equipped_items.is_empty():
 		var no_items_label = Label.new()
@@ -161,3 +185,50 @@ func _on_item_unequipped(adventurer_id: String, item: Dictionary) -> void:
 		var adv = GameManager.get_adventurer(current_selected_adventurer)
 		if adv:
 			_update_detail_view(adv)
+
+
+func _on_unequip_item(item_index: int) -> void:
+	if current_selected_adventurer.is_empty():
+		return
+	
+	var success = GameManager.unequip_item_from_adventurer(current_selected_adventurer, item_index)
+	if success:
+		var adv = GameManager.get_adventurer(current_selected_adventurer)
+		if adv:
+			_update_detail_view(adv)
+
+
+func _refresh_inventory_list() -> void:
+	inventory_list.clear()
+	
+	for i in range(GameManager.inventory.size()):
+		var item = GameManager.inventory[i]
+		
+		# 장착 가능한 아이템만 표시
+		if not item.get("type") or item.get("type") not in ["weapon", "armor", "accessory"]:
+			continue
+		
+		var item_text = "%s %s" % [item.get("grade_emoji", ""), item["name"]]
+		if item.get("is_artifact", false):
+			item_text += " 🔮"
+		if item.has("speed_bonus"):
+			item_text += " [속도: ×%.2f]" % item["speed_bonus"]
+		
+		inventory_list.add_item(item_text, -1)
+		inventory_list.set_item_metadata(inventory_list.item_count - 1, i)
+
+
+func _on_inventory_item_selected(index: int) -> void:
+	if current_selected_adventurer.is_empty():
+		return
+	
+	var inventory_index = inventory_list.get_item_metadata(index)
+	if inventory_index < 0 or inventory_index >= GameManager.inventory.size():
+		return
+	
+	var success = GameManager.equip_item_to_adventurer(current_selected_adventurer, inventory_index)
+	if success:
+		var adv = GameManager.get_adventurer(current_selected_adventurer)
+		if adv:
+			_update_detail_view(adv)
+		print("✅ 장착 완료!")
