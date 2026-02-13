@@ -73,7 +73,7 @@ func generate_rewards(dungeon_tier: int) -> Dictionary:
 	
 	# 일반 아이템 수 (평균)
 	var item_count = int(reward_config["common_items"])
-	if randf() < fract(reward_config["common_items"]):
+	if randf() < (reward_config["common_items"] - int(reward_config["common_items"])):
 		item_count += 1
 	
 	# 임시: 쿼터 드롭 (나중에 게임매니저에서 제공)

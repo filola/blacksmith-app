@@ -3,7 +3,6 @@ extends Control
 ## 모험가 탭 UI
 
 @onready var adventure_list: ItemList = %AdventureList
-@onready var adventurer_detail: PanelContainer = %AdventurerDetail
 @onready var adventurer_name_label: Label = %AdventurerNameLabel
 @onready var adventurer_description_label: Label = %AdventurerDescriptionLabel
 @onready var adventurer_portrait: TextureRect = %AdventurerPortrait
@@ -19,6 +18,11 @@ var exploration_timer: Timer
 
 
 func _ready() -> void:
+	# 노드 검증
+	if not adventure_list or not start_exploration_btn or not inventory_list:
+		push_error("AdventureTab: 필수 노드를 찾을 수 없습니다!")
+		return
+	
 	# 신호 연결
 	GameManager.exploration_started.connect(_on_exploration_started)
 	GameManager.exploration_completed.connect(_on_exploration_completed)
@@ -51,7 +55,7 @@ func _refresh_adventure_list() -> void:
 	
 	for adv in adventurers:
 		var status = "⏳ 대기중" if not adv.is_exploring else "🚀 탐험중"
-		adventure_list.add_item("%s - %s" % [adv.name, status], -1)
+		adventure_list.add_item("%s - %s" % [adv.name, status])
 
 
 func _on_adventure_selected(index: int) -> void:
@@ -234,7 +238,7 @@ func _refresh_inventory_list() -> void:
 		if item.has("speed_bonus"):
 			item_text += " [속도: ×%.2f]" % item["speed_bonus"]
 		
-		inventory_list.add_item(item_text, -1)
+		inventory_list.add_item(item_text)
 		inventory_list.set_item_metadata(inventory_list.item_count - 1, i)
 
 
