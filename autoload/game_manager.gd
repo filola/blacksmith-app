@@ -100,6 +100,14 @@ func _load_data() -> void:
 	add_child(adventure_system)
 	dungeon = Dungeon.new()
 	add_child(dungeon)
+	
+	# 테스트용 초기 리소스 (첫 실행)
+	if ores.get("copper", 0) == 0:
+		gold = 100
+		ores["copper"] = 10
+		ores["tin"] = 5
+		bars["copper"] = 3
+		bars["tin"] = 2
 
 
 ## 광석 추가

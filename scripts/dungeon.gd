@@ -7,39 +7,39 @@ class_name Dungeon
 # 던전 난이도별 보상 설정
 var dungeon_rewards: Dictionary = {
 	1: {
-		"min_gold": 5,
-		"max_gold": 20,
+		"min_gold": 10,
+		"max_gold": 30,
 		"common_items": 1.5,  # 평균 1.5개
-		"artifact_chance": 0.05,  # 5% 유물
+		"artifact_chance": 0.08,  # 8% 유물
 		"possible_artifacts": ["cursed_ring"]
 	},
 	2: {
-		"min_gold": 20,
-		"max_gold": 50,
+		"min_gold": 30,
+		"max_gold": 70,
 		"common_items": 2.0,
-		"artifact_chance": 0.10,  # 10%
+		"artifact_chance": 0.12,  # 12%
 		"possible_artifacts": ["cursed_ring", "golden_amulet", "dragon_scale", "shadow_cloak"]
 	},
 	3: {
-		"min_gold": 50,
-		"max_gold": 100,
+		"min_gold": 70,
+		"max_gold": 150,
 		"common_items": 2.5,
 		"artifact_chance": 0.15,
 		"possible_artifacts": ["golden_amulet", "dragon_scale", "holy_grail", "eternal_blade", "shadow_cloak"]
 	},
 	4: {
-		"min_gold": 100,
-		"max_gold": 200,
+		"min_gold": 150,
+		"max_gold": 250,
 		"common_items": 3.0,
-		"artifact_chance": 0.20,
-		"possible_artifacts": ["holy_grail", "eternal_blade", "dragon_scale"]
+		"artifact_chance": 0.18,
+		"possible_artifacts": ["golden_amulet", "dragon_scale", "holy_grail", "eternal_blade", "shadow_cloak"]
 	},
 	5: {
-		"min_gold": 200,
-		"max_gold": 300,
+		"min_gold": 250,
+		"max_gold": 400,
 		"common_items": 3.5,
-		"artifact_chance": 0.25,
-		"possible_artifacts": ["holy_grail", "eternal_blade"]
+		"artifact_chance": 0.20,
+		"possible_artifacts": ["holy_grail", "eternal_blade", "dragon_scale"]
 	}
 }
 

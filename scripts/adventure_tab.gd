@@ -168,9 +168,29 @@ func _on_exploration_started(adventurer_id: String, tier: int) -> void:
 	print("탐험 시작: %s - Tier %d" % [adventurer_id, tier])
 
 
-func _on_exploration_completed(adventurer_id: String, rewards: Dictionary) -> void:
+func _on_exploration_completed(adventurer_id: String, exploration_data: Dictionary) -> void:
+	if adventurer_id != current_selected_adventurer:
+		return
+	
+	var rewards = exploration_data.get("rewards", {})
+	
 	print("탐험 완료: %s" % adventurer_id)
-	print("보상: %s" % rewards)
+	print("금화: %d" % rewards.get("gold", 0))
+	
+	# 보상 요약 출력
+	var reward_summary = "✅ 탐험 완료!\n"
+	reward_summary += "💰 %d Gold\n" % rewards.get("gold", 0)
+	
+	var item_count = 0
+	for ore_reward in rewards.get("items", []):
+		item_count += ore_reward.get("quantity", 0)
+	if item_count > 0:
+		reward_summary += "📦 광석 %d개\n" % item_count
+	
+	if rewards.get("artifacts", []).size() > 0:
+		reward_summary += "🔮 유물 %d개!" % rewards.get("artifacts", []).size()
+	
+	print(reward_summary)
 
 
 func _on_item_equipped(adventurer_id: String, item: Dictionary) -> void:
