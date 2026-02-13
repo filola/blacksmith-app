@@ -54,7 +54,7 @@ func _complete_mine() -> void:
 func _spawn_float_text(text: String) -> void:
 	var label = Label.new()
 	label.text = text
-	label.add_theme_color_override("font_color", Color(GameManager.ore_data[current_ore]["color"]))
+	label.add_theme_color_override("font_color", Color.html(GameManager.ore_data[current_ore]["color"]))
 	# CanvasLayer 위에 올려서 탭 위치 무관하게 정확한 좌표 사용
 	label.global_position = mine_button.global_position + Vector2(randf_range(-30, 30), -20)
 	get_tree().root.add_child(label)
@@ -94,7 +94,6 @@ func _update_ore_buttons() -> void:
 			continue
 
 		var hbox = HBoxContainer.new()
-		hbox.theme_override_constants = {}
 
 		# 광석 아이콘
 		var icon = TextureRect.new()
@@ -109,7 +108,7 @@ func _update_ore_buttons() -> void:
 		btn.text = "%s (%d)" % [data["name"], GameManager.ores.get(ore_id, 0)]
 		btn.name = ore_id
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.add_theme_color_override("font_color", Color(data["color"]))
+		btn.add_theme_color_override("font_color", Color.html(data["color"]))
 		btn.pressed.connect(select_ore.bind(ore_id))
 		hbox.add_child(btn)
 

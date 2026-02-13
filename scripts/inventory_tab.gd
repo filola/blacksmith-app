@@ -43,7 +43,7 @@ func _update_list() -> void:
 		# 등급 이모지 + 이름
 		var name_label = Label.new()
 		name_label.text = "%s %s [%s]" % [item["grade_emoji"], item["name"], item["grade_name"]]
-		name_label.add_theme_color_override("font_color", Color(item["grade_color"]))
+		name_label.add_theme_color_override("font_color", Color.html(item["grade_color"]))
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		hbox.add_child(name_label)
 

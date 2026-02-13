@@ -100,7 +100,7 @@ func _on_craft(recipe_id: String) -> void:
 	craft_result.visible = true
 	result_name.text = item["name"]
 	result_grade.text = "%s %s" % [item["grade_emoji"], item["grade_name"]]
-	result_grade.add_theme_color_override("font_color", Color(item["grade_color"]))
+	result_grade.add_theme_color_override("font_color", Color.html(item["grade_color"]))
 	result_price.text = "판매가: 💰%d" % item["price"]
 
 	# 등급별 이펙트

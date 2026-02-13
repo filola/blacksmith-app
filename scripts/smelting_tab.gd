@@ -52,7 +52,7 @@ func _update_list() -> void:
 			data["ore_per_bar"]
 		]
 		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		info.add_theme_color_override("font_color", Color(data["color"]))
+		info.add_theme_color_override("font_color", Color.html(data["color"]))
 		hbox.add_child(info)
 
 		var btn = Button.new()
