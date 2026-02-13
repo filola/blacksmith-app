@@ -1,0 +1,74 @@
+{
+  "cursed_ring": {
+    "id": "cursed_ring",
+    "name": "저주받은 반지",
+    "type": "accessory",
+    "subtype": "ring",
+    "description": "탐험 속도 +10%",
+    "rarity": "rare",
+    "price": 100,
+    "speed_bonus": 1.1,
+    "dungeon_tier_min": 1,
+    "icon": "res://resources/assets/dungeon-crawl/items/ring1.png"
+  },
+  "golden_amulet": {
+    "id": "golden_amulet",
+    "name": "황금 부적",
+    "type": "accessory",
+    "subtype": "amulet",
+    "description": "탐험 속도 +20%",
+    "rarity": "epic",
+    "price": 250,
+    "speed_bonus": 1.2,
+    "dungeon_tier_min": 2,
+    "icon": "res://resources/assets/dungeon-crawl/items/amulet1.png"
+  },
+  "dragon_scale": {
+    "id": "dragon_scale",
+    "name": "용의 비늘",
+    "type": "armor",
+    "subtype": "chest",
+    "description": "탐험 속도 +15%, 강력한 방어",
+    "rarity": "epic",
+    "price": 400,
+    "speed_bonus": 1.15,
+    "dungeon_tier_min": 2,
+    "icon": "res://resources/assets/dungeon-crawl/armour/scale_mail1.png"
+  },
+  "holy_grail": {
+    "id": "holy_grail",
+    "name": "성배",
+    "type": "accessory",
+    "subtype": "cup",
+    "description": "탐험 속도 +30%, 회복 능력",
+    "rarity": "legendary",
+    "price": 1000,
+    "speed_bonus": 1.3,
+    "dungeon_tier_min": 3,
+    "icon": "res://resources/assets/dungeon-crawl/items/cup1.png"
+  },
+  "eternal_blade": {
+    "id": "eternal_blade",
+    "name": "영원의 검",
+    "type": "weapon",
+    "subtype": "sword",
+    "description": "탐험 속도 +25%",
+    "rarity": "legendary",
+    "price": 800,
+    "speed_bonus": 1.25,
+    "dungeon_tier_min": 3,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/demon_blade.png"
+  },
+  "shadow_cloak": {
+    "id": "shadow_cloak",
+    "name": "그림자의 외투",
+    "type": "armor",
+    "subtype": "cloak",
+    "description": "탐험 속도 +22%",
+    "rarity": "epic",
+    "price": 350,
+    "speed_bonus": 1.22,
+    "dungeon_tier_min": 2,
+    "icon": "res://resources/assets/dungeon-crawl/armour/cloak1.png"
+  }
+}

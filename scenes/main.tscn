@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/mining_tab.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/smelting_tab.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/crafting_tab.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/inventory_tab.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/adventure_tab.tscn" id="6"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -89,4 +90,11 @@ visible = false
 layout_mode = 2
 
 [node name="InventoryTab" parent="MarginContainer/VBox/TabContainer/🏪 가게" instance=ExtResource("5")]
+layout_mode = 1
+
+[node name="🚀 모험" type="Control" parent="MarginContainer/VBox/TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="AdventureTab" parent="MarginContainer/VBox/TabContainer/🚀 모험" instance=ExtResource("6")]
 layout_mode = 1

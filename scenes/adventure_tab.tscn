@@ -1,0 +1,131 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/adventure_tab.gd" id="1"]
+
+[node name="AdventureTab" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="HSplitContainer" type="HSplitContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offset = 300
+
+[node name="AdventureList" type="ItemList" parent="HSplitContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(250, 0)
+
+[node name="DetailPanel" type="VBoxContainer" parent="HSplitContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="AdventurerDetail" type="PanelContainer" parent="DetailPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DetailVBox" type="VBoxContainer" parent="DetailPanel/AdventurerDetail"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AdventurerPortrait" type="TextureRect" parent="DetailPanel/AdventurerDetail/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 150)
+expand_mode = 1
+
+[node name="AdventurerNameLabel" type="Label" parent="DetailPanel/AdventurerDetail/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "모험가 이름"
+theme_override_font_sizes/font_size = 20
+
+[node name="AdventurerDescriptionLabel" type="Label" parent="DetailPanel/AdventurerDetail/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "설명"
+custom_minimum_size = Vector2(0, 60)
+autowrap_mode = 2
+
+[node name="ExplorationStatusLabel" type="Label" parent="DetailPanel/AdventurerDetail/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "상태"
+theme_override_font_sizes/font_size = 14
+
+[node name="ExplorationProgress" type="ProgressBar" parent="DetailPanel/AdventurerDetail/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 25)
+value = 0.0
+visible = false
+
+[node name="EquippedItemsLabel" type="Label" parent="DetailPanel/AdventurerDetail/DetailVBox"]
+layout_mode = 2
+text = "장착 아이템"
+theme_override_font_sizes/font_size = 14
+
+[node name="EquippedItemsContainer" type="VBoxContainer" parent="DetailPanel/AdventurerDetail/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+
+[node name="HSeparator" type="HSeparator" parent="DetailPanel"]
+layout_mode = 2
+
+[node name="ExplorationControls" type="PanelContainer" parent="DetailPanel"]
+layout_mode = 2
+
+[node name="ControlsVBox" type="VBoxContainer" parent="DetailPanel/ExplorationControls"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TierLabel" type="Label" parent="DetailPanel/ExplorationControls/ControlsVBox"]
+layout_mode = 2
+text = "던전 난이도"
+
+[node name="TierHBox" type="HBoxContainer" parent="DetailPanel/ExplorationControls/ControlsVBox"]
+layout_mode = 2
+
+[node name="DungeonTierSpinBox" type="SpinBox" parent="DetailPanel/ExplorationControls/ControlsVBox/TierHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 5.0
+value = 1.0
+
+[node name="TierDescription" type="Label" parent="DetailPanel/ExplorationControls/ControlsVBox"]
+layout_mode = 2
+text = "난이도가 높을수록 탐험 시간이 오래 걸리고 보상이 큽니다"
+autowrap_mode = 2
+text_overrun_behavior = 3
+
+[node name="StartExplorationBtn" type="Button" parent="DetailPanel/ExplorationControls/ControlsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+text = "🚀 탐험 시작!"
+theme_override_font_sizes/font_size = 18
+
+[node name="HSeparator2" type="HSeparator" parent="DetailPanel"]
+layout_mode = 2
+
+[node name="InventoryLabel" type="Label" parent="DetailPanel"]
+layout_mode = 2
+text = "인벤토리 (장착 가능)"
+theme_override_font_sizes/font_size = 14
+
+[node name="InventoryList" type="ItemList" parent="DetailPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3

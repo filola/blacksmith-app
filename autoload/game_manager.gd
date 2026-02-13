@@ -8,6 +8,10 @@ signal ore_changed(ore_id: String, amount: int)
 signal bar_changed(ore_id: String, amount: int)
 signal item_crafted(item_name: String, grade: String)
 signal reputation_changed(amount: int)
+signal exploration_started(adventurer_id: String, tier: int)
+signal exploration_completed(adventurer_id: String, rewards: Dictionary)
+signal item_equipped(adventurer_id: String, item: Dictionary)
+signal item_unequipped(adventurer_id: String, item: Dictionary)
 
 # 재화
 var gold: int = 0 :
@@ -40,6 +44,11 @@ var max_unlocked_tier: int = 1
 # 데이터
 var ore_data: Dictionary = {}
 var recipe_data: Dictionary = {}
+var artifact_data: Dictionary = {}
+
+# 시스템
+var adventure_system: AdventureSystem
+var dungeon: Dungeon
 
 # 등급 시스템
 const GRADES = {
@@ -79,6 +88,18 @@ func _load_data() -> void:
 	if recipe_file:
 		recipe_data = JSON.parse_string(recipe_file.get_as_text())
 		recipe_file.close()
+	
+	# 유물 데이터 로드
+	var artifact_file = FileAccess.open("res://resources/data/artifacts.json", FileAccess.READ)
+	if artifact_file:
+		artifact_data = JSON.parse_string(artifact_file.get_as_text())
+		artifact_file.close()
+	
+	# 시스템 초기화
+	adventure_system = AdventureSystem.new()
+	add_child(adventure_system)
+	dungeon = Dungeon.new()
+	add_child(dungeon)
 
 
 ## 광석 추가
@@ -142,7 +163,8 @@ func craft_item(recipe_id: String) -> Dictionary:
 		"grade_color": grade_info["color"],
 		"grade_emoji": grade_info["emoji"],
 		"price": int(recipe["base_price"] * grade_info["multiplier"]),
-		"tier": recipe["tier"]
+		"tier": recipe["tier"],
+		"is_artifact": false  # 일반 아이템
 	}
 
 	inventory.append(item)
@@ -208,3 +230,97 @@ func sell_item(index: int) -> int:
 ## 채굴 파워 계산
 func get_mine_power() -> float:
 	return 1.0 + (pickaxe_level - 1) * 0.5
+
+
+## ===== 모험가 시스템 =====
+
+## 모든 모험가 획득
+func get_adventurers() -> Array:
+	if not adventure_system:
+		return []
+	return adventure_system.get_all_adventurers()
+
+
+## 특정 모험가 획득
+func get_adventurer(adventurer_id: String):
+	if not adventure_system:
+		return null
+	return adventure_system.get_adventurer(adventurer_id)
+
+
+## 모험가에게 아이템 장착
+func equip_item_to_adventurer(adventurer_id: String, inventory_index: int) -> bool:
+	if inventory_index < 0 or inventory_index >= inventory.size():
+		return false
+	
+	var item = inventory[inventory_index]
+	if not adventure_system or not adventure_system.equip_to_adventurer(adventurer_id, item):
+		return false
+	
+	# 인벤토리에서 제거
+	inventory.remove_at(inventory_index)
+	item_equipped.emit(adventurer_id, item)
+	return true
+
+
+## 모험가에게서 아이템 해제
+func unequip_item_from_adventurer(adventurer_id: String, item_index: int) -> bool:
+	if not adventure_system:
+		return false
+	
+	var item = adventure_system.unequip_from_adventurer(adventurer_id, item_index)
+	if item.is_empty():
+		return false
+	
+	# 인벤토리에 추가
+	inventory.append(item)
+	item_unequipped.emit(adventurer_id, item)
+	return true
+
+
+## 모험가 탐험 시작
+func start_exploration(adventurer_id: String, dungeon_tier: int) -> bool:
+	if not adventure_system:
+		return false
+	
+	var success = adventure_system.start_adventure(adventurer_id, dungeon_tier)
+	if success:
+		exploration_started.emit(adventurer_id, dungeon_tier)
+	return success
+
+
+## 탐험 완료 확인 및 보상 처리
+func check_and_complete_exploration(adventurer_id: String) -> Dictionary:
+	if not adventure_system or not dungeon:
+		return {}
+	
+	if not adventure_system.check_exploration_complete(adventurer_id):
+		return {}
+	
+	var adv = adventure_system.get_adventurer(adventurer_id)
+	if not adv:
+		return {}
+	
+	# 탐험 종료 처리
+	var exploration_data = adv.finish_exploration()
+	if exploration_data.is_empty():
+		return {}
+	
+	# 보상 생성
+	var rewards = dungeon.generate_rewards(adv.current_dungeon_tier)
+	
+	# 보상 적용
+	gold += rewards["gold"]
+	
+	# 광석 추가
+	for ore_reward in rewards["items"]:
+		add_ore(ore_reward["ore_id"], ore_reward["quantity"])
+	
+	# 유물 인벤토리 추가
+	for artifact in rewards["artifacts"]:
+		inventory.append(artifact)
+	
+	exploration_data["rewards"] = rewards
+	exploration_completed.emit(adventurer_id, exploration_data)
+	
+	return exploration_data
