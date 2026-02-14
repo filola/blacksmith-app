@@ -3,7 +3,6 @@ extends Control
 ## 채굴 탭 - 자동 + 클릭 채굴 (랜덤 광석)
 
 @onready var mine_button: Button = %MineButton
-@onready var ore_list: VBoxContainer = %OreList
 @onready var mine_progress: ProgressBar = %MineProgress
 @onready var mine_label: Label = %MineLabel
 @onready var power_label: Label = %PowerLabel
