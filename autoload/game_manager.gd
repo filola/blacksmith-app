@@ -75,6 +75,59 @@ const BASE_GRADE_CHANCES = {
 	"legendary": 1.0
 }
 
+# 광석별 드롭 확률 (티어별)
+const ORE_SPAWN_CHANCES = {
+	# Tier 1 - 쉬운 광석 (50%)
+	1: {
+		"copper": 25.0,
+		"tin": 25.0
+	},
+	# Tier 2 - 중간 광석 (30%)
+	2: {
+		"iron": 15.0,
+		"silver": 15.0
+	},
+	# Tier 3 - 어려운 광석 (15%)
+	3: {
+		"gold": 15.0
+	},
+	# Tier 4 - 매우 어려운 광석 (5%)
+	4: {
+		"mithril": 5.0
+	},
+	# Tier 5 - 전설 광석 (5%)
+	5: {
+		"orichalcum": 5.0
+	}
+}
+
+## 랜덤 광석 선택 함수
+func get_random_ore() -> String:
+	# 현재 해금된 티어에서만 광석 선택
+	var available_ores = []
+	var total_chance = 0.0
+	
+	# 각 오픈된 티어에서 광석 확률 수집
+	for tier in range(1, max_unlocked_tier + 1):
+		if ORE_SPAWN_CHANCES.has(tier):
+			for ore_id in ORE_SPAWN_CHANCES[tier]:
+				available_ores.append({
+					"ore_id": ore_id,
+					"chance": ORE_SPAWN_CHANCES[tier][ore_id]
+				})
+				total_chance += ORE_SPAWN_CHANCES[tier][ore_id]
+	
+	# 확률 기반 선택
+	var roll = randf() * total_chance
+	var current = 0.0
+	for ore_info in available_ores:
+		current += ore_info["chance"]
+		if roll <= current:
+			return ore_info["ore_id"]
+	
+	# 폴백 (first available ore)
+	return available_ores[0]["ore_id"] if available_ores.size() > 0 else "copper"
+
 
 func _ready() -> void:
 	push_error("🎮 GameManager._ready() called")
