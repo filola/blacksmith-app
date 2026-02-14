@@ -77,7 +77,9 @@ const BASE_GRADE_CHANCES = {
 
 
 func _ready() -> void:
+	push_error("🎮 GameManager._ready() called")
 	_load_data()
+	push_error("🎮 GameManager._ready() completed")
 
 
 func _load_data() -> void:
@@ -116,8 +118,14 @@ func _load_data() -> void:
 		abilities_file.close()
 	
 	# 시스템 초기화
+	push_error("🚀 GameManager: Creating AdventureSystem...")
 	adventure_system = AdventureSystem.new()
+	push_error("🚀 GameManager: Adding AdventureSystem as child...")
 	add_child(adventure_system)
+	push_error("🚀 GameManager: Calling adventure_system._load_data()...")
+	adventure_system._load_data()  # 명시적으로 데이터 로드
+	push_error("🚀 GameManager: adventure_system initialized with %d adventurers" % adventure_system.adventurers.size())
+	
 	dungeon = Dungeon.new()
 	add_child(dungeon)
 	
@@ -265,8 +273,11 @@ func get_mine_power() -> float:
 ## 모든 모험가 획득
 func get_adventurers() -> Array:
 	if not adventure_system:
+		push_error("❌ GameManager.get_adventurers(): adventure_system is null!")
 		return []
-	return adventure_system.get_all_adventurers()
+	var result = adventure_system.get_all_adventurers()
+	push_error("📋 GameManager.get_adventurers(): returning %d adventurers" % result.size())
+	return result
 
 
 ## 특정 모험가 획득

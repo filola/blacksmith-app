@@ -25,9 +25,14 @@ var hire_cost_label: Label
 
 
 func _ready() -> void:
+	push_error("🎮 AdventureTab._ready() called")
 	# 노드 검증
+	push_error("  🔍 adventure_list: %s" % ("✅" if adventure_list else "❌"))
+	push_error("  🔍 start_exploration_btn: %s" % ("✅" if start_exploration_btn else "❌"))
+	push_error("  🔍 inventory_list: %s" % ("✅" if inventory_list else "❌"))
+	
 	if not adventure_list or not start_exploration_btn or not inventory_list:
-		push_error("AdventureTab: 필수 노드를 찾을 수 없습니다!")
+		push_error("❌ AdventureTab: 필수 노드를 찾을 수 없습니다!")
 		return
 	
 	# 신호 연결
@@ -56,14 +61,43 @@ func _ready() -> void:
 	# 인벤토리 신호
 	inventory_list.item_selected.connect(_on_inventory_item_selected)
 	
+	push_error("  📞 Calling _refresh_adventure_list()...")
 	_refresh_adventure_list()
+	push_error("✅ AdventureTab._ready() completed - adventure_list has %d items" % adventure_list.item_count)
 
 
 func _refresh_adventure_list() -> void:
-	adventure_list.clear()
-	var all_adventurers = GameManager.get_adventurers()
+	push_error("🔄 _refresh_adventure_list() called")
+	push_error("  adventure_list type: %s" % typeof(adventure_list))
 	
+	adventure_list.clear()
+	push_error("  ✅ adventure_list.clear() done")
+	
+	# Check GameManager
+	push_error("  🎮 GameManager exists: %s" % ("✅" if GameManager else "❌"))
+	if GameManager:
+		push_error("  🎮 GameManager.adventure_system: %s" % ("✅" if GameManager.adventure_system else "❌"))
+		if GameManager.adventure_system:
+			var adv_count = GameManager.adventure_system.adventurers.size()
+			push_error("  🎮 GameManager.adventure_system.adventurers.size(): %d" % adv_count)
+	
+	var all_adventurers = GameManager.get_adventurers()
+	push_error("  📋 Got %d adventurers from GameManager" % all_adventurers.size())
+	
+	if all_adventurers.size() == 0:
+		push_error("  ⚠️  WARNING: all_adventurers is empty!")
+		push_error("  Debugging info:")
+		push_error("    - all_adventurers type: %s" % typeof(all_adventurers))
+		push_error("    - all_adventurers length: %d" % len(all_adventurers))
+		return  # Early return to see error message
+	
+	var added_count = 0
 	for adv in all_adventurers:
+		push_error("    Processing adventurer: %s (id: %s)" % [adv.name if adv else "NULL", adv.id if adv else "NULL"])
+		if not adv:
+			push_error("      ❌ Adventurer is NULL!")
+			continue
+			
 		var status = ""
 		if not adv.hired:
 			status = " 💰 미고용"
@@ -73,7 +107,12 @@ func _refresh_adventure_list() -> void:
 			status = "⏳ 대기중"
 		
 		var level_info = " Lv.%d" % adv.level if adv.hired else ""
-		adventure_list.add_item("%s%s%s" % [adv.name, status, level_info])
+		var item_text = "%s%s%s" % [adv.name, status, level_info]
+		adventure_list.add_item(item_text)
+		push_error("    ➕ Added: %s" % item_text)
+		added_count += 1
+	
+	push_error("✅ _refresh_adventure_list() completed - added %d items, total items: %d" % [added_count, adventure_list.item_count])
 
 
 func _on_adventure_selected(index: int) -> void:

@@ -11,100 +11,116 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="HSplitContainer" type="HSplitContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+split_offset = 200
+
+[node name="LeftScroll" type="ScrollContainer" parent="HSplitContainer"]
+layout_mode = 2
+
+[node name="LeftPanel" type="VBoxContainer" parent="HSplitContainer/LeftScroll"]
+layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="AdventureList" type="ItemList" parent="VBoxContainer"]
+[node name="ListLabel" type="Label" parent="HSplitContainer/LeftScroll/LeftPanel"]
+layout_mode = 2
+text = "모험가 목록"
+theme_override_font_sizes/font_size = 16
+
+[node name="AdventureList" type="ItemList" parent="HSplitContainer/LeftScroll/LeftPanel"]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 2
-custom_minimum_size = Vector2(0, 150)
-
-[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
-layout_mode = 2
-
-[node name="DetailPanel" type="PanelContainer" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="DetailVBox" type="VBoxContainer" parent="VBoxContainer/DetailPanel"]
+[node name="RightPanel" type="VBoxContainer" parent="HSplitContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="DetailPanel" type="PanelContainer" parent="HSplitContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DetailScroll" type="ScrollContainer" parent="HSplitContainer/RightPanel/DetailPanel"]
+layout_mode = 2
+
+[node name="DetailVBox" type="VBoxContainer" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll"]
 layout_mode = 2
 theme_override_constants/separation = 10
+size_flags_horizontal = 2
 
-[node name="AdventurerPortrait" type="TextureRect" parent="VBoxContainer/DetailPanel/DetailVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-custom_minimum_size = Vector2(0, 100)
-expand_mode = 1
-
-[node name="AdventurerNameLabel" type="Label" parent="VBoxContainer/DetailPanel/DetailVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "모험가 선택"
-theme_override_font_sizes/font_size = 20
-
-[node name="AdventurerDescriptionLabel" type="Label" parent="VBoxContainer/DetailPanel/DetailVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "설명"
-custom_minimum_size = Vector2(0, 50)
-autowrap_mode = 2
-
-[node name="ExplorationStatusLabel" type="Label" parent="VBoxContainer/DetailPanel/DetailVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "대기 중"
-theme_override_font_sizes/font_size = 14
-
-[node name="ExplorationProgress" type="ProgressBar" parent="VBoxContainer/DetailPanel/DetailVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-custom_minimum_size = Vector2(0, 25)
-value = 0.0
-visible = false
-
-[node name="EquippedItemsLabel" type="Label" parent="VBoxContainer/DetailPanel/DetailVBox"]
-layout_mode = 2
-text = "장착 아이템"
-theme_override_font_sizes/font_size = 14
-
-[node name="EquippedItemsContainer" type="VBoxContainer" parent="VBoxContainer/DetailPanel/DetailVBox"]
+[node name="AdventurerPortrait" type="TextureRect" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(0, 80)
+expand_mode = 1
 
-[node name="DungeonTierLabel" type="Label" parent="VBoxContainer/DetailPanel/DetailVBox"]
+[node name="AdventurerNameLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "모험가 선택"
+theme_override_font_sizes/font_size = 18
+
+[node name="AdventurerDescriptionLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "설명"
+custom_minimum_size = Vector2(0, 40)
+autowrap_mode = 2
+
+[node name="ExplorationStatusLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "대기 중"
+theme_override_font_sizes/font_size = 12
+
+[node name="ExplorationProgress" type="ProgressBar" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+value = 0.0
+visible = false
+
+[node name="EquippedItemsLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
+layout_mode = 2
+text = "장착 아이템"
+theme_override_font_sizes/font_size = 12
+
+[node name="EquippedItemsContainer" type="VBoxContainer" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+
+[node name="DungeonTierLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
 layout_mode = 2
 text = "던전 난이도"
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 12
 
-[node name="DungeonTierSpinBox" type="SpinBox" parent="VBoxContainer/DetailPanel/DetailVBox"]
+[node name="DungeonTierSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = 1.0
 max_value = 5.0
 value = 1.0
 
-[node name="StartExplorationBtn" type="Button" parent="VBoxContainer/DetailPanel/DetailVBox"]
+[node name="StartExplorationBtn" type="Button" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 40)
 text = "🚀 탐험 시작!"
-theme_override_font_sizes/font_size = 16
-
-[node name="InventoryLabel" type="Label" parent="VBoxContainer/DetailPanel/DetailVBox"]
-layout_mode = 2
-text = "인벤토리 (장착 가능)"
 theme_override_font_sizes/font_size = 14
 
-[node name="InventoryList" type="ItemList" parent="VBoxContainer/DetailPanel/DetailVBox"]
+[node name="InventoryLabel" type="Label" parent="HSplitContainer/RightPanel"]
+layout_mode = 2
+text = "인벤토리 (장착 가능)"
+theme_override_font_sizes/font_size = 12
+
+[node name="InventoryList" type="ItemList" parent="HSplitContainer/RightPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_vertical = 2
 custom_minimum_size = Vector2(0, 100)

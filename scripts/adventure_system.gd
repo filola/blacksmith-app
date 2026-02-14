@@ -102,9 +102,10 @@ class Adventurer:
 		
 		return float(exp_in_level) / float(exp_needed)
 	
-	## 경험치 추가 및 레벨업 확인 (연속 레벨업 지원)
+	## 경험치 추가 및 레벨업 가능 수 반환 (실제 레벨 변경 X, 개수만 반환)
 	func add_experience(amount: int) -> int:
 		experience += amount
+		push_error("⭐ Adventurer.add_experience(%d): total exp now %d" % [amount, experience])
 		
 		# 도달 가능한 모든 레벨 업을 카운팅 (실제 레벨 변경 없이)
 		var levels_gained = 0
@@ -113,15 +114,18 @@ class Adventurer:
 			levels_gained += 1
 			next_level += 1
 		
+		push_error("  📊 Levels available to gain: %d" % levels_gained)
 		# 한 번에 올라간 레벨 수 반환 (0 = 레벨업 없음, 1+ = 레벨업 수)
 		return levels_gained
 	
 	## 레벨업 처리
 	func level_up() -> Dictionary:
 		if not EXP_PER_LEVEL.has(level + 1):
+			push_error("  ❌ level_up(): Max level reached!")
 			return {}  # 최대 레벨 도달
 		
 		level += 1
+		push_error("  📈 level_up(): Now level %d" % level)
 		
 		# 스텟 상승
 		var hp_increase = 10 + (level - 1) * 2  # 레벨마다 2씩 증가
@@ -208,19 +212,57 @@ var adventurer_data: Dictionary = {}
 var abilities_data: Dictionary = {}
 
 func _ready() -> void:
+	push_error("✅ AdventureSystem._ready() called")
 	_load_data()
+	push_error("✅ AdventureSystem._ready() - _load_data() completed, adventurers: %d" % adventurers.size())
 
 
 func _load_data() -> void:
+	push_error("🔍 AdventureSystem._load_data() START - adventurers.size(): %d" % adventurers.size())
+	
 	# 모험가 데이터 로드
 	var adventurer_file = FileAccess.open("res://resources/data/adventurers.json", FileAccess.READ)
 	if adventurer_file:
-		adventurer_data = JSON.parse_string(adventurer_file.get_as_text())
+		push_error("📂 Successfully opened adventurers.json")
+		var json_text = adventurer_file.get_as_text()
+		push_error("📄 JSON content length: %d chars" % json_text.length())
+		
+		var parsed = JSON.parse_string(json_text)
+		push_error("  Parsed type: %s" % typeof(parsed))
+		push_error("  Parsed is null: %s" % ("✅" if parsed == null else "❌"))
+		push_error("  Parsed is Array: %s" % ("✅" if parsed is Array else "❌"))
+		push_error("  Parsed is Dictionary: %s" % ("✅" if parsed is Dictionary else "❌"))
+		
+		if parsed != null and parsed is Dictionary:
+			adventurer_data = parsed
+			push_error("📦 Successfully assigned adventurer_data: %d entries" % adventurer_data.size())
+		else:
+			push_error("❌ Failed to parse JSON as Dictionary! Got: %s" % typeof(parsed))
+			adventurer_file.close()
+			return
+		
 		adventurer_file.close()
 		
 		# 초기 모험가 생성
+		var created_count = 0
 		for adv_id in adventurer_data:
 			var data = adventurer_data[adv_id]
+			push_error("  ➕ Creating adventurer: %s (name: %s)" % [adv_id, data.get("name", "?")])
+			
+			# Validate data
+			if not data.has("name"):
+				push_error("    ❌ Missing 'name' field!")
+				continue
+			if not data.has("base_hp"):
+				push_error("    ❌ Missing 'base_hp' field!")
+				continue
+			if not data.has("base_speed"):
+				push_error("    ❌ Missing 'base_speed' field!")
+				continue
+			if not data.has("portrait"):
+				push_error("    ❌ Missing 'portrait' field!")
+				continue
+			
 			var adv = Adventurer.new(
 				adv_id,
 				data["name"],
@@ -234,15 +276,32 @@ func _load_data() -> void:
 				data.get("hired", false)
 			)
 			adventurers[adv_id] = adv
+			created_count += 1
+			push_error("    ✅ Successfully created, total adventurers now: %d" % adventurers.size())
+		
+		push_error("✅ AdventureSystem: 생성된 모험가: %d명 (final dict size: %d)" % [created_count, adventurers.size()])
+	else:
+		push_error("❌ AdventureSystem: adventurers.json 파일을 찾을 수 없습니다!")
 	
 	# 능력 데이터 로드
 	var abilities_file = FileAccess.open("res://resources/data/abilities.json", FileAccess.READ)
 	if abilities_file:
-		abilities_data = JSON.parse_string(abilities_file.get_as_text())
+		push_error("📂 Successfully opened abilities.json")
+		var abilities_text = abilities_file.get_as_text()
+		var parsed_abilities = JSON.parse_string(abilities_text)
+		
+		if parsed_abilities != null and parsed_abilities is Dictionary:
+			abilities_data = parsed_abilities
+			push_error("📦 Successfully loaded abilities_data with %d classes" % abilities_data.size())
+		else:
+			push_error("❌ Failed to parse abilities.json!")
+		
 		abilities_file.close()
 		
 		# 초기 능력 해금 (레벨 1에서 해금되는 능력 찾기)
 		_unlock_initial_abilities()
+	else:
+		push_error("⚠️  Could not open abilities.json - continuing without abilities")
 
 
 ## 초기 능력 해금 (모든 모험가의 레벨 1 능력)
@@ -262,7 +321,14 @@ func _unlock_initial_abilities() -> void:
 func _get_class_abilities(character_class: String) -> Array:
 	var class_key = character_class + "_abilities"
 	if abilities_data.has(class_key):
-		return abilities_data[class_key] as Array
+		var result = abilities_data[class_key]
+		if result is Array:
+			push_error("  ✅ _get_class_abilities(%s): Found %d abilities" % [character_class, result.size()])
+			return result as Array
+		else:
+			push_error("  ❌ _get_class_abilities(%s): NOT an Array! Type: %s" % [character_class, typeof(result)])
+			return []
+	push_error("  ⚠️  _get_class_abilities(%s): Key not found in abilities_data" % character_class)
 	return []
 
 
