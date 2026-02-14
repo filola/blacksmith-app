@@ -13,6 +13,12 @@ signal exploration_completed(adventurer_id: String, rewards: Dictionary)
 signal item_equipped(adventurer_id: String, item: Dictionary)
 signal item_unequipped(adventurer_id: String, item: Dictionary)
 
+# Phase 3 시그널
+signal adventurer_hired(adventurer_id: String, cost: int)
+signal experience_gained(adventurer_id: String, amount: int)
+signal adventurer_leveled_up(adventurer_id: String, new_level: int, stat_changes: Dictionary)
+signal tier_unlocked(tier: int)
+
 # 재화
 var gold: int = 0 :
 	set(value):
@@ -45,6 +51,8 @@ var max_unlocked_tier: int = 1
 var ore_data: Dictionary = {}
 var recipe_data: Dictionary = {}
 var artifact_data: Dictionary = {}
+var adventurer_data: Dictionary = {}
+var abilities_data: Dictionary = {}
 
 # 시스템
 var adventure_system: AdventureSystem
@@ -94,6 +102,18 @@ func _load_data() -> void:
 	if artifact_file:
 		artifact_data = JSON.parse_string(artifact_file.get_as_text())
 		artifact_file.close()
+	
+	# 모험가 데이터 로드
+	var adventurer_file = FileAccess.open("res://resources/data/adventurers.json", FileAccess.READ)
+	if adventurer_file:
+		adventurer_data = JSON.parse_string(adventurer_file.get_as_text())
+		adventurer_file.close()
+	
+	# 능력 데이터 로드
+	var abilities_file = FileAccess.open("res://resources/data/abilities.json", FileAccess.READ)
+	if abilities_file:
+		abilities_data = JSON.parse_string(abilities_file.get_as_text())
+		abilities_file.close()
 	
 	# 시스템 초기화
 	adventure_system = AdventureSystem.new()
@@ -315,7 +335,7 @@ func check_and_complete_exploration(adventurer_id: String) -> Dictionary:
 		return {}
 	
 	# 보상 생성
-	var rewards = dungeon.generate_rewards(adv.current_dungeon_tier)
+	var rewards = dungeon.generate_rewards(adv.current_dungeon_tier, adv.level)
 	
 	# 보상 적용
 	gold += rewards["gold"]
@@ -328,7 +348,141 @@ func check_and_complete_exploration(adventurer_id: String) -> Dictionary:
 	for artifact in rewards["artifacts"]:
 		inventory.append(artifact)
 	
+	# 경험치 처리 (Phase 3)
+	if rewards.has("experience"):
+		_process_experience(adventurer_id, rewards["experience"])
+	
 	exploration_data["rewards"] = rewards
 	exploration_completed.emit(adventurer_id, exploration_data)
 	
 	return exploration_data
+
+
+## ===== Phase 3: 모험가 고용 & 레벨업 시스템 =====
+
+## 모험가 고용
+func hire_adventurer(adventurer_id: String) -> bool:
+	var adv = adventure_system.get_adventurer(adventurer_id)
+	if not adv or adv.hired:
+		return false
+	
+	var hire_data = adventurer_data.get(adventurer_id, {})
+	var hire_cost = hire_data.get("hire_cost", 100)
+	
+	if gold < hire_cost:
+		return false
+	
+	gold -= hire_cost
+	adventure_system.hire_adventurer(adventurer_id)
+	adventurer_hired.emit(adventurer_id, hire_cost)
+	
+	# 새 티어 언락 확인
+	_check_tier_unlock()
+	
+	return true
+
+
+## 고용된 모험가만 조회
+func get_hired_adventurers() -> Array:
+	if not adventure_system:
+		return []
+	return adventure_system.get_hired_adventurers()
+
+
+## 미고용 모험가 조회
+func get_available_adventurers() -> Array:
+	if not adventure_system:
+		return []
+	return adventure_system.get_available_adventurers()
+
+
+## 모험가 고용 비용 조회
+func get_hire_cost(adventurer_id: String) -> int:
+	var data = adventurer_data.get(adventurer_id, {})
+	return data.get("hire_cost", 100)
+
+
+## 경험치 처리 및 레벨업
+func _process_experience(adventurer_id: String, amount: int) -> void:
+	if not adventure_system:
+		return
+	
+	var adv = adventure_system.get_adventurer(adventurer_id)
+	if not adv:
+		return
+	
+	# 경험치 추가
+	var should_level_up = adventure_system.add_experience(adventurer_id, amount)
+	experience_gained.emit(adventurer_id, amount)
+	
+	# 레벨업 처리
+	if should_level_up:
+		var level_up_result = adventure_system.level_up(adventurer_id)
+		var new_level = level_up_result.get("level", adv.level)
+		adventurer_leveled_up.emit(adventurer_id, new_level, level_up_result)
+		
+		# 새 티어 언락 확인
+		_check_tier_unlock()
+
+
+## 월드 티어 자동 언락
+func _check_tier_unlock() -> void:
+	var hired_adventurers = adventure_system.get_hired_adventurers()
+	if hired_adventurers.is_empty():
+		return
+	
+	# 티어별 언락 조건
+	var unlock_conditions = {
+		2: {"min_adventurers": 2, "min_level": 3},
+		3: {"min_adventurers": 3, "min_level": 5},
+		4: {"min_adventurers": 4, "min_level": 7},
+		5: {"min_adventurers": 5, "min_level": 10},
+		6: {"min_adventurers": 6, "min_level": 12}
+	}
+	
+	for tier in unlock_conditions:
+		if max_unlocked_tier >= tier:
+			continue
+		
+		var condition = unlock_conditions[tier]
+		
+		# 조건 확인
+		if hired_adventurers.size() < condition["min_adventurers"]:
+			continue
+		
+		var meets_level = true
+		for adv in hired_adventurers:
+			if adv.level < condition["min_level"]:
+				meets_level = false
+				break
+		
+		if meets_level:
+			max_unlocked_tier = tier
+			tier_unlocked.emit(tier)
+
+
+## 평균 모험가 레벨 계산
+func get_average_adventurer_level() -> float:
+	var hired_adventurers = adventure_system.get_hired_adventurers()
+	if hired_adventurers.is_empty():
+		return 1.0
+	
+	var total_level = 0
+	for adv in hired_adventurers:
+		total_level += adv.level
+	
+	return float(total_level) / float(hired_adventurers.size())
+
+
+## 모험가의 해금된 능력 조회
+func get_unlocked_abilities(adventurer_id: String) -> Array:
+	if not adventure_system:
+		return []
+	return adventure_system.get_unlocked_abilities(adventurer_id)
+
+
+## 모험가의 모든 클래스 능력 조회
+func get_all_class_abilities(adventurer_id: String) -> Array:
+	if not adventure_system:
+		return []
+	return adventure_system.get_all_class_abilities(adventurer_id)

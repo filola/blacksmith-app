@@ -56,8 +56,8 @@ func _load_artifact_data() -> void:
 		artifact_file.close()
 
 
-## 던전 탐험 보상 계산
-func generate_rewards(dungeon_tier: int) -> Dictionary:
+## 던전 탐험 보상 계산 (경험치 포함)
+func generate_rewards(dungeon_tier: int, adventurer_level: int = 1) -> Dictionary:
 	if not dungeon_rewards.has(dungeon_tier):
 		dungeon_tier = 1
 	
@@ -65,7 +65,8 @@ func generate_rewards(dungeon_tier: int) -> Dictionary:
 	var rewards = {
 		"gold": 0,
 		"items": [],  # 일반 아이템 (쿼터)
-		"artifacts": []  # 유물
+		"artifacts": [],  # 유물
+		"experience": 0  # 경험치
 	}
 	
 	# 골드
@@ -90,6 +91,13 @@ func generate_rewards(dungeon_tier: int) -> Dictionary:
 			artifact["is_artifact"] = true  # 표시
 			artifact["acquired_tier"] = dungeon_tier
 			rewards["artifacts"].append(artifact)
+	
+	# 경험치 (난이도와 모험가 레벨에 따라)
+	var base_exp = 50 + dungeon_tier * 20  # 기본 경험치
+	var level_scaling = 1.0 - (max(0, adventurer_level - dungeon_tier) * 0.05)  # 레벨 차이에 따른 스케일
+	level_scaling = max(level_scaling, 0.3)  # 최소 30%
+	
+	rewards["experience"] = int(base_exp * level_scaling)
 	
 	return rewards
 

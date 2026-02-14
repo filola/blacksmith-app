@@ -1,0 +1,130 @@
+{
+  "warrior_abilities": [
+    {
+      "id": "warrior_shield_bash",
+      "name": "쉴드 배시",
+      "description": "몬스터에게 큰 피해를 입힌다",
+      "class": "warrior",
+      "unlock_level": 3,
+      "effect": "damage_increase",
+      "value": 0.2,
+      "emoji": "⚔️"
+    },
+    {
+      "id": "warrior_armor_break",
+      "name": "갑옷 파괴",
+      "description": "몬스터의 방어력을 약화시킨다",
+      "class": "warrior",
+      "unlock_level": 6,
+      "effect": "enemy_defense_reduction",
+      "value": 0.15,
+      "emoji": "🛡️"
+    },
+    {
+      "id": "warrior_whirlwind",
+      "name": "회전 베기",
+      "description": "모든 몬스터에게 동시에 피해를 입힌다",
+      "class": "warrior",
+      "unlock_level": 10,
+      "effect": "aoe_damage",
+      "value": 0.15,
+      "emoji": "🌪️"
+    }
+  ],
+  "rogue_abilities": [
+    {
+      "id": "rogue_shadow_step",
+      "name": "그림자 발걸음",
+      "description": "탐험 속도가 증가한다",
+      "class": "rogue",
+      "unlock_level": 3,
+      "effect": "speed_increase",
+      "value": 0.15,
+      "emoji": "👣"
+    },
+    {
+      "id": "rogue_poison_blade",
+      "name": "독 칠한 검",
+      "description": "탐험 보상 증가",
+      "class": "rogue",
+      "unlock_level": 6,
+      "effect": "reward_increase",
+      "value": 0.1,
+      "emoji": "🐍"
+    },
+    {
+      "id": "rogue_backstab",
+      "name": "백스탭",
+      "description": "치명타 확률 증가",
+      "class": "rogue",
+      "unlock_level": 10,
+      "effect": "critical_chance",
+      "value": 0.25,
+      "emoji": "🔪"
+    }
+  ],
+  "mage_abilities": [
+    {
+      "id": "mage_fireball",
+      "name": "파이어볼",
+      "description": "큰 폭발 피해를 입힌다",
+      "class": "mage",
+      "unlock_level": 3,
+      "effect": "damage_increase",
+      "value": 0.25,
+      "emoji": "🔥"
+    },
+    {
+      "id": "mage_mana_shield",
+      "name": "마나 보호막",
+      "description": "체력 증가",
+      "class": "mage",
+      "unlock_level": 6,
+      "effect": "hp_increase",
+      "value": 0.2,
+      "emoji": "✨"
+    },
+    {
+      "id": "mage_meteor_storm",
+      "name": "메테오 스톰",
+      "description": "모든 몬스터에게 연쇄 피해를 입힌다",
+      "class": "mage",
+      "unlock_level": 10,
+      "effect": "aoe_damage",
+      "value": 0.2,
+      "emoji": "⛈️"
+    }
+  ],
+  "paladin_abilities": [
+    {
+      "id": "paladin_holy_light",
+      "name": "성스러운 빛",
+      "description": "탐험 중 자동으로 체력을 회복한다",
+      "class": "paladin",
+      "unlock_level": 3,
+      "effect": "hp_regeneration",
+      "value": 0.05,
+      "emoji": "☀️"
+    },
+    {
+      "id": "paladin_divine_protection",
+      "name": "신성한 보호",
+      "description": "피해 감소",
+      "class": "paladin",
+      "unlock_level": 6,
+      "effect": "damage_reduction",
+      "value": 0.15,
+      "emoji": "🙏"
+    },
+    {
+      "id": "paladin_divine_judgment",
+      "name": "신성한 심판",
+      "description": "보스 몬스터에게 추가 피해를 입힌다",
+      "class": "paladin",
+      "unlock_level": 10,
+      "effect": "boss_damage",
+      "value": 0.3,
+      "emoji": "⚡"
+    }
+  ]
+}
