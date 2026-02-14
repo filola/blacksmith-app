@@ -75,58 +75,58 @@ const BASE_GRADE_CHANCES = {
 	"legendary": 1.0
 }
 
-# 광석별 드롭 확률 (티어별)
+# 광석별 드롭 확률 (티어별 - 각 Tier 내에서 100%로 정규화)
 const ORE_SPAWN_CHANCES = {
-	# Tier 1 - 쉬운 광석 (50%)
+	# Tier 1 - 기본 광석
 	1: {
-		"copper": 25.0,
-		"tin": 25.0
+		"copper": 50.0,    # 흔함, 가치 낮음
+		"tin": 50.0        # 덜 흔함, 가치 높음
 	},
-	# Tier 2 - 중간 광석 (30%)
+	# Tier 2 - 중급 광석
 	2: {
-		"iron": 15.0,
-		"silver": 15.0
+		"iron": 50.0,      # 적당함
+		"silver": 50.0     # 더 귀함
 	},
-	# Tier 3 - 어려운 광석 (15%)
+	# Tier 3 - 고급 광석
 	3: {
-		"gold": 15.0
+		"gold": 100.0
 	},
-	# Tier 4 - 매우 어려운 광석 (5%)
+	# Tier 4 - 매우 귀한 광석
 	4: {
-		"mithril": 5.0
+		"mithril": 100.0
 	},
-	# Tier 5 - 전설 광석 (5%)
+	# Tier 5 - 전설 광석
 	5: {
-		"orichalcum": 5.0
+		"orichalcum": 100.0
 	}
 }
 
-## 랜덤 광석 선택 함수
+## 랜덤 광석 선택 함수 (각 Tier별로 정규화된 확률)
 func get_random_ore() -> String:
-	# 현재 해금된 티어에서만 광석 선택
-	var available_ores = []
-	var total_chance = 0.0
-	
-	# 각 오픈된 티어에서 광석 확률 수집
+	# 현재 해금된 티어 목록
+	var available_tiers = []
 	for tier in range(1, max_unlocked_tier + 1):
 		if ORE_SPAWN_CHANCES.has(tier):
-			for ore_id in ORE_SPAWN_CHANCES[tier]:
-				available_ores.append({
-					"ore_id": ore_id,
-					"chance": ORE_SPAWN_CHANCES[tier][ore_id]
-				})
-				total_chance += ORE_SPAWN_CHANCES[tier][ore_id]
+			available_tiers.append(tier)
 	
-	# 확률 기반 선택
-	var roll = randf() * total_chance
+	if available_tiers.is_empty():
+		return "copper"  # 폴백
+	
+	# Step 1: Tier 선택 (모든 해금된 Tier가 동등한 확률)
+	var selected_tier = available_tiers[randi() % available_tiers.size()]
+	
+	# Step 2: 선택된 Tier에서 광석 선택
+	var tier_ores = ORE_SPAWN_CHANCES[selected_tier]
+	var roll = randf() * 100.0
 	var current = 0.0
-	for ore_info in available_ores:
-		current += ore_info["chance"]
+	for ore_id in tier_ores:
+		current += tier_ores[ore_id]
 		if roll <= current:
-			return ore_info["ore_id"]
+			return ore_id
 	
-	# 폴백 (first available ore)
-	return available_ores[0]["ore_id"] if available_ores.size() > 0 else "copper"
+	# 폴백 (첫 번째 광석)
+	var ore_keys = tier_ores.keys()
+	return ore_keys[0] if ore_keys.size() > 0 else "copper"
 
 
 func _ready() -> void:
