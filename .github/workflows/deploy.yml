@@ -19,7 +19,7 @@ jobs:
       - name: Download Godot Export Templates
         run: |
           curl -sL -o Godot_v4.6-stable_export_templates.tpz https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_export_templates.tpz
-          mkdir -p ~/.local/share/godot/export_templates/4.6-stable
+          mkdir -p ~/.local/share/godot/export_templates/4.6.stable
           
           # .tpz is a ZIP file, not tar
           # Extract to temporary location first
@@ -28,25 +28,25 @@ jobs:
           
           # Move templates from templates/ subdirectory to the version directory
           if [ -d "$TEMP_DIR/templates" ]; then
-            mv "$TEMP_DIR/templates"/* ~/.local/share/godot/export_templates/4.6-stable/
+            mv "$TEMP_DIR/templates"/* ~/.local/share/godot/export_templates/4.6.stable/
           else
             # If templates/ doesn't exist, move all files
-            mv "$TEMP_DIR"/* ~/.local/share/godot/export_templates/4.6-stable/ 2>/dev/null || true
+            mv "$TEMP_DIR"/* ~/.local/share/godot/export_templates/4.6.stable/ 2>/dev/null || true
           fi
           
           rm -rf "$TEMP_DIR"
           
           # Verify installation
           echo "✓ Export templates installed at:"
-          ls -la ~/.local/share/godot/export_templates/4.6-stable/ | head -15
+          ls -la ~/.local/share/godot/export_templates/4.6.stable/ | head -15
 
       - name: Verify Export Templates
         run: |
           echo "Checking export templates structure:"
-          find ~/.local/share/godot/export_templates/4.6-stable -type f -name "*.zip" | head -20
+          find ~/.local/share/godot/export_templates/4.6.stable -type f -name "*.zip" | head -20
           echo ""
           echo "Full directory structure:"
-          ls -R ~/.local/share/godot/export_templates/4.6-stable | head -50
+          ls -R ~/.local/share/godot/export_templates/4.6.stable | head -50
 
       - name: Export to HTML5
         run: |
