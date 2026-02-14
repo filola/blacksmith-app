@@ -27,6 +27,10 @@ window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[gui]
+
+theme_custom_colors/font_color = Color(1, 1, 1, 1)
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

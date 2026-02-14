@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#222222">
+	<title>$GODOT_PROJECT_NAME</title>
+	<link id="favicon" rel="icon" type="image/png" href="favicon.png">
+	<link rel="apple-touch-icon" href="apple-touch-icon.png">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<!-- Google Fonts: Noto Sans CJK for Korean support -->
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+			background: #222;
+			font-family: 'Noto Sans KR', sans-serif;
+		}
+		#container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 100vw;
+			height: 100vh;
+		}
+		canvas {
+			display: block;
+		}
+		.godot {
+			font-family: 'Noto Sans KR', sans-serif;
+		}
+	</style>
+	$GODOT_HEAD_INCLUDE
+</head>
+<body>
+	<div id="container">
+		<canvas id="canvas">
+			HTML5 canvas appears to be unsupported in the current browser.<br>
+			Please try updating your browser to the latest version.
+		</canvas>
+	</div>
+	<script type="text/javascript" src="index.js"></script>
+	<script type="text/javascript">//<![CDATA[
+		var engine = new Engine;
+		var setStatusMode = EngineLoader.setStatusMode;
+		engine.setProgressFunc((current, total) => {
+			if (total > 0) {
+				document.getElementById('status').innerHTML = current + "/" + total;
+			} else {
+				document.getElementById('status').innerHTML = current;
+			}
+		});
+		function displayFailureNotice(err) {
+			if (parent && parent != window) {
+				// We are running in an iframe.
+				parent.postMessage({gameId: "$GODOT_PROJECT_NAME", message: "iframePerms"}, "*");
+			} else {
+				// Ignore restore notice.
+			}
+		}
+		if (!Engine.isWebGLAvailable()) {
+			displayFailureNotice("WebGL not available");
+		} else {
+			setStatusMode('indeterminate');
+			engine.startGame({
+				onProgress: function(current, total) {
+					if (total > 0) {
+						setStatusMode('determinate');
+						engine.setProgressFunc((current, total) => {
+							document.getElementById('canvas').style.opacity = (current / total) * 100 + '%';
+						});
+					} else if (current == total) {
+						setStatusMode('noticed');
+					}
+				}
+			}).catch(() => {
+				displayFailureNotice("Loading failed.");
+			});
+		}
+	//]]></script>
+	$GODOT_BODY_INCLUDE
+</body>
+</html>

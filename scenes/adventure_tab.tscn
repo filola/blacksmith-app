@@ -22,20 +22,25 @@ split_offset = 200
 
 [node name="LeftScroll" type="ScrollContainer" parent="HSplitContainer"]
 layout_mode = 2
+custom_minimum_size = Vector2(150, 0)
 
 [node name="LeftPanel" type="VBoxContainer" parent="HSplitContainer/LeftScroll"]
 layout_mode = 2
 theme_override_constants/separation = 10
+size_flags_horizontal = 2
+size_flags_vertical = 2
 
 [node name="ListLabel" type="Label" parent="HSplitContainer/LeftScroll/LeftPanel"]
 layout_mode = 2
 text = "모험가 목록"
 theme_override_font_sizes/font_size = 16
+custom_minimum_size = Vector2(0, 30)
 
 [node name="AdventureList" type="ItemList" parent="HSplitContainer/LeftScroll/LeftPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
+custom_minimum_size = Vector2(150, 200)
 
 [node name="RightPanel" type="VBoxContainer" parent="HSplitContainer"]
 layout_mode = 2
