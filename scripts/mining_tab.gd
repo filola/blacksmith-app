@@ -75,79 +75,42 @@ func _spawn_float_text(text: String) -> void:
 	tween.tween_callback(label.queue_free)
 
 
-## 광석 드롭 확률 계산
+## 광석 드롭 확률 계산 (GameManager의 ORE_SPAWN_CHANCES 사용)
 func _calculate_ore_probabilities() -> Dictionary:
 	var probabilities: Dictionary = {}
-	var available_ores: Array[String] = []
 	
-	# 현재 해금된 광석만 필터링
-	for ore_id in GameManager.ore_data:
-		var data = GameManager.ore_data[ore_id]
-		if data["tier"] <= GameManager.max_unlocked_tier:
-			available_ores.append(ore_id)
-	
-	# 티어별 기본 확률 계산
-	var tier_probabilities: Dictionary = {}
-	for ore_id in available_ores:
-		var tier = GameManager.ore_data[ore_id]["tier"]
-		if not tier_probabilities.has(tier):
-			tier_probabilities[tier] = []
-		tier_probabilities[tier].append(ore_id)
-	
-	# 티어별 가중치 (낮은 티어일수록 높음)
-	var max_tier = 1
-	for ore_id in available_ores:
-		max_tier = max(max_tier, GameManager.ore_data[ore_id]["tier"])
-	
-	var tier_weights: Dictionary = {}
-	for tier in tier_probabilities:
-		# 역 가중치: Tier 1 = 70%, Tier 2 = 25%, Tier 3+ = 5%
-		if tier == 1:
-			tier_weights[tier] = 70.0
-		elif tier == 2:
-			tier_weights[tier] = 25.0
-		else:
-			tier_weights[tier] = 5.0 / max(1, max_tier - 2)
-	
-	# 각 광석의 확률 계산
-	for tier in tier_probabilities:
-		var tier_prob = tier_weights.get(tier, 0.0)
-		var ore_count = tier_probabilities[tier].size()
-		var ore_prob = tier_prob / ore_count
+	# GameManager의 ORE_SPAWN_CHANCES 사용
+	for tier in GameManager.ORE_SPAWN_CHANCES:
+		if tier > GameManager.max_unlocked_tier:
+			continue
 		
-		for ore_id in tier_probabilities[tier]:
-			probabilities[ore_id] = ore_prob
+		for ore_id in GameManager.ORE_SPAWN_CHANCES[tier]:
+			probabilities[ore_id] = GameManager.ORE_SPAWN_CHANCES[tier][ore_id]
+	
+	# 디버그 로깅
+	var total_prob = 0.0
+	for ore_id in probabilities:
+		total_prob += probabilities[ore_id]
+	
+	push_error("📊 _calculate_ore_probabilities():")
+	push_error("  Available ores: %s" % probabilities.keys())
+	push_error("  Probabilities: %s" % probabilities)
+	push_error("  Total: %.1f%%" % total_prob)
 	
 	return probabilities
 
 
-## 랜덤 광석 선택 (확률 기반)
+## 랜덤 광석 선택 (GameManager의 확률 사용)
 func _select_random_ore() -> void:
-	var available_ores: Array[String] = []
-	
-	# 현재 해금된 광석만 필터링
-	for ore_id in GameManager.ore_data:
-		var data = GameManager.ore_data[ore_id]
-		if data["tier"] <= GameManager.max_unlocked_tier:
-			available_ores.append(ore_id)
-	
-	# 확률 계산
-	var probabilities = _calculate_ore_probabilities()
-	
-	# 확률 기반 선택
-	var random_value = randf() * 100.0
-	var cumulative = 0.0
-	var selected_ore = available_ores[0]
-	
-	for ore_id in available_ores:
-		cumulative += probabilities.get(ore_id, 0.0)
-		if random_value < cumulative:
-			selected_ore = ore_id
-			break
-	
-	current_ore = selected_ore
+	# GameManager의 get_random_ore() 사용 - 이미 확률 기반 선택 구현됨
+	current_ore = GameManager.get_random_ore()
 	mining_time = GameManager.ore_data[current_ore]["base_time"]
 	mine_progress_value = 0.0
+	
+	push_error("🎲 Selected ore: %s (tier %d)" % [
+		GameManager.ore_data[current_ore]["name"],
+		GameManager.ore_data[current_ore]["tier"]
+	])
 
 
 func _update_display() -> void:
@@ -209,6 +172,14 @@ func _refresh_probability_list() -> void:
 	# 확률 높은 순서로 정렬
 	sorted_ores.sort_custom(func(a, b): return a["probability"] > b["probability"])
 	
+	# 디버그: 합계 확인
+	var total = 0.0
+	for ore_info in sorted_ores:
+		total += ore_info["probability"]
+	push_error("📈 _refresh_probability_list():")
+	push_error("  표시할 광석 개수: %d" % sorted_ores.size())
+	push_error("  확률 합계: %.1f%%" % total)
+	
 	# UI 추가
 	for ore_info in sorted_ores:
 		var label = Label.new()
@@ -216,3 +187,4 @@ func _refresh_probability_list() -> void:
 		label.text = "%s: %.1f%%" % [ore_info["name"], prob_percent]
 		label.add_theme_color_override("font_color", Color.html(ore_info["color"]))
 		prob_list.add_child(label)
+		push_error("  → %s: %.1f%%" % [ore_info["name"], prob_percent])
