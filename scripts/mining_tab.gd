@@ -193,7 +193,6 @@ func _refresh_probability_list() -> void:
 	
 	# 확률 계산
 	var probabilities = _calculate_ore_probabilities()
-	push_error("디버그: 확률 계산됨 - %s" % probabilities)
 	
 	# 각 광석별 확률 표시 (내림차순으로 정렬)
 	var sorted_ores: Array = []

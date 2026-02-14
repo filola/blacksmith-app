@@ -46,9 +46,36 @@ layout_mode = 2
 text = "채굴력: 1.0"
 horizontal_alignment = 1
 
-[node name="AutoLabel" type="Label" parent="VBox"]
+[node name="Sep" type="HSeparator" parent="VBox"]
+layout_mode = 2
+
+[node name="OreTitle" type="Label" parent="VBox"]
+layout_mode = 2
+text = "보유 광석"
+theme_override_font_sizes/font_size = 18
+
+[node name="OreScroll" type="ScrollContainer" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 2
+
+[node name="OreList" type="VBoxContainer" parent="VBox/OreScroll"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "⚙️ 자동 채굴 중... (0.1x 속도)"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 14
+size_flags_horizontal = 3
+
+[node name="Sep2" type="HSeparator" parent="VBox"]
+layout_mode = 2
+
+[node name="ProbTitle" type="Label" parent="VBox"]
+layout_mode = 2
+text = "광석 드롭 확률"
+theme_override_font_sizes/font_size = 18
+
+[node name="ProbScroll" type="ScrollContainer" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ProbList" type="VBoxContainer" parent="VBox/ProbScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
