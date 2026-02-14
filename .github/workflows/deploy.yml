@@ -18,27 +18,48 @@ jobs:
 
       - name: Download Godot Export Templates
         run: |
+          echo "📥 Downloading Godot 4.6 export templates..."
           curl -sL -o Godot_v4.6-stable_export_templates.tpz https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_export_templates.tpz
-          mkdir -p ~/.local/share/godot/export_templates/4.6.stable
           
-          # .tpz is a ZIP file, not tar
-          # Extract to temporary location first
+          # Create export templates directory
+          TEMPLATES_DIR="$HOME/.local/share/godot/export_templates/4.6.stable"
+          mkdir -p "$TEMPLATES_DIR"
+          
+          echo "📦 Extracting templates (this may take ~30s)..."
           TEMP_DIR=$(mktemp -d)
+          
+          # .tpz is a ZIP file containing a templates/ subdirectory
           unzip -q Godot_v4.6-stable_export_templates.tpz -d "$TEMP_DIR"
           
-          # Move templates from templates/ subdirectory to the version directory
+          echo "📂 Extracted contents:"
+          ls -la "$TEMP_DIR/" | head -10
+          
+          # Move templates to the correct location
           if [ -d "$TEMP_DIR/templates" ]; then
-            mv "$TEMP_DIR/templates"/* ~/.local/share/godot/export_templates/4.6.stable/
+            echo "✓ Found templates/ subdirectory, moving contents..."
+            mv "$TEMP_DIR/templates"/* "$TEMPLATES_DIR/"
           else
-            # If templates/ doesn't exist, move all files
-            mv "$TEMP_DIR"/* ~/.local/share/godot/export_templates/4.6.stable/ 2>/dev/null || true
+            echo "⚠ No templates/ subdirectory found, moving all files..."
+            mv "$TEMP_DIR"/* "$TEMPLATES_DIR/" 2>/dev/null || true
           fi
           
+          # Cleanup
           rm -rf "$TEMP_DIR"
           
-          # Verify installation
-          echo "✓ Export templates installed at:"
-          ls -la ~/.local/share/godot/export_templates/4.6.stable/ | head -15
+          # Verify installation with detailed output
+          echo ""
+          echo "✓ Export templates installed at: $TEMPLATES_DIR"
+          echo "📄 Directory contents:"
+          ls -la "$TEMPLATES_DIR/" | head -20
+          
+          # Check for critical web templates
+          if [ -f "$TEMPLATES_DIR/web/index.html" ]; then
+            echo "✅ Found web/index.html!"
+          else
+            echo "❌ WARNING: web/index.html not found"
+            echo "   Available files in web/:"
+            ls -la "$TEMPLATES_DIR/web/" 2>/dev/null || echo "   (web/ directory does not exist)"
+          fi
 
       - name: Verify Export Templates
         run: |
@@ -51,13 +72,35 @@ jobs:
       - name: Export to HTML5
         run: |
           mkdir -p build/web
+          
+          echo "🏗️ Starting Godot HTML5 export..."
+          echo "📋 Godot binary: ./Godot_v4.6-stable_linux.x86_64"
+          echo "📋 Export templates dir: $HOME/.local/share/godot/export_templates/4.6.stable/"
+          echo ""
+          
+          # Run export with verbose output
           ./Godot_v4.6-stable_linux.x86_64 --headless --export-release "Web" build/web/index.html 2>&1 | tee export.log
           
-          # If export fails, show more debug info
-          if [ $? -ne 0 ]; then
-            echo "Export failed. Full logs:"
+          EXPORT_STATUS=$?
+          
+          echo ""
+          echo "📊 Export Status: $EXPORT_STATUS"
+          
+          if [ $EXPORT_STATUS -ne 0 ]; then
+            echo "❌ Export FAILED"
+            echo ""
+            echo "📄 Full export log:"
             cat export.log
+            echo ""
+            echo "🔍 Debugging info:"
+            echo "   - Templates dir contents:"
+            ls -la "$HOME/.local/share/godot/export_templates/4.6.stable/" || echo "     (templates dir not found)"
             exit 1
+          else
+            echo "✅ Export SUCCEEDED"
+            echo ""
+            echo "📦 Build output:"
+            ls -lh build/web/
           fi
 
       - name: Deploy to GitHub Pages
