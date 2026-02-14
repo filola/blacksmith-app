@@ -12,13 +12,13 @@ jobs:
       
       - name: Download Godot 4.6
         run: |
-          wget https://downloads.tuxfamily.org/godotengine/4.6/Godot_v4.6-stable_linux.x86_64.zip
+          wget https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_linux.x86_64.zip
           unzip Godot_v4.6-stable_linux.x86_64.zip
           chmod +x Godot_v4.6-stable_linux.x86_64
 
       - name: Download Godot Export Templates
         run: |
-          wget https://downloads.tuxfamily.org/godotengine/4.6/Godot_v4.6-stable_export-templates.tpz
+          wget https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_export-templates.tpz
           mkdir -p ~/.local/share/godot/export_templates/4.6-stable
           cd ~/.local/share/godot/export_templates/4.6-stable
           tar -xzf $GITHUB_WORKSPACE/Godot_v4.6-stable_export-templates.tpz
