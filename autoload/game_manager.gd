@@ -272,11 +272,16 @@ func get_mine_power() -> float:
 
 ## 모든 모험가 획득
 func get_adventurers() -> Array:
+	push_error("📞 GameManager.get_adventurers() called")
 	if not adventure_system:
 		push_error("❌ GameManager.get_adventurers(): adventure_system is null!")
 		return []
+	push_error("  ✅ adventure_system exists")
+	push_error("  adventure_system.adventurers.size() = %d" % adventure_system.adventurers.size())
 	var result = adventure_system.get_all_adventurers()
-	push_error("📋 GameManager.get_adventurers(): returning %d adventurers" % result.size())
+	push_error("  📋 adventure_system.get_all_adventurers() returned %d adventurers" % result.size())
+	push_error("  result type: %s" % typeof(result))
+	push_error("✅ GameManager.get_adventurers(): returning %d adventurers" % result.size())
 	return result
 
 

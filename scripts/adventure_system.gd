@@ -339,9 +339,17 @@ func get_adventurer(adventurer_id: String) -> Adventurer:
 
 ## 모든 모험가 획득
 func get_all_adventurers() -> Array[Adventurer]:
+	push_error("🔍 get_all_adventurers() called")
+	push_error("  adventurers.size() = %d" % adventurers.size())
+	push_error("  adventurers.values().size() = %d" % adventurers.values().size())
+	
 	var result: Array[Adventurer] = []
-	for adv in adventurers.values():
+	for adv_id in adventurers:
+		var adv = adventurers[adv_id]
+		push_error("  Adding: %s (id: %s)" % [adv.name if adv else "NULL", adv_id])
 		result.append(adv)
+	
+	push_error("✅ get_all_adventurers() returning %d adventurers" % result.size())
 	return result
 
 

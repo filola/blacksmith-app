@@ -67,37 +67,23 @@ func _ready() -> void:
 
 
 func _refresh_adventure_list() -> void:
-	push_error("🔄 _refresh_adventure_list() called")
-	push_error("  adventure_list type: %s" % typeof(adventure_list))
+	push_error("🔄 _refresh_adventure_list() START")
 	
 	adventure_list.clear()
-	push_error("  ✅ adventure_list.clear() done")
-	
-	# Check GameManager
-	push_error("  🎮 GameManager exists: %s" % ("✅" if GameManager else "❌"))
-	if GameManager:
-		push_error("  🎮 GameManager.adventure_system: %s" % ("✅" if GameManager.adventure_system else "❌"))
-		if GameManager.adventure_system:
-			var adv_count = GameManager.adventure_system.adventurers.size()
-			push_error("  🎮 GameManager.adventure_system.adventurers.size(): %d" % adv_count)
 	
 	var all_adventurers = GameManager.get_adventurers()
-	push_error("  📋 Got %d adventurers from GameManager" % all_adventurers.size())
 	
 	if all_adventurers.size() == 0:
-		push_error("  ⚠️  WARNING: all_adventurers is empty!")
-		push_error("  Debugging info:")
-		push_error("    - all_adventurers type: %s" % typeof(all_adventurers))
-		push_error("    - all_adventurers length: %d" % len(all_adventurers))
-		return  # Early return to see error message
+		push_error("⚠️  WARNING: all_adventurers is empty!")
+		push_error("✅ _refresh_adventure_list() END - 0 items added")
+		return
 	
 	var added_count = 0
 	for adv in all_adventurers:
-		push_error("    Processing adventurer: %s (id: %s)" % [adv.name if adv else "NULL", adv.id if adv else "NULL"])
 		if not adv:
-			push_error("      ❌ Adventurer is NULL!")
+			push_error("  ❌ NULL adventurer encountered!")
 			continue
-			
+		
 		var status = ""
 		if not adv.hired:
 			status = " 💰 미고용"
@@ -109,10 +95,9 @@ func _refresh_adventure_list() -> void:
 		var level_info = " Lv.%d" % adv.level if adv.hired else ""
 		var item_text = "%s%s%s" % [adv.name, status, level_info]
 		adventure_list.add_item(item_text)
-		push_error("    ➕ Added: %s" % item_text)
 		added_count += 1
 	
-	push_error("✅ _refresh_adventure_list() completed - added %d items, total items: %d" % [added_count, adventure_list.item_count])
+	push_error("✅ _refresh_adventure_list() END - added %d items, ItemList.item_count: %d" % [added_count, adventure_list.item_count])
 
 
 func _on_adventure_selected(index: int) -> void:
