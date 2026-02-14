@@ -2,50 +2,35 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+    branches: [main]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       
-      - name: Setup Godot
-        uses: chickensoft-games/setup-godot@v2
-        with:
-          version: 4.6
-          use-dotnet: false
-      
-      - name: Verify Godot installation
+      - name: Download Godot 4.6
         run: |
-          godot --version
-      
+          wget https://downloads.tuxfamily.org/godotengine/4.6/Godot_v4.6-stable_linux.x86_64.zip
+          unzip Godot_v4.6-stable_linux.x86_64.zip
+          chmod +x Godot_v4.6-stable_linux.x86_64
+
+      - name: Download Godot Export Templates
+        run: |
+          wget https://downloads.tuxfamily.org/godotengine/4.6/Godot_v4.6-stable_export-templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/4.6-stable
+          cd ~/.local/share/godot/export_templates/4.6-stable
+          tar -xzf $GITHUB_WORKSPACE/Godot_v4.6-stable_export-templates.tpz
+          mv templates/* .
+
       - name: Export to HTML5
         run: |
           mkdir -p build/web
-          godot --headless --export-release "Web" build/web/index.html
-      
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'build/web'
-      
+          ./Godot_v4.6-stable_linux.x86_64 --headless --export-release "Web" build/web/index.html
+
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/web
