@@ -12,17 +12,36 @@ jobs:
       
       - name: Download Godot 4.6
         run: |
-          wget https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_linux.x86_64.zip
-          unzip Godot_v4.6-stable_linux.x86_64.zip
+          curl -sL -o Godot_v4.6-stable_linux.x86_64.zip https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_linux.x86_64.zip
+          unzip -o Godot_v4.6-stable_linux.x86_64.zip
           chmod +x Godot_v4.6-stable_linux.x86_64
 
       - name: Download Godot Export Templates
         run: |
-          wget https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_export_templates.tpz
+          curl -sL -o Godot_v4.6-stable_export_templates.tpz https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_export_templates.tpz
           mkdir -p ~/.local/share/godot/export_templates/4.6-stable
-          cd ~/.local/share/godot/export_templates/4.6-stable
-          tar -xzf $GITHUB_WORKSPACE/Godot_v4.6-stable_export_templates.tpz
-          mv templates/* .
+          
+          # Try unzip first (most likely to work for .tpz files)
+          if unzip -o Godot_v4.6-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/4.6-stable/ 2>/dev/null; then
+            echo "✓ Successfully extracted using unzip"
+            # Move templates to correct location if needed
+            if [ -d ~/.local/share/godot/export_templates/4.6-stable/templates ]; then
+              mv ~/.local/share/godot/export_templates/4.6-stable/templates/* ~/.local/share/godot/export_templates/4.6-stable/
+              rmdir ~/.local/share/godot/export_templates/4.6-stable/templates
+            fi
+          # Fallback to tar without gzip compression
+          elif tar xf Godot_v4.6-stable_export_templates.tpz -C ~/.local/share/godot/export_templates/4.6-stable/ 2>/dev/null; then
+            echo "✓ Successfully extracted using tar (uncompressed)"
+            # Move templates to correct location if needed
+            if [ -d ~/.local/share/godot/export_templates/4.6-stable/templates ]; then
+              mv ~/.local/share/godot/export_templates/4.6-stable/templates/* ~/.local/share/godot/export_templates/4.6-stable/
+              rmdir ~/.local/share/godot/export_templates/4.6-stable/templates
+            fi
+          else
+            echo "✗ Failed to extract templates with both methods"
+            file Godot_v4.6-stable_export_templates.tpz
+            exit 1
+          fi
 
       - name: Export to HTML5
         run: |
