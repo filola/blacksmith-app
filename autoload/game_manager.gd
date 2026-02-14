@@ -352,6 +352,9 @@ func check_and_complete_exploration(adventurer_id: String) -> Dictionary:
 	if rewards.has("experience"):
 		_process_experience(adventurer_id, rewards["experience"])
 	
+	# 탐험 완료 후 추가 티어 언락 체크
+	_check_tier_unlock()
+	
 	exploration_data["rewards"] = rewards
 	exploration_completed.emit(adventurer_id, exploration_data)
 	
@@ -411,15 +414,17 @@ func _process_experience(adventurer_id: String, amount: int) -> void:
 	if not adv:
 		return
 	
-	# 경험치 추가
-	var should_level_up = adventure_system.add_experience(adventurer_id, amount)
+	# 경험치 추가 및 레벨업 수 확인
+	var levels_gained = adventure_system.add_experience(adventurer_id, amount)
 	experience_gained.emit(adventurer_id, amount)
 	
-	# 레벨업 처리
-	if should_level_up:
-		var level_up_result = adventure_system.level_up(adventurer_id)
-		var new_level = level_up_result.get("level", adv.level)
-		adventurer_leveled_up.emit(adventurer_id, new_level, level_up_result)
+	# 레벨업 처리 (연속 레벨업 지원)
+	if levels_gained > 0:
+		for i in range(levels_gained):
+			var level_up_result = adventure_system.level_up(adventurer_id)
+			if not level_up_result.is_empty():
+				var new_level = level_up_result.get("level", adv.level)
+				adventurer_leveled_up.emit(adventurer_id, new_level, level_up_result)
 		
 		# 새 티어 언락 확인
 		_check_tier_unlock()

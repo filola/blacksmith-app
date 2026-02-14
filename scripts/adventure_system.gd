@@ -102,15 +102,19 @@ class Adventurer:
 		
 		return float(exp_in_level) / float(exp_needed)
 	
-	## 경험치 추가 및 레벨업 확인
-	func add_experience(amount: int) -> bool:
+	## 경험치 추가 및 레벨업 확인 (연속 레벨업 지원)
+	func add_experience(amount: int) -> int:
 		experience += amount
 		
-		# 다음 레벨 도달 확인
-		if EXP_PER_LEVEL.has(level + 1) and experience >= EXP_PER_LEVEL[level + 1]:
-			return true  # 레벨업 발생
+		# 도달 가능한 모든 레벨 업을 카운팅 (실제 레벨 변경 없이)
+		var levels_gained = 0
+		var next_level = level + 1
+		while EXP_PER_LEVEL.has(next_level) and experience >= EXP_PER_LEVEL[next_level]:
+			levels_gained += 1
+			next_level += 1
 		
-		return false  # 레벨업 없음
+		# 한 번에 올라간 레벨 수 반환 (0 = 레벨업 없음, 1+ = 레벨업 수)
+		return levels_gained
 	
 	## 레벨업 처리
 	func level_up() -> Dictionary:
@@ -247,18 +251,19 @@ func _unlock_initial_abilities() -> void:
 		var adv = adventurers[adv_id]
 		var class_abilities = _get_class_abilities(adv.character_class)
 		
-		for ability_id in class_abilities:
-			var ability = class_abilities[ability_id]
+		for ability in class_abilities:
 			if ability.get("unlock_level", 1) == 1:
-				adv.unlocked_abilities.append(ability_id)
+				var ability_id = ability.get("id", "")
+				if not ability_id.is_empty() and not ability_id in adv.unlocked_abilities:
+					adv.unlocked_abilities.append(ability_id)
 
 
 ## 모험가 클래스별 능력 조회
-func _get_class_abilities(character_class: String) -> Dictionary:
+func _get_class_abilities(character_class: String) -> Array:
 	var class_key = character_class + "_abilities"
 	if abilities_data.has(class_key):
-		return abilities_data[class_key]
-	return {}
+		return abilities_data[class_key] as Array
+	return []
 
 
 ## 모험가 획득
@@ -336,10 +341,10 @@ func check_exploration_complete(adventurer_id: String) -> bool:
 
 
 ## 경험치 추가 및 레벨업 확인
-func add_experience(adventurer_id: String, amount: int) -> bool:
+func add_experience(adventurer_id: String, amount: int) -> int:
 	var adv = get_adventurer(adventurer_id)
 	if not adv:
-		return false
+		return 0
 	
 	return adv.add_experience(amount)
 
@@ -354,12 +359,15 @@ func level_up(adventurer_id: String) -> Dictionary:
 	
 	# 새 레벨에서 해금되는 능력 확인
 	var class_abilities = _get_class_abilities(adv.character_class)
-	for ability_id in class_abilities:
-		var ability = class_abilities[ability_id]
+	var new_abilities: Array[String] = []
+	for ability in class_abilities:
+		var ability_id = ability.get("id", "")
 		if ability.get("unlock_level") == adv.level:
-			if not ability_id in adv.unlocked_abilities:
+			if not ability_id.is_empty() and not ability_id in adv.unlocked_abilities:
 				adv.unlocked_abilities.append(ability_id)
-				level_up_result["new_abilities"] = [ability_id]
+				new_abilities.append(ability_id)
+	if not new_abilities.is_empty():
+		level_up_result["new_abilities"] = new_abilities
 	
 	return level_up_result
 
@@ -373,11 +381,17 @@ func get_unlocked_abilities(adventurer_id: String) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	var class_abilities = _get_class_abilities(adv.character_class)
 	
+	# abilities를 ID로 인덱싱하기 위해 맵 생성
+	var ability_map: Dictionary = {}
+	for ability in class_abilities:
+		var ability_id = ability.get("id", "")
+		if not ability_id.is_empty():
+			ability_map[ability_id] = ability
+	
+	# 해금된 능력만 결과에 추가
 	for ability_id in adv.unlocked_abilities:
-		for ability in class_abilities:
-			if ability.get("id") == ability_id:
-				result.append(ability)
-				break
+		if ability_map.has(ability_id):
+			result.append(ability_map[ability_id])
 	
 	return result
 
