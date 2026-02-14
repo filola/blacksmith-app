@@ -68,15 +68,28 @@ func _ready() -> void:
 
 func _refresh_adventure_list() -> void:
 	push_error("🔄 _refresh_adventure_list() START")
+	push_error("  🎮 GameManager: %s" % ("✅" if GameManager else "❌"))
+	push_error("  🎮 GameManager.adventure_system: %s" % ("✅" if GameManager.adventure_system else "❌"))
+	if GameManager.adventure_system:
+		push_error("  📊 GameManager.adventure_system.adventurers.size(): %d" % GameManager.adventure_system.adventurers.size())
 	
 	adventure_list.clear()
 	
 	var all_adventurers = GameManager.get_adventurers()
+	push_error("  📋 all_adventurers.size(): %d" % all_adventurers.size())
+	push_error("  📋 all_adventurers type: %s" % typeof(all_adventurers))
 	
 	if all_adventurers.size() == 0:
 		push_error("⚠️  WARNING: all_adventurers is empty!")
-		push_error("✅ _refresh_adventure_list() END - 0 items added")
-		return
+		# 강제로 다시 로드 시도
+		push_error("🔧 Forcing GameManager.adventure_system._load_data()...")
+		if GameManager.adventure_system:
+			GameManager.adventure_system._load_data()
+			all_adventurers = GameManager.get_adventurers()
+			push_error("  After forced load: %d adventurers" % all_adventurers.size())
+		if all_adventurers.size() == 0:
+			push_error("✅ _refresh_adventure_list() END - 0 items added (still empty)")
+			return
 	
 	var added_count = 0
 	for adv in all_adventurers:

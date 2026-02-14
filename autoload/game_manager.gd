@@ -118,13 +118,15 @@ func _load_data() -> void:
 		abilities_file.close()
 	
 	# 시스템 초기화
-	push_error("🚀 GameManager: Creating AdventureSystem...")
+	push_error("🚀 GameManager._load_data(): Creating AdventureSystem...")
 	adventure_system = AdventureSystem.new()
-	push_error("🚀 GameManager: Adding AdventureSystem as child...")
+	push_error("🚀 GameManager._load_data(): Adding AdventureSystem as child...")
 	add_child(adventure_system)
-	push_error("🚀 GameManager: Calling adventure_system._load_data()...")
-	adventure_system._load_data()  # 명시적으로 데이터 로드
-	push_error("🚀 GameManager: adventure_system initialized with %d adventurers" % adventure_system.adventurers.size())
+	# NOTE: add_child() may or may not immediately call adventure_system._ready()
+	# So we explicitly call _load_data() to ensure data is loaded
+	push_error("🚀 GameManager._load_data(): Calling adventure_system._load_data()...")
+	adventure_system._load_data()
+	push_error("🚀 GameManager._load_data(): adventure_system initialized with %d adventurers" % adventure_system.adventurers.size())
 	
 	dungeon = Dungeon.new()
 	add_child(dungeon)
@@ -507,3 +509,22 @@ func get_all_class_abilities(adventurer_id: String) -> Array:
 	if not adventure_system:
 		return []
 	return adventure_system.get_all_class_abilities(adventurer_id)
+
+
+## ===== 디버그 =====
+
+## GameManager 상태 확인
+func get_debug_status() -> String:
+	var status = "=== GameManager Debug Status ===\n"
+	status += "adventure_system: %s\n" % ("✅ exists" if adventure_system else "❌ null")
+	
+	if adventure_system:
+		var debug_info = adventure_system.get_debug_info()
+		status += "\nAdventure System:\n"
+		status += "  Adventurers: %d\n" % debug_info["adventurers_count"]
+		status += "  Adventurer Data: %d\n" % debug_info["adventurer_data_count"]
+		status += "  Abilities Data: %d\n" % debug_info["abilities_data_count"]
+		status += "  IDs: %s\n" % str(debug_info["adventurer_ids"])
+		status += "  Names: %s\n" % str(debug_info["adventurer_names"])
+	
+	return status

@@ -220,6 +220,28 @@ func _ready() -> void:
 func _load_data() -> void:
 	push_error("🔍 AdventureSystem._load_data() START - adventurers.size(): %d" % adventurers.size())
 	
+	# 이미 로드된 경우 스킵 (중복 로드 방지)
+	if not adventurers.is_empty() and not adventurer_data.is_empty():
+		push_error("⏭️  AdventureSystem._load_data(): Already loaded, skipping")
+		return
+	
+	# TEST: 하드코딩된 모험가 1명으로 테스트 (초기 검증용)
+	push_error("🧪 TEST MODE: 하드코딩된 모험가 추가 (검증용)")
+	var test_adv = Adventurer.new(
+		"test_adventurer",
+		"테스트 전사",
+		"하드코딩된 테스트 모험가",
+		"warrior",
+		100,
+		1.0,
+		"res://resources/assets/dungeon-crawl/player/player_m_idle_anim_f0.png",
+		1,
+		0,
+		false
+	)
+	adventurers["test_adventurer"] = test_adv
+	push_error("✅ TEST: 테스트 모험가 추가 완료 - 현재 adventurers.size(): %d" % adventurers.size())
+	
 	# 모험가 데이터 로드
 	var adventurer_file = FileAccess.open("res://resources/data/adventurers.json", FileAccess.READ)
 	if adventurer_file:
@@ -485,3 +507,24 @@ func get_all_class_abilities(adventurer_id: String) -> Array[Dictionary]:
 		result.append(ability_with_lock)
 	
 	return result
+
+
+## ===== 디버그 헬퍼 메서드 =====
+
+## 현재 상태 진단
+func get_debug_info() -> Dictionary:
+	var info = {
+		"adventurers_count": adventurers.size(),
+		"adventurer_data_count": adventurer_data.size(),
+		"abilities_data_count": abilities_data.size(),
+		"adventurer_ids": [],
+		"adventurer_names": []
+	}
+	
+	for adv_id in adventurers:
+		info["adventurer_ids"].append(adv_id)
+		var adv = adventurers[adv_id]
+		if adv:
+			info["adventurer_names"].append(adv.name)
+	
+	return info
