@@ -37,7 +37,7 @@ value = 0.0
 unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(0, 80)
-text = "⛏️  캐기!"
+text = "캐기!"
 theme_override_font_sizes/font_size = 28
 
 [node name="PowerLabel" type="Label" parent="VBox"]

@@ -67,36 +67,36 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="⛏️ 채굴" type="Control" parent="MarginContainer/VBox/TabContainer"]
+[node name="채굴" type="Control" parent="MarginContainer/VBox/TabContainer"]
 layout_mode = 2
 
-[node name="MiningTab" parent="MarginContainer/VBox/TabContainer/⛏️ 채굴" instance=ExtResource("2")]
+[node name="MiningTab" parent="MarginContainer/VBox/TabContainer/채굴" instance=ExtResource("2")]
 layout_mode = 1
 
-[node name="🔥 제련" type="Control" parent="MarginContainer/VBox/TabContainer"]
+[node name="제련" type="Control" parent="MarginContainer/VBox/TabContainer"]
 visible = false
 layout_mode = 2
 
-[node name="SmeltingTab" parent="MarginContainer/VBox/TabContainer/🔥 제련" instance=ExtResource("3")]
+[node name="SmeltingTab" parent="MarginContainer/VBox/TabContainer/제련" instance=ExtResource("3")]
 layout_mode = 1
 
-[node name="⚔️ 제작" type="Control" parent="MarginContainer/VBox/TabContainer"]
+[node name="제작" type="Control" parent="MarginContainer/VBox/TabContainer"]
 visible = false
 layout_mode = 2
 
-[node name="CraftingTab" parent="MarginContainer/VBox/TabContainer/⚔️ 제작" instance=ExtResource("4")]
+[node name="CraftingTab" parent="MarginContainer/VBox/TabContainer/제작" instance=ExtResource("4")]
 layout_mode = 1
 
-[node name="🏪 가게" type="Control" parent="MarginContainer/VBox/TabContainer"]
+[node name="가게" type="Control" parent="MarginContainer/VBox/TabContainer"]
 visible = false
 layout_mode = 2
 
-[node name="InventoryTab" parent="MarginContainer/VBox/TabContainer/🏪 가게" instance=ExtResource("5")]
+[node name="InventoryTab" parent="MarginContainer/VBox/TabContainer/가게" instance=ExtResource("5")]
 layout_mode = 1
 
-[node name="🚀 모험" type="Control" parent="MarginContainer/VBox/TabContainer"]
+[node name="모험" type="Control" parent="MarginContainer/VBox/TabContainer"]
 visible = false
 layout_mode = 2
 
-[node name="AdventureTab" parent="MarginContainer/VBox/TabContainer/🚀 모험" instance=ExtResource("6")]
+[node name="AdventureTab" parent="MarginContainer/VBox/TabContainer/모험" instance=ExtResource("6")]
 layout_mode = 1
