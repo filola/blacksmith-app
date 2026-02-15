@@ -72,13 +72,13 @@ func _update_recipes() -> void:
 
 		# 기본 가격
 		var price_label = Label.new()
-		price_label.text = "💰%d~" % recipe["base_price"]
+		price_label.text = "[금화]%d~" % recipe["base_price"]
 		price_label.custom_minimum_size.x = 80
 		hbox.add_child(price_label)
 
 		# 제작 버튼
 		var btn = Button.new()
-		btn.text = "⚒️ 제작"
+		btn.text = "[제작] 제작"
 		btn.custom_minimum_size.x = 100
 		btn.disabled = not GameManager.can_craft(recipe_id)
 		btn.pressed.connect(_on_craft.bind(recipe_id))
@@ -101,7 +101,7 @@ func _on_craft(recipe_id: String) -> void:
 	result_name.text = item["name"]
 	result_grade.text = "%s %s" % [item["grade_emoji"], item["grade_name"]]
 	result_grade.add_theme_color_override("font_color", Color.html(item["grade_color"]))
-	result_price.text = "판매가: 💰%d" % item["price"]
+	result_price.text = "판매가: [금화]%d" % item["price"]
 
 	# 등급별 이펙트
 	_play_craft_effect(item["grade"])

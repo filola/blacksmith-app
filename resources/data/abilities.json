@@ -8,7 +8,7 @@
       "unlock_level": 3,
       "effect": "damage_increase",
       "value": 0.2,
-      "emoji": "⚔️"
+      "emoji": "[검]"
     },
     {
       "id": "warrior_armor_break",
@@ -18,7 +18,7 @@
       "unlock_level": 6,
       "effect": "enemy_defense_reduction",
       "value": 0.15,
-      "emoji": "🛡️"
+      "emoji": "[방패]"
     },
     {
       "id": "warrior_whirlwind",
@@ -28,7 +28,7 @@
       "unlock_level": 10,
       "effect": "aoe_damage",
       "value": 0.15,
-      "emoji": "🌪️"
+      "emoji": "[회오리]"
     }
   ],
   "rogue_abilities": [
@@ -40,7 +40,7 @@
       "unlock_level": 3,
       "effect": "speed_increase",
       "value": 0.15,
-      "emoji": "👣"
+      "emoji": "[발자국]"
     },
     {
       "id": "rogue_poison_blade",
@@ -50,7 +50,7 @@
       "unlock_level": 6,
       "effect": "reward_increase",
       "value": 0.1,
-      "emoji": "🐍"
+      "emoji": "[독]"
     },
     {
       "id": "rogue_backstab",
@@ -60,7 +60,7 @@
       "unlock_level": 10,
       "effect": "critical_chance",
       "value": 0.25,
-      "emoji": "🔪"
+      "emoji": "[단검]"
     }
   ],
   "mage_abilities": [
@@ -72,7 +72,7 @@
       "unlock_level": 3,
       "effect": "damage_increase",
       "value": 0.25,
-      "emoji": "🔥"
+      "emoji": "[제련]"
     },
     {
       "id": "mage_mana_shield",
@@ -82,7 +82,7 @@
       "unlock_level": 6,
       "effect": "hp_increase",
       "value": 0.2,
-      "emoji": "✨"
+      "emoji": "[강화]"
     },
     {
       "id": "mage_meteor_storm",
@@ -92,7 +92,7 @@
       "unlock_level": 10,
       "effect": "aoe_damage",
       "value": 0.2,
-      "emoji": "⛈️"
+      "emoji": "[번개]"
     }
   ],
   "paladin_abilities": [
@@ -104,7 +104,7 @@
       "unlock_level": 3,
       "effect": "hp_regeneration",
       "value": 0.05,
-      "emoji": "☀️"
+      "emoji": "[빛]"
     },
     {
       "id": "paladin_divine_protection",
@@ -114,7 +114,7 @@
       "unlock_level": 6,
       "effect": "damage_reduction",
       "value": 0.15,
-      "emoji": "🙏"
+      "emoji": "[기도]"
     },
     {
       "id": "paladin_divine_judgment",
@@ -124,7 +124,7 @@
       "unlock_level": 10,
       "effect": "boss_damage",
       "value": 0.3,
-      "emoji": "⚡"
+      "emoji": "[번개]"
     }
   ]
 }

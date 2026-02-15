@@ -237,7 +237,7 @@ func get_auto_mine_speed() -> float:
 # ===============================================
 
 ## 랜덤 광석 선택 함수 (각 Tier별로 정규화된 확률)
-## GameConfig.ORE_SPAWN_CHANCES에서 데이터 읽음 (결합도 ↓)
+## GameConfig.ORE_SPAWN_CHANCES에서 데이터 읽음 (결합도 v)
 func get_random_ore() -> String:
 	# 현재 해금된 티어 목록
 	var available_tiers = []
@@ -266,9 +266,9 @@ func get_random_ore() -> String:
 
 
 func _ready() -> void:
-	push_error("🎮 GameManager._ready() called")
+	push_error("[게임] GameManager._ready() called")
 	_load_data()
-	push_error("🎮 GameManager._ready() completed")
+	push_error("[게임] GameManager._ready() completed")
 
 
 func _load_data() -> void:
@@ -307,13 +307,13 @@ func _load_data() -> void:
 		abilities_file.close()
 	
 	# 시스템 초기화
-	push_error("🚀 GameManager._load_data(): Creating AdventureSystem...")
+	push_error("[탐험] GameManager._load_data(): Creating AdventureSystem...")
 	adventure_system = AdventureSystem.new()
-	push_error("🚀 GameManager._load_data(): Adding AdventureSystem as child...")
+	push_error("[탐험] GameManager._load_data(): Adding AdventureSystem as child...")
 	add_child(adventure_system)
-	push_error("🚀 GameManager._load_data(): Calling adventure_system._load_data()...")
+	push_error("[탐험] GameManager._load_data(): Calling adventure_system._load_data()...")
 	adventure_system._load_data()
-	push_error("🚀 GameManager._load_data(): adventure_system initialized with %d adventurers" % adventure_system.adventurers.size())
+	push_error("[탐험] GameManager._load_data(): adventure_system initialized with %d adventurers" % adventure_system.adventurers.size())
 	
 	dungeon = Dungeon.new()
 	add_child(dungeon)
@@ -330,7 +330,7 @@ func _load_data() -> void:
 	auto_mine_speed = 0.05  # 느린 백그라운드 채굴
 
 
-## 광석 → 주괴 제련
+## 광석 -> 주괴 제련
 func smelt_ore(ore_id: String) -> bool:
 	if not ore_data.has(ore_id):
 		return false
@@ -394,7 +394,7 @@ func craft_item(recipe_id: String) -> Dictionary:
 
 
 ## 등급 굴림 (확률 강화 반영)
-## GameConfig의 상수를 사용하여 밸런스 조정 시 한 곳만 수정 (결합도 ↓)
+## GameConfig의 상수를 사용하여 밸런스 조정 시 한 곳만 수정 (결합도 v)
 func _roll_grade(recipe_id: String) -> String:
 	var chances = GameConfig.BASE_GRADE_CHANCES.duplicate()
 
@@ -455,16 +455,16 @@ func get_mine_power() -> float:
 
 ## 모든 모험가 획득
 func get_adventurers() -> Array:
-	push_error("📞 GameManager.get_adventurers() called")
+	push_error("[호출] GameManager.get_adventurers() called")
 	if not adventure_system:
-		push_error("❌ GameManager.get_adventurers(): adventure_system is null!")
+		push_error("[X] GameManager.get_adventurers(): adventure_system is null!")
 		return []
-	push_error("  ✅ adventure_system exists")
+	push_error("  [OK] adventure_system exists")
 	push_error("  adventure_system.adventurers.size() = %d" % adventure_system.adventurers.size())
 	var result = adventure_system.get_all_adventurers()
-	push_error("  📋 adventure_system.get_all_adventurers() returned %d adventurers" % result.size())
+	push_error("  [목록] adventure_system.get_all_adventurers() returned %d adventurers" % result.size())
 	push_error("  result type: %s" % typeof(result))
-	push_error("✅ GameManager.get_adventurers(): returning %d adventurers" % result.size())
+	push_error("[OK] GameManager.get_adventurers(): returning %d adventurers" % result.size())
 	return result
 
 
@@ -629,7 +629,7 @@ func _process_experience(adventurer_id: String, amount: int) -> void:
 
 
 ## 월드 티어 자동 언락
-## GameConfig.TIER_UNLOCK_CONDITIONS에서 조건 읽음 (결합도 ↓)
+## GameConfig.TIER_UNLOCK_CONDITIONS에서 조건 읽음 (결합도 v)
 ## 밸런스 조정 시 GameConfig.gd만 수정하면 됨
 func _check_tier_unlock() -> void:
 	var hired_adventurers = adventure_system.get_hired_adventurers()
@@ -691,7 +691,7 @@ func get_all_class_abilities(adventurer_id: String) -> Array:
 ## GameManager 상태 확인
 func get_debug_status() -> String:
 	var status = "=== GameManager Debug Status ===\n"
-	status += "adventure_system: %s\n" % ("✅ exists" if adventure_system else "❌ null")
+	status += "adventure_system: %s\n" % ("[OK] exists" if adventure_system else "[X] null")
 	
 	if adventure_system:
 		var debug_info = adventure_system.get_debug_info()

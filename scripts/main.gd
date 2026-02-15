@@ -24,8 +24,8 @@ func _on_reputation_changed(_amount: int) -> void:
 
 
 func _update_status() -> void:
-	gold_label.text = "💰 %d Gold" % GameManager.get_gold()
-	reputation_label.text = "⭐ 명성: %d" % GameManager.get_reputation()
+	gold_label.text = "[금화] %d Gold" % GameManager.get_gold()
+	reputation_label.text = "[명성] 명성: %d" % GameManager.get_reputation()
 
 
 func _setup_korean_fonts() -> void:

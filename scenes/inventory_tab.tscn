@@ -22,7 +22,7 @@ theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="VBox"]
 layout_mode = 2
-text = "🏪 가게"
+text = "[가게] 가게"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 24
 

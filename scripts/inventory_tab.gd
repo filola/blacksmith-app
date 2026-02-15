@@ -52,7 +52,7 @@ func _update_list() -> void:
 
 		# 가격
 		var price_label = Label.new()
-		price_label.text = "💰%d" % item["price"]
+		price_label.text = "[금화]%d" % item["price"]
 		price_label.custom_minimum_size.x = 80
 		hbox.add_child(price_label)
 
@@ -86,7 +86,7 @@ func _on_sell_item(item: Dictionary) -> void:
 		return
 	var price = GameManager.sell_item(index)
 	if price > 0:
-		sell_result.text = "💰 %d Gold 획득!" % price
+		sell_result.text = "[금화] %d Gold 획득!" % price
 		_flash_result()
 		_update_list()
 
@@ -96,7 +96,7 @@ func _on_sell_all() -> void:
 	while not GameManager.get_inventory_items().is_empty():
 		total += GameManager.sell_item(0)
 	if total > 0:
-		sell_result.text = "💰 총 %d Gold 획득!" % total
+		sell_result.text = "[금화] 총 %d Gold 획득!" % total
 		_flash_result()
 		_update_list()
 
@@ -105,7 +105,7 @@ func _on_equip_item(inventory_index: int) -> void:
 	# 모험가 선택 팝업 (간단히 처리 - 첫 번째 모험가)
 	var adventurers = GameManager.get_adventurers()
 	if adventurers.is_empty():
-		sell_result.text = "⚠️ 모험가가 없습니다!"
+		sell_result.text = "[주의] 모험가가 없습니다!"
 		_flash_result()
 		return
 	
@@ -115,11 +115,11 @@ func _on_equip_item(inventory_index: int) -> void:
 	
 	if success:
 		var inv_items = GameManager.get_inventory_items()
-		sell_result.text = "✅ %s을(를) %s에게 장착!" % [inv_items[inventory_index]["name"] if inventory_index < inv_items.size() else "아이템", adv.name]
+		sell_result.text = "[OK] %s을(를) %s에게 장착!" % [inv_items[inventory_index]["name"] if inventory_index < inv_items.size() else "아이템", adv.name]
 		_flash_result()
 		_update_list()
 	else:
-		sell_result.text = "❌ 장착 실패!"
+		sell_result.text = "[X] 장착 실패!"
 		_flash_result()
 
 

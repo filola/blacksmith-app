@@ -40,7 +40,7 @@ theme_override_constants/separation = 30
 
 [node name="TitleLabel" type="Label" parent="MarginContainer/VBox/TopBar"]
 layout_mode = 2
-text = "⚒️ 대장장이"
+text = "[제작] 대장장이"
 theme_override_font_sizes/font_size = 28
 
 [node name="Spacer" type="Control" parent="MarginContainer/VBox/TopBar"]
@@ -50,13 +50,13 @@ size_flags_horizontal = 3
 [node name="GoldLabel" type="Label" parent="MarginContainer/VBox/TopBar"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "💰 0 Gold"
+text = "[금화] 0 Gold"
 theme_override_font_sizes/font_size = 20
 
 [node name="ReputationLabel" type="Label" parent="MarginContainer/VBox/TopBar"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "⭐ 명성: 0"
+text = "[명성] 명성: 0"
 theme_override_font_sizes/font_size = 20
 
 [node name="Sep" type="HSeparator" parent="MarginContainer/VBox"]

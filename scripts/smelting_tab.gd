@@ -33,7 +33,7 @@ func _update_list() -> void:
 
 		# 화살표
 		var arrow = Label.new()
-		arrow.text = " → "
+		arrow.text = " -> "
 		hbox.add_child(arrow)
 
 		# 주괴 아이콘
@@ -46,7 +46,7 @@ func _update_list() -> void:
 		hbox.add_child(bar_icon)
 
 		var info = Label.new()
-		info.text = "%s: %d개 → %s: %d개 (필요: %d)" % [
+		info.text = "%s: %d개 -> %s: %d개 (필요: %d)" % [
 			data["name"], GameManager.get_ore_count(ore_id),
 			data["bar_name"], GameManager.get_bar_count(ore_id),
 			data["ore_per_bar"]
@@ -74,7 +74,7 @@ func _update_list() -> void:
 func _on_smelt(ore_id: String) -> void:
 	if GameManager.smelt_ore(ore_id):
 		var data = GameManager.ore_data[ore_id]
-		result_label.text = "✅ %s 1개 제련 완료!" % data["bar_name"]
+		result_label.text = "[OK] %s 1개 제련 완료!" % data["bar_name"]
 		_flash_result()
 
 
@@ -84,7 +84,7 @@ func _on_smelt_all(ore_id: String) -> void:
 		count += 1
 	if count > 0:
 		var data = GameManager.ore_data[ore_id]
-		result_label.text = "✅ %s %d개 제련 완료!" % [data["bar_name"], count]
+		result_label.text = "[OK] %s %d개 제련 완료!" % [data["bar_name"], count]
 		_flash_result()
 
 

@@ -105,7 +105,7 @@ class Adventurer:
 	## 경험치 추가 및 레벨업 가능 수 반환 (실제 레벨 변경 X, 개수만 반환)
 	func add_experience(amount: int) -> int:
 		experience += amount
-		push_error("⭐ Adventurer.add_experience(%d): total exp now %d" % [amount, experience])
+		push_error("[명성] Adventurer.add_experience(%d): total exp now %d" % [amount, experience])
 		
 		# 도달 가능한 모든 레벨 업을 카운팅 (실제 레벨 변경 없이)
 		var levels_gained = 0
@@ -114,18 +114,18 @@ class Adventurer:
 			levels_gained += 1
 			next_level += 1
 		
-		push_error("  📊 Levels available to gain: %d" % levels_gained)
+		push_error("  [통계] Levels available to gain: %d" % levels_gained)
 		# 한 번에 올라간 레벨 수 반환 (0 = 레벨업 없음, 1+ = 레벨업 수)
 		return levels_gained
 	
 	## 레벨업 처리
 	func level_up() -> Dictionary:
 		if not EXP_PER_LEVEL.has(level + 1):
-			push_error("  ❌ level_up(): Max level reached!")
+			push_error("  [X] level_up(): Max level reached!")
 			return {}  # 최대 레벨 도달
 		
 		level += 1
-		push_error("  📈 level_up(): Now level %d" % level)
+		push_error("  [확률] level_up(): Now level %d" % level)
 		
 		# 스텟 상승
 		var hp_increase = 10 + (level - 1) * 2  # 레벨마다 2씩 증가
@@ -212,21 +212,21 @@ var adventurer_data: Dictionary = {}
 var abilities_data: Dictionary = {}
 
 func _ready() -> void:
-	push_error("✅ AdventureSystem._ready() called")
+	push_error("[OK] AdventureSystem._ready() called")
 	_load_data()
-	push_error("✅ AdventureSystem._ready() - _load_data() completed, adventurers: %d" % adventurers.size())
+	push_error("[OK] AdventureSystem._ready() - _load_data() completed, adventurers: %d" % adventurers.size())
 
 
 func _load_data() -> void:
-	push_error("🔍 AdventureSystem._load_data() START - adventurers.size(): %d" % adventurers.size())
+	push_error("[검색] AdventureSystem._load_data() START - adventurers.size(): %d" % adventurers.size())
 	
 	# 이미 로드된 경우 스킵 (중복 로드 방지)
 	if not adventurers.is_empty() and not adventurer_data.is_empty():
-		push_error("⏭️  AdventureSystem._load_data(): Already loaded, skipping")
+		push_error("[건너뜀]  AdventureSystem._load_data(): Already loaded, skipping")
 		return
 	
 	# TEST: 하드코딩된 모험가 1명으로 테스트 (초기 검증용)
-	push_error("🧪 TEST MODE: 하드코딩된 모험가 추가 (검증용)")
+	push_error("[테스트] TEST MODE: 하드코딩된 모험가 추가 (검증용)")
 	var test_adv = Adventurer.new(
 		"test_adventurer",
 		"테스트 전사",
@@ -240,26 +240,26 @@ func _load_data() -> void:
 		false
 	)
 	adventurers["test_adventurer"] = test_adv
-	push_error("✅ TEST: 테스트 모험가 추가 완료 - 현재 adventurers.size(): %d" % adventurers.size())
+	push_error("[OK] TEST: 테스트 모험가 추가 완료 - 현재 adventurers.size(): %d" % adventurers.size())
 	
 	# 모험가 데이터 로드
 	var adventurer_file = FileAccess.open("res://resources/data/adventurers.json", FileAccess.READ)
 	if adventurer_file:
-		push_error("📂 Successfully opened adventurers.json")
+		push_error("[파일] Successfully opened adventurers.json")
 		var json_text = adventurer_file.get_as_text()
-		push_error("📄 JSON content length: %d chars" % json_text.length())
+		push_error("[문서] JSON content length: %d chars" % json_text.length())
 		
 		var parsed = JSON.parse_string(json_text)
 		push_error("  Parsed type: %s" % typeof(parsed))
-		push_error("  Parsed is null: %s" % ("✅" if parsed == null else "❌"))
-		push_error("  Parsed is Array: %s" % ("✅" if parsed is Array else "❌"))
-		push_error("  Parsed is Dictionary: %s" % ("✅" if parsed is Dictionary else "❌"))
+		push_error("  Parsed is null: %s" % ("[OK]" if parsed == null else "[X]"))
+		push_error("  Parsed is Array: %s" % ("[OK]" if parsed is Array else "[X]"))
+		push_error("  Parsed is Dictionary: %s" % ("[OK]" if parsed is Dictionary else "[X]"))
 		
 		if parsed != null and parsed is Dictionary:
 			adventurer_data = parsed
 			push_error("[유물] Successfully assigned adventurer_data: %d entries" % adventurer_data.size())
 		else:
-			push_error("❌ Failed to parse JSON as Dictionary! Got: %s" % typeof(parsed))
+			push_error("[X] Failed to parse JSON as Dictionary! Got: %s" % typeof(parsed))
 			adventurer_file.close()
 			return
 		
@@ -269,20 +269,20 @@ func _load_data() -> void:
 		var created_count = 0
 		for adv_id in adventurer_data:
 			var data = adventurer_data[adv_id]
-			push_error("  ➕ Creating adventurer: %s (name: %s)" % [adv_id, data.get("name", "?")])
+			push_error("  [추가] Creating adventurer: %s (name: %s)" % [adv_id, data.get("name", "?")])
 			
 			# Validate data
 			if not data.has("name"):
-				push_error("    ❌ Missing 'name' field!")
+				push_error("    [X] Missing 'name' field!")
 				continue
 			if not data.has("base_hp"):
-				push_error("    ❌ Missing 'base_hp' field!")
+				push_error("    [X] Missing 'base_hp' field!")
 				continue
 			if not data.has("base_speed"):
-				push_error("    ❌ Missing 'base_speed' field!")
+				push_error("    [X] Missing 'base_speed' field!")
 				continue
 			if not data.has("portrait"):
-				push_error("    ❌ Missing 'portrait' field!")
+				push_error("    [X] Missing 'portrait' field!")
 				continue
 			
 			var adv = Adventurer.new(
@@ -299,16 +299,16 @@ func _load_data() -> void:
 			)
 			adventurers[adv_id] = adv
 			created_count += 1
-			push_error("    ✅ Successfully created, total adventurers now: %d" % adventurers.size())
+			push_error("    [OK] Successfully created, total adventurers now: %d" % adventurers.size())
 		
-		push_error("✅ AdventureSystem: 생성된 모험가: %d명 (final dict size: %d)" % [created_count, adventurers.size()])
+		push_error("[OK] AdventureSystem: 생성된 모험가: %d명 (final dict size: %d)" % [created_count, adventurers.size()])
 	else:
-		push_error("❌ AdventureSystem: adventurers.json 파일을 찾을 수 없습니다!")
+		push_error("[X] AdventureSystem: adventurers.json 파일을 찾을 수 없습니다!")
 	
 	# 능력 데이터 로드
 	var abilities_file = FileAccess.open("res://resources/data/abilities.json", FileAccess.READ)
 	if abilities_file:
-		push_error("📂 Successfully opened abilities.json")
+		push_error("[파일] Successfully opened abilities.json")
 		var abilities_text = abilities_file.get_as_text()
 		var parsed_abilities = JSON.parse_string(abilities_text)
 		
@@ -316,14 +316,14 @@ func _load_data() -> void:
 			abilities_data = parsed_abilities
 			push_error("[유물] Successfully loaded abilities_data with %d classes" % abilities_data.size())
 		else:
-			push_error("❌ Failed to parse abilities.json!")
+			push_error("[X] Failed to parse abilities.json!")
 		
 		abilities_file.close()
 		
 		# 초기 능력 해금 (레벨 1에서 해금되는 능력 찾기)
 		_unlock_initial_abilities()
 	else:
-		push_error("⚠️  Could not open abilities.json - continuing without abilities")
+		push_error("[주의]  Could not open abilities.json - continuing without abilities")
 
 
 ## 초기 능력 해금 (모든 모험가의 레벨 1 능력)
@@ -345,12 +345,12 @@ func _get_class_abilities(character_class: String) -> Array:
 	if abilities_data.has(class_key):
 		var result = abilities_data[class_key]
 		if result is Array:
-			push_error("  ✅ _get_class_abilities(%s): Found %d abilities" % [character_class, result.size()])
+			push_error("  [OK] _get_class_abilities(%s): Found %d abilities" % [character_class, result.size()])
 			return result as Array
 		else:
-			push_error("  ❌ _get_class_abilities(%s): NOT an Array! Type: %s" % [character_class, typeof(result)])
+			push_error("  [X] _get_class_abilities(%s): NOT an Array! Type: %s" % [character_class, typeof(result)])
 			return []
-	push_error("  ⚠️  _get_class_abilities(%s): Key not found in abilities_data" % character_class)
+	push_error("  [주의]  _get_class_abilities(%s): Key not found in abilities_data" % character_class)
 	return []
 
 
@@ -361,7 +361,7 @@ func get_adventurer(adventurer_id: String) -> Adventurer:
 
 ## 모든 모험가 획득
 func get_all_adventurers() -> Array[Adventurer]:
-	push_error("🔍 get_all_adventurers() called")
+	push_error("[검색] get_all_adventurers() called")
 	push_error("  adventurers.size() = %d" % adventurers.size())
 	push_error("  adventurers.values().size() = %d" % adventurers.values().size())
 	
@@ -371,7 +371,7 @@ func get_all_adventurers() -> Array[Adventurer]:
 		push_error("  Adding: %s (id: %s)" % [adv.name if adv else "NULL", adv_id])
 		result.append(adv)
 	
-	push_error("✅ get_all_adventurers() returning %d adventurers" % result.size())
+	push_error("[OK] get_all_adventurers() returning %d adventurers" % result.size())
 	return result
 
 

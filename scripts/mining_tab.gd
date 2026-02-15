@@ -92,7 +92,7 @@ func _calculate_ore_probabilities() -> Dictionary:
 	for ore_id in probabilities:
 		total_prob += probabilities[ore_id]
 	
-	push_error("📊 _calculate_ore_probabilities():")
+	push_error("[통계] _calculate_ore_probabilities():")
 	push_error("  Available ores: %s" % probabilities.keys())
 	push_error("  Probabilities: %s" % probabilities)
 	push_error("  Total: %.1f%%" % total_prob)
@@ -107,7 +107,7 @@ func _select_random_ore() -> void:
 	mining_time = GameManager.ore_data[current_ore]["base_time"]
 	mine_progress_value = 0.0
 	
-	push_error("🎲 Selected ore: %s (tier %d)" % [
+	push_error("[랜덤] Selected ore: %s (tier %d)" % [
 		GameManager.ore_data[current_ore]["name"],
 		GameManager.ore_data[current_ore]["tier"]
 	])
@@ -176,7 +176,7 @@ func _refresh_probability_list() -> void:
 	var total = 0.0
 	for ore_info in sorted_ores:
 		total += ore_info["probability"]
-	push_error("📈 _refresh_probability_list():")
+	push_error("[확률] _refresh_probability_list():")
 	push_error("  표시할 광석 개수: %d" % sorted_ores.size())
 	push_error("  확률 합계: %.1f%%" % total)
 	
@@ -187,4 +187,4 @@ func _refresh_probability_list() -> void:
 		label.text = "%s: %.1f%%" % [ore_info["name"], prob_percent]
 		label.add_theme_color_override("font_color", Color.html(ore_info["color"]))
 		prob_list.add_child(label)
-		push_error("  → %s: %.1f%%" % [ore_info["name"], prob_percent])
+		push_error("  -> %s: %.1f%%" % [ore_info["name"], prob_percent])
