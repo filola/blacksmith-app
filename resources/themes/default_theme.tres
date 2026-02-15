@@ -1,7 +1,4 @@
 [gd_resource type="Theme" format=3]
 
-[ext_resource type="FontFile" id="1_i6pxr" path="res://resources/fonts/NotoSansKR-Regular.ttf"]
-
 [resource]
-default_font = ExtResource("1_i6pxr")
 default_font_sizes/font_size = 16
