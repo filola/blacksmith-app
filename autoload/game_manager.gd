@@ -158,6 +158,9 @@ func _load_data() -> void:
 		ores["tin"] = GameConfig.INITIAL_TIN
 		bars["copper"] = GameConfig.INITIAL_COPPER_BAR
 		bars["tin"] = GameConfig.INITIAL_TIN_BAR
+	
+	# 자동 채굴 속도 초기화
+	auto_mine_speed = 0.05  # 느린 백그라운드 채굴
 
 
 ## 광석 추가
