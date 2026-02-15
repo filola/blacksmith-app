@@ -1,22 +1,31 @@
 extends Node
 
 ## 게임 전역 상태 관리
+## GameConfig를 통해 매직 넘버 제거, 결합도 최소화
 
-# 시그널
+# ===============================================
+# 신호 (의미별 그룹화)
+# ===============================================
+
+# 재화 관련
 signal gold_changed(amount: int)
+signal reputation_changed(amount: int)
+
+# 인벤토리 관련
 signal ore_changed(ore_id: String, amount: int)
 signal bar_changed(ore_id: String, amount: int)
 signal item_crafted(item_name: String, grade: String)
-signal reputation_changed(amount: int)
-signal exploration_started(adventurer_id: String, tier: int)
-signal exploration_completed(adventurer_id: String, rewards: Dictionary)
 signal item_equipped(adventurer_id: String, item: Dictionary)
 signal item_unequipped(adventurer_id: String, item: Dictionary)
 
-# Phase 3 시그널
+# 모험 관련
+signal exploration_started(adventurer_id: String, tier: int)
+signal exploration_completed(adventurer_id: String, rewards: Dictionary)
 signal adventurer_hired(adventurer_id: String, cost: int)
 signal experience_gained(adventurer_id: String, amount: int)
 signal adventurer_leveled_up(adventurer_id: String, new_level: int, stat_changes: Dictionary)
+
+# 시스템 진행
 signal tier_unlocked(tier: int)
 
 # 재화
@@ -58,55 +67,13 @@ var abilities_data: Dictionary = {}
 var adventure_system: AdventureSystem
 var dungeon: Dungeon
 
-# 등급 시스템
-const GRADES = {
-	"common":    {"name": "일반", "color": "#ffffff", "multiplier": 1.0, "emoji": "⬜"},
-	"uncommon":  {"name": "고급", "color": "#4caf50", "multiplier": 1.5, "emoji": "🟢"},
-	"rare":      {"name": "레어", "color": "#2196f3", "multiplier": 2.5, "emoji": "🔵"},
-	"epic":      {"name": "에픽", "color": "#9c27b0", "multiplier": 5.0, "emoji": "🟣"},
-	"legendary": {"name": "전설", "color": "#ff9800", "multiplier": 10.0, "emoji": "🟠"}
-}
-
-const BASE_GRADE_CHANCES = {
-	"common": 60.0,
-	"uncommon": 25.0,
-	"rare": 10.0,
-	"epic": 4.0,
-	"legendary": 1.0
-}
-
-# 광석별 드롭 확률 (티어별 - 각 Tier 내에서 100%로 정규화)
-const ORE_SPAWN_CHANCES = {
-	# Tier 1 - 기본 광석
-	1: {
-		"copper": 50.0,    # 흔함, 가치 낮음
-		"tin": 50.0        # 덜 흔함, 가치 높음
-	},
-	# Tier 2 - 중급 광석
-	2: {
-		"iron": 50.0,      # 적당함
-		"silver": 50.0     # 더 귀함
-	},
-	# Tier 3 - 고급 광석
-	3: {
-		"gold": 100.0
-	},
-	# Tier 4 - 매우 귀한 광석
-	4: {
-		"mithril": 100.0
-	},
-	# Tier 5 - 전설 광석
-	5: {
-		"orichalcum": 100.0
-	}
-}
-
 ## 랜덤 광석 선택 함수 (각 Tier별로 정규화된 확률)
+## GameConfig.ORE_SPAWN_CHANCES에서 데이터 읽음 (결합도 ↓)
 func get_random_ore() -> String:
 	# 현재 해금된 티어 목록
 	var available_tiers = []
 	for tier in range(1, max_unlocked_tier + 1):
-		if ORE_SPAWN_CHANCES.has(tier):
+		if GameConfig.ORE_SPAWN_CHANCES.has(tier):
 			available_tiers.append(tier)
 	
 	if available_tiers.is_empty():
@@ -116,7 +83,7 @@ func get_random_ore() -> String:
 	var selected_tier = available_tiers[randi() % available_tiers.size()]
 	
 	# Step 2: 선택된 Tier에서 광석 선택
-	var tier_ores = ORE_SPAWN_CHANCES[selected_tier]
+	var tier_ores = GameConfig.ORE_SPAWN_CHANCES[selected_tier]
 	var roll = randf() * 100.0
 	var current = 0.0
 	for ore_id in tier_ores:
@@ -186,11 +153,11 @@ func _load_data() -> void:
 	
 	# 테스트용 초기 리소스 (첫 실행)
 	if ores.get("copper", 0) == 0:
-		gold = 100
-		ores["copper"] = 10
-		ores["tin"] = 5
-		bars["copper"] = 3
-		bars["tin"] = 2
+		gold = GameConfig.INITIAL_GOLD
+		ores["copper"] = GameConfig.INITIAL_COPPER
+		ores["tin"] = GameConfig.INITIAL_TIN
+		bars["copper"] = GameConfig.INITIAL_COPPER_BAR
+		bars["tin"] = GameConfig.INITIAL_TIN_BAR
 
 
 ## 광석 추가
@@ -241,7 +208,7 @@ func craft_item(recipe_id: String) -> Dictionary:
 
 	# 등급 결정
 	var grade = _roll_grade(recipe_id)
-	var grade_info = GRADES[grade]
+	var grade_info = GameConfig.GRADES[grade]
 
 	# 아이템 생성
 	var item = {
@@ -252,7 +219,6 @@ func craft_item(recipe_id: String) -> Dictionary:
 		"grade": grade,
 		"grade_name": grade_info["name"],
 		"grade_color": grade_info["color"],
-		"grade_emoji": grade_info["emoji"],
 		"price": int(recipe["base_price"] * grade_info["multiplier"]),
 		"tier": recipe["tier"],
 		"is_artifact": false  # 일반 아이템
@@ -268,28 +234,30 @@ func craft_item(recipe_id: String) -> Dictionary:
 
 
 ## 등급 굴림 (확률 강화 반영)
+## GameConfig의 상수를 사용하여 밸런스 조정 시 한 곳만 수정 (결합도 ↓)
 func _roll_grade(recipe_id: String) -> String:
-	var chances = BASE_GRADE_CHANCES.duplicate()
+	var chances = GameConfig.BASE_GRADE_CHANCES.duplicate()
 
-	# 모루 보너스: 레벨당 레어 이상 확률 +0.5%
-	var anvil_bonus = (anvil_level - 1) * 0.5
-	chances["rare"] += anvil_bonus * 0.5
-	chances["epic"] += anvil_bonus * 0.3
-	chances["legendary"] += anvil_bonus * 0.2
+	# 모루 보너스: 레벨당 일정량 증가
+	var anvil_bonus = (anvil_level - 1) * GameConfig.ANVIL_BONUS_PER_LEVEL
+	chances["rare"] += anvil_bonus * GameConfig.ANVIL_RARE_WEIGHT
+	chances["epic"] += anvil_bonus * GameConfig.ANVIL_EPIC_WEIGHT
+	chances["legendary"] += anvil_bonus * GameConfig.ANVIL_LEGENDARY_WEIGHT
 	chances["common"] -= anvil_bonus
 
-	# 숙련도 보너스: 10회당 +1%
+	# 숙련도 보너스: 임계값마다 증가
 	var craft_count = mastery.get(recipe_id, 0)
-	var mastery_bonus = floor(craft_count / 10.0) * 1.0
-	mastery_bonus = min(mastery_bonus, 15.0)  # 최대 15%
-	chances["uncommon"] += mastery_bonus * 0.4
-	chances["rare"] += mastery_bonus * 0.3
-	chances["epic"] += mastery_bonus * 0.2
-	chances["legendary"] += mastery_bonus * 0.1
+	var mastery_bonus = floor(float(craft_count) / GameConfig.MASTERY_CRAFT_COUNT_THRESHOLD) * GameConfig.MASTERY_BONUS_PER_THRESHOLD
+	mastery_bonus = min(mastery_bonus, GameConfig.MASTERY_MAX_BONUS)
+	
+	chances["uncommon"] += mastery_bonus * GameConfig.MASTERY_UNCOMMON_WEIGHT
+	chances["rare"] += mastery_bonus * GameConfig.MASTERY_RARE_WEIGHT
+	chances["epic"] += mastery_bonus * GameConfig.MASTERY_EPIC_WEIGHT
+	chances["legendary"] += mastery_bonus * GameConfig.MASTERY_LEGENDARY_WEIGHT
 	chances["common"] -= mastery_bonus
 
-	# common이 음수 되지 않게
-	chances["common"] = max(chances["common"], 5.0)
+	# 일반 등급이 음수가 되지 않도록 제한
+	chances["common"] = max(chances["common"], GameConfig.ANVIL_COMMON_MIN)
 
 	# 확률 정규화
 	var total = 0.0
@@ -318,9 +286,9 @@ func sell_item(index: int) -> int:
 	return price
 
 
-## 채굴 파워 계산
+## 채굴 파워 계산 (GameConfig에서 정의된 상수 사용)
 func get_mine_power() -> float:
-	return 1.0 + (pickaxe_level - 1) * 0.5
+	return GameConfig.PICKAXE_POWER_BASE + (pickaxe_level - 1) * GameConfig.PICKAXE_POWER_PER_LEVEL
 
 
 ## ===== 모험가 시스템 =====
@@ -470,10 +438,10 @@ func get_available_adventurers() -> Array:
 	return adventure_system.get_available_adventurers()
 
 
-## 모험가 고용 비용 조회
+## 모험가 고용 비용 조회 (기본값은 GameConfig에서)
 func get_hire_cost(adventurer_id: String) -> int:
 	var data = adventurer_data.get(adventurer_id, {})
-	return data.get("hire_cost", 100)
+	return data.get("hire_cost", GameConfig.ADVENTURER_HIRE_COST_DEFAULT)
 
 
 ## 경험치 처리 및 레벨업
@@ -502,30 +470,25 @@ func _process_experience(adventurer_id: String, amount: int) -> void:
 
 
 ## 월드 티어 자동 언락
+## GameConfig.TIER_UNLOCK_CONDITIONS에서 조건 읽음 (결합도 ↓)
+## 밸런스 조정 시 GameConfig.gd만 수정하면 됨
 func _check_tier_unlock() -> void:
 	var hired_adventurers = adventure_system.get_hired_adventurers()
 	if hired_adventurers.is_empty():
 		return
 	
-	# 티어별 언락 조건
-	var unlock_conditions = {
-		2: {"min_adventurers": 2, "min_level": 3},
-		3: {"min_adventurers": 3, "min_level": 5},
-		4: {"min_adventurers": 4, "min_level": 7},
-		5: {"min_adventurers": 5, "min_level": 10},
-		6: {"min_adventurers": 6, "min_level": 12}
-	}
-	
-	for tier in unlock_conditions:
+	# GameConfig에서 정의된 언락 조건 사용
+	for tier in GameConfig.TIER_UNLOCK_CONDITIONS:
 		if max_unlocked_tier >= tier:
 			continue
 		
-		var condition = unlock_conditions[tier]
+		var condition = GameConfig.TIER_UNLOCK_CONDITIONS[tier]
 		
-		# 조건 확인
+		# 조건 1: 필요한 인원 수 확인
 		if hired_adventurers.size() < condition["min_adventurers"]:
 			continue
 		
+		# 조건 2: 최소 레벨 확인
 		var meets_level = true
 		for adv in hired_adventurers:
 			if adv.level < condition["min_level"]:
