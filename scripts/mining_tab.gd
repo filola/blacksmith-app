@@ -26,8 +26,8 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	# 자동 채굴
-	if GameManager.auto_mine_speed > 0:
-		mine_progress_value += delta * GameManager.auto_mine_speed * GameManager.get_mine_power()
+	if GameManager.get_auto_mine_speed() > 0:
+		mine_progress_value += delta * GameManager.get_auto_mine_speed() * GameManager.get_mine_power()
 		if mine_progress_value >= mining_time:
 			_complete_mine()
 		mine_progress.value = (mine_progress_value / mining_time) * 100.0
@@ -79,13 +79,13 @@ func _spawn_float_text(text: String) -> void:
 func _calculate_ore_probabilities() -> Dictionary:
 	var probabilities: Dictionary = {}
 	
-	# GameManager의 ORE_SPAWN_CHANCES 사용
-	for tier in GameManager.ORE_SPAWN_CHANCES:
-		if tier > GameManager.max_unlocked_tier:
+	# GameConfig의 ORE_SPAWN_CHANCES 사용
+	for tier in GameConfig.ORE_SPAWN_CHANCES:
+		if tier > GameManager.get_max_unlocked_tier():
 			continue
 		
-		for ore_id in GameManager.ORE_SPAWN_CHANCES[tier]:
-			probabilities[ore_id] = GameManager.ORE_SPAWN_CHANCES[tier][ore_id]
+		for ore_id in GameConfig.ORE_SPAWN_CHANCES[tier]:
+			probabilities[ore_id] = GameConfig.ORE_SPAWN_CHANCES[tier][ore_id]
 	
 	# 디버그 로깅
 	var total_prob = 0.0
@@ -131,9 +131,9 @@ func _refresh_ore_list() -> void:
 	
 	for ore_id in GameManager.ore_data:
 		var data = GameManager.ore_data[ore_id]
-		if data["tier"] <= GameManager.max_unlocked_tier:
+		if data["tier"] <= GameManager.get_max_unlocked_tier():
 			var label = Label.new()
-			label.text = "%s: %d개" % [data["name"], GameManager.ores.get(ore_id, 0)]
+			label.text = "%s: %d개" % [data["name"], GameManager.get_ore_count(ore_id)]
 			label.add_theme_color_override("font_color", Color.html(data["color"]))
 			ore_list.add_child(label)
 
@@ -161,7 +161,7 @@ func _refresh_probability_list() -> void:
 	var sorted_ores: Array = []
 	for ore_id in GameManager.ore_data:
 		var data = GameManager.ore_data[ore_id]
-		if data["tier"] <= GameManager.max_unlocked_tier:
+		if data["tier"] <= GameManager.get_max_unlocked_tier():
 			sorted_ores.append({
 				"id": ore_id,
 				"name": data["name"],

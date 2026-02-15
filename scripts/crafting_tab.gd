@@ -46,7 +46,7 @@ func _update_recipes() -> void:
 		var mat_text = ""
 		for mat_id in recipe["materials"]:
 			var ore_data = GameManager.ore_data[mat_id]
-			var have = GameManager.bars.get(mat_id, 0)
+			var have = GameManager.get_bar_count(mat_id)
 			var need = recipe["materials"][mat_id]
 			var color = "green" if have >= need else "red"
 			mat_text += "[color=%s]%s %d/%d[/color]  " % [color, ore_data["bar_name"], have, need]
@@ -60,7 +60,7 @@ func _update_recipes() -> void:
 		info.add_child(mat_label)
 
 		# 숙련도 표시
-		var craft_count = GameManager.mastery.get(recipe_id, 0)
+		var craft_count = GameManager.get_mastery_count(recipe_id)
 		if craft_count > 0:
 			var mastery_label = Label.new()
 			mastery_label.text = "숙련도: %d회 제작" % craft_count

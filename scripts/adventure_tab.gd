@@ -357,8 +357,9 @@ func _on_unequip_item(item_index: int) -> void:
 func _refresh_inventory_list() -> void:
 	inventory_list.clear()
 	
-	for i in range(GameManager.inventory.size()):
-		var item = GameManager.inventory[i]
+	var inv_items = GameManager.get_inventory_items()
+	for i in range(inv_items.size()):
+		var item = inv_items[i]
 		
 		# 장착 가능한 아이템만 표시
 		if not item.get("type") or item.get("type") not in ["weapon", "armor", "accessory"]:
@@ -379,7 +380,7 @@ func _on_inventory_item_selected(index: int) -> void:
 		return
 	
 	var inventory_index = inventory_list.get_item_metadata(index)
-	if inventory_index < 0 or inventory_index >= GameManager.inventory.size():
+	if inventory_index < 0 or inventory_index >= GameManager.get_inventory_items().size():
 		return
 	
 	var success = GameManager.equip_item_to_adventurer(current_selected_adventurer, inventory_index)

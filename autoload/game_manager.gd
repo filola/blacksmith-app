@@ -2,6 +2,7 @@ extends Node
 
 ## 게임 전역 상태 관리
 ## GameConfig를 통해 매직 넘버 제거, 결합도 최소화
+## Level 1 리팩토링: 모든 상태 접근을 메서드로 통일
 
 # ===============================================
 # 신호 (의미별 그룹화)
@@ -14,6 +15,7 @@ signal reputation_changed(amount: int)
 # 인벤토리 관련
 signal ore_changed(ore_id: String, amount: int)
 signal bar_changed(ore_id: String, amount: int)
+signal inventory_changed()
 signal item_crafted(item_name: String, grade: String)
 signal item_equipped(adventurer_id: String, item: Dictionary)
 signal item_unequipped(adventurer_id: String, item: Dictionary)
@@ -66,6 +68,173 @@ var abilities_data: Dictionary = {}
 # 시스템
 var adventure_system: AdventureSystem
 var dungeon: Dungeon
+
+
+# ===============================================
+# 상태 접근 메서드 (Level 1 리팩토링)
+# ===============================================
+
+# ----- Ore (광석) -----
+
+## 광석 추가
+func add_ore(ore_id: String, amount: int = 1) -> bool:
+	if not ores.has(ore_id) or amount <= 0:
+		return false
+	ores[ore_id] += amount
+	ore_changed.emit(ore_id, ores[ore_id])
+	return true
+
+## 광석 제거
+func remove_ore(ore_id: String, amount: int) -> bool:
+	if not ores.has(ore_id) or amount <= 0 or ores[ore_id] < amount:
+		return false
+	ores[ore_id] -= amount
+	ore_changed.emit(ore_id, ores[ore_id])
+	return true
+
+## 광석 수량 설정
+func set_ore(ore_id: String, amount: int) -> bool:
+	if not ores.has(ore_id) or amount < 0:
+		return false
+	ores[ore_id] = amount
+	ore_changed.emit(ore_id, ores[ore_id])
+	return true
+
+## 광석 수량 조회
+func get_ore_count(ore_id: String) -> int:
+	return ores.get(ore_id, 0)
+
+## 전체 광석 현황
+func get_all_ores() -> Dictionary:
+	return ores.duplicate()
+
+
+# ----- Bar (주괴) -----
+
+## 주괴 추가
+func add_bar(ore_id: String, amount: int = 1) -> bool:
+	if not bars.has(ore_id) or amount <= 0:
+		return false
+	bars[ore_id] += amount
+	bar_changed.emit(ore_id, bars[ore_id])
+	return true
+
+## 주괴 제거
+func remove_bar(ore_id: String, amount: int) -> bool:
+	if not bars.has(ore_id) or amount <= 0 or bars[ore_id] < amount:
+		return false
+	bars[ore_id] -= amount
+	bar_changed.emit(ore_id, bars[ore_id])
+	return true
+
+## 주괴 수량 조회
+func get_bar_count(ore_id: String) -> int:
+	return bars.get(ore_id, 0)
+
+## 전체 주괴 현황
+func get_all_bars() -> Dictionary:
+	return bars.duplicate()
+
+
+# ----- Inventory (아이템) -----
+
+## 아이템 추가
+func add_item(item: Dictionary) -> bool:
+	if item.is_empty():
+		return false
+	inventory.append(item)
+	inventory_changed.emit()
+	return true
+
+## 아이템 제거 (인덱스 기반)
+func remove_item(item_index: int) -> bool:
+	if item_index < 0 or item_index >= inventory.size():
+		return false
+	inventory.remove_at(item_index)
+	inventory_changed.emit()
+	return true
+
+## 인벤토리 전체 조회
+func get_inventory_items() -> Array[Dictionary]:
+	return inventory
+
+## 타입별 아이템 조회
+func get_items_by_type(item_type: String) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for item in inventory:
+		if item.get("type", "") == item_type:
+			result.append(item)
+	return result
+
+
+# ----- Gold (금화) -----
+
+## 금화 추가
+func add_gold(amount: int) -> void:
+	gold += amount
+
+## 금화 차감 (잔액 부족 시 실패)
+func remove_gold(amount: int) -> bool:
+	if gold < amount:
+		return false
+	gold -= amount
+	return true
+
+## 금화 조회
+func get_gold() -> int:
+	return gold
+
+
+# ----- Reputation (명성) -----
+
+## 명성 추가
+func add_reputation(amount: int) -> void:
+	reputation += amount
+
+## 명성 조회
+func get_reputation() -> int:
+	return reputation
+
+
+# ----- Upgrade Levels (업그레이드) -----
+
+func get_pickaxe_level() -> int:
+	return pickaxe_level
+
+func set_pickaxe_level(level: int) -> void:
+	pickaxe_level = level
+
+func get_anvil_level() -> int:
+	return anvil_level
+
+func set_anvil_level(level: int) -> void:
+	anvil_level = level
+
+func get_furnace_level() -> int:
+	return furnace_level
+
+func set_furnace_level(level: int) -> void:
+	furnace_level = level
+
+
+# ----- Other State Getters -----
+
+## 숙련도 조회
+func get_mastery_count(recipe_id: String) -> int:
+	return mastery.get(recipe_id, 0)
+
+## 최대 해금 티어 조회
+func get_max_unlocked_tier() -> int:
+	return max_unlocked_tier
+
+## 자동 채굴 속도 조회
+func get_auto_mine_speed() -> float:
+	return auto_mine_speed
+
+
+# ===============================================
+# 게임 로직
+# ===============================================
 
 ## 랜덤 광석 선택 함수 (각 Tier별로 정규화된 확률)
 ## GameConfig.ORE_SPAWN_CHANCES에서 데이터 읽음 (결합도 ↓)
@@ -142,8 +311,6 @@ func _load_data() -> void:
 	adventure_system = AdventureSystem.new()
 	push_error("🚀 GameManager._load_data(): Adding AdventureSystem as child...")
 	add_child(adventure_system)
-	# NOTE: add_child() may or may not immediately call adventure_system._ready()
-	# So we explicitly call _load_data() to ensure data is loaded
 	push_error("🚀 GameManager._load_data(): Calling adventure_system._load_data()...")
 	adventure_system._load_data()
 	push_error("🚀 GameManager._load_data(): adventure_system initialized with %d adventurers" % adventure_system.adventurers.size())
@@ -163,23 +330,14 @@ func _load_data() -> void:
 	auto_mine_speed = 0.05  # 느린 백그라운드 채굴
 
 
-## 광석 추가
-func add_ore(ore_id: String, amount: int = 1) -> void:
-	if ores.has(ore_id):
-		ores[ore_id] += amount
-		ore_changed.emit(ore_id, ores[ore_id])
-
-
 ## 광석 → 주괴 제련
 func smelt_ore(ore_id: String) -> bool:
 	if not ore_data.has(ore_id):
 		return false
 	var needed = ore_data[ore_id]["ore_per_bar"]
-	if ores[ore_id] >= needed:
-		ores[ore_id] -= needed
-		bars[ore_id] += 1
-		ore_changed.emit(ore_id, ores[ore_id])
-		bar_changed.emit(ore_id, bars[ore_id])
+	if get_ore_count(ore_id) >= needed:
+		remove_ore(ore_id, needed)
+		add_bar(ore_id)
 		return true
 	return false
 
@@ -192,7 +350,7 @@ func can_craft(recipe_id: String) -> bool:
 	if not recipe.get("unlocked", false):
 		return false
 	for mat_id in recipe["materials"]:
-		if bars.get(mat_id, 0) < recipe["materials"][mat_id]:
+		if get_bar_count(mat_id) < recipe["materials"][mat_id]:
 			return false
 	return true
 
@@ -206,8 +364,7 @@ func craft_item(recipe_id: String) -> Dictionary:
 
 	# 재료 소모
 	for mat_id in recipe["materials"]:
-		bars[mat_id] -= recipe["materials"][mat_id]
-		bar_changed.emit(mat_id, bars[mat_id])
+		remove_bar(mat_id, recipe["materials"][mat_id])
 
 	# 등급 결정
 	var grade = _roll_grade(recipe_id)
@@ -227,7 +384,7 @@ func craft_item(recipe_id: String) -> Dictionary:
 		"is_artifact": false  # 일반 아이템
 	}
 
-	inventory.append(item)
+	add_item(item)
 
 	# 숙련도 증가
 	mastery[recipe_id] = mastery.get(recipe_id, 0) + 1
@@ -242,14 +399,14 @@ func _roll_grade(recipe_id: String) -> String:
 	var chances = GameConfig.BASE_GRADE_CHANCES.duplicate()
 
 	# 모루 보너스: 레벨당 일정량 증가
-	var anvil_bonus = (anvil_level - 1) * GameConfig.ANVIL_BONUS_PER_LEVEL
+	var anvil_bonus = (get_anvil_level() - 1) * GameConfig.ANVIL_BONUS_PER_LEVEL
 	chances["rare"] += anvil_bonus * GameConfig.ANVIL_RARE_WEIGHT
 	chances["epic"] += anvil_bonus * GameConfig.ANVIL_EPIC_WEIGHT
 	chances["legendary"] += anvil_bonus * GameConfig.ANVIL_LEGENDARY_WEIGHT
 	chances["common"] -= anvil_bonus
 
 	# 숙련도 보너스: 임계값마다 증가
-	var craft_count = mastery.get(recipe_id, 0)
+	var craft_count = get_mastery_count(recipe_id)
 	var mastery_bonus = floor(float(craft_count) / GameConfig.MASTERY_CRAFT_COUNT_THRESHOLD) * GameConfig.MASTERY_BONUS_PER_THRESHOLD
 	mastery_bonus = min(mastery_bonus, GameConfig.MASTERY_MAX_BONUS)
 	
@@ -283,15 +440,15 @@ func sell_item(index: int) -> int:
 		return 0
 	var item = inventory[index]
 	var price = item["price"]
-	gold += price
-	reputation += 1
-	inventory.remove_at(index)
+	add_gold(price)
+	add_reputation(1)
+	remove_item(index)
 	return price
 
 
 ## 채굴 파워 계산 (GameConfig에서 정의된 상수 사용)
 func get_mine_power() -> float:
-	return GameConfig.PICKAXE_POWER_BASE + (pickaxe_level - 1) * GameConfig.PICKAXE_POWER_PER_LEVEL
+	return GameConfig.PICKAXE_POWER_BASE + (get_pickaxe_level() - 1) * GameConfig.PICKAXE_POWER_PER_LEVEL
 
 
 ## ===== 모험가 시스템 =====
@@ -328,7 +485,7 @@ func equip_item_to_adventurer(adventurer_id: String, inventory_index: int) -> bo
 		return false
 	
 	# 인벤토리에서 제거
-	inventory.remove_at(inventory_index)
+	remove_item(inventory_index)
 	item_equipped.emit(adventurer_id, item)
 	return true
 
@@ -343,7 +500,7 @@ func unequip_item_from_adventurer(adventurer_id: String, item_index: int) -> boo
 		return false
 	
 	# 인벤토리에 추가
-	inventory.append(item)
+	add_item(item)
 	item_unequipped.emit(adventurer_id, item)
 	return true
 
@@ -380,7 +537,7 @@ func check_and_complete_exploration(adventurer_id: String) -> Dictionary:
 	var rewards = dungeon.generate_rewards(adv.current_dungeon_tier, adv.level)
 	
 	# 보상 적용
-	gold += rewards["gold"]
+	add_gold(rewards["gold"])
 	
 	# 광석 추가
 	for ore_reward in rewards["items"]:
@@ -388,7 +545,7 @@ func check_and_complete_exploration(adventurer_id: String) -> Dictionary:
 	
 	# 유물 인벤토리 추가
 	for artifact in rewards["artifacts"]:
-		inventory.append(artifact)
+		add_item(artifact)
 	
 	# 경험치 처리 (Phase 3)
 	if rewards.has("experience"):
@@ -414,10 +571,9 @@ func hire_adventurer(adventurer_id: String) -> bool:
 	var hire_data = adventurer_data.get(adventurer_id, {})
 	var hire_cost = hire_data.get("hire_cost", 100)
 	
-	if gold < hire_cost:
+	if not remove_gold(hire_cost):
 		return false
 	
-	gold -= hire_cost
 	adventure_system.hire_adventurer(adventurer_id)
 	adventurer_hired.emit(adventurer_id, hire_cost)
 	

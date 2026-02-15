@@ -19,7 +19,7 @@ func _update_list() -> void:
 	for child in item_list.get_children():
 		child.queue_free()
 
-	if GameManager.inventory.is_empty():
+	if GameManager.get_inventory_items().is_empty():
 		var empty = Label.new()
 		empty.text = "아이템이 없습니다. 제작 탭에서 만들어보세요!"
 		empty.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
@@ -29,8 +29,9 @@ func _update_list() -> void:
 
 	sell_all_button.disabled = false
 
-	for i in range(GameManager.inventory.size()):
-		var item = GameManager.inventory[i]
+	var items = GameManager.get_inventory_items()
+	for i in range(items.size()):
+		var item = items[i]
 		var hbox = HBoxContainer.new()
 
 		# 아이템 아이콘
@@ -80,7 +81,7 @@ func _update_list() -> void:
 
 
 func _on_sell_item(item: Dictionary) -> void:
-	var index = GameManager.inventory.find(item)
+	var index = GameManager.get_inventory_items().find(item)
 	if index == -1:
 		return
 	var price = GameManager.sell_item(index)
@@ -92,7 +93,7 @@ func _on_sell_item(item: Dictionary) -> void:
 
 func _on_sell_all() -> void:
 	var total = 0
-	while not GameManager.inventory.is_empty():
+	while not GameManager.get_inventory_items().is_empty():
 		total += GameManager.sell_item(0)
 	if total > 0:
 		sell_result.text = "💰 총 %d Gold 획득!" % total
@@ -113,7 +114,8 @@ func _on_equip_item(inventory_index: int) -> void:
 	var success = GameManager.equip_item_to_adventurer(adv.id, inventory_index)
 	
 	if success:
-		sell_result.text = "✅ %s을(를) %s에게 장착!" % [GameManager.inventory[inventory_index]["name"] if inventory_index < GameManager.inventory.size() else "아이템", adv.name]
+		var inv_items = GameManager.get_inventory_items()
+		sell_result.text = "✅ %s을(를) %s에게 장착!" % [inv_items[inventory_index]["name"] if inventory_index < inv_items.size() else "아이템", adv.name]
 		_flash_result()
 		_update_list()
 	else:
