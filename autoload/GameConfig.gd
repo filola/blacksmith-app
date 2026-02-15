@@ -1,3 +1,5 @@
+extends Node
+
 ## GameConfig.gd - 게임 밸런스 상수 관리
 ## 모든 매직 넘버를 한 곳에서 관리하여 결합도 낮추기
 ## Note: class_name removed to avoid conflict with autoload singleton
