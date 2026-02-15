@@ -321,7 +321,7 @@ func _on_exploration_completed(adventurer_id: String, exploration_data: Dictiona
 	for ore_reward in rewards.get("items", []):
 		item_count += ore_reward.get("quantity", 0)
 	if item_count > 0:
-		reward_summary += "📦 광석 %d개\n" % item_count
+		reward_summary += "[유물] 광석 %d개\n" % item_count
 	
 	if rewards.get("artifacts", []).size() > 0:
 		reward_summary += "🔮 유물 %d개!" % rewards.get("artifacts", []).size()

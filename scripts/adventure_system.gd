@@ -257,7 +257,7 @@ func _load_data() -> void:
 		
 		if parsed != null and parsed is Dictionary:
 			adventurer_data = parsed
-			push_error("📦 Successfully assigned adventurer_data: %d entries" % adventurer_data.size())
+			push_error("[유물] Successfully assigned adventurer_data: %d entries" % adventurer_data.size())
 		else:
 			push_error("❌ Failed to parse JSON as Dictionary! Got: %s" % typeof(parsed))
 			adventurer_file.close()
@@ -314,7 +314,7 @@ func _load_data() -> void:
 		
 		if parsed_abilities != null and parsed_abilities is Dictionary:
 			abilities_data = parsed_abilities
-			push_error("📦 Successfully loaded abilities_data with %d classes" % abilities_data.size())
+			push_error("[유물] Successfully loaded abilities_data with %d classes" % abilities_data.size())
 		else:
 			push_error("❌ Failed to parse abilities.json!")
 		
