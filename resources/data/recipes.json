@@ -1,6 +1,6 @@
 {
   "copper_sword": {
-    "name": "구리 검",
+    "name": "Copper Sword",
     "type": "weapon",
     "subtype": "sword",
     "materials": {"copper": 3},
@@ -10,7 +10,7 @@
     "icon": "res://resources/assets/dungeon-crawl/weapons/short_sword1.png"
   },
   "copper_shield": {
-    "name": "구리 방패",
+    "name": "Copper Shield",
     "type": "armor",
     "subtype": "shield",
     "materials": {"copper": 4},
@@ -20,7 +20,7 @@
     "icon": "res://resources/assets/dungeon-crawl/armour/buckler1.png"
   },
   "tin_dagger": {
-    "name": "주석 단검",
+    "name": "Tin Dagger",
     "type": "weapon",
     "subtype": "dagger",
     "materials": {"tin": 2},
@@ -30,7 +30,7 @@
     "icon": "res://resources/assets/dungeon-crawl/weapons/dagger.png"
   },
   "bronze_sword": {
-    "name": "청동 검",
+    "name": "Bronze Sword",
     "type": "weapon",
     "subtype": "sword",
     "materials": {"copper": 2, "tin": 2},
@@ -40,7 +40,7 @@
     "icon": "res://resources/assets/dungeon-crawl/weapons/long_sword1.png"
   },
   "iron_sword": {
-    "name": "철 검",
+    "name": "Iron Sword",
     "type": "weapon",
     "subtype": "sword",
     "materials": {"iron": 4},
@@ -50,7 +50,7 @@
     "icon": "res://resources/assets/dungeon-crawl/weapons/greatsword1.png"
   },
   "iron_armor": {
-    "name": "철 갑옷",
+    "name": "Iron Armor",
     "type": "armor",
     "subtype": "chest",
     "materials": {"iron": 6},
@@ -60,7 +60,7 @@
     "icon": "res://resources/assets/dungeon-crawl/armour/chain_mail1.png"
   },
   "silver_bow": {
-    "name": "은 활",
+    "name": "Silver Bow",
     "type": "weapon",
     "subtype": "bow",
     "materials": {"silver": 4, "iron": 2},
@@ -70,7 +70,7 @@
     "icon": "res://resources/assets/dungeon-crawl/weapons/hand_axe1.png"
   },
   "gold_staff": {
-    "name": "금 지팡이",
+    "name": "Gold Staff",
     "type": "weapon",
     "subtype": "staff",
     "materials": {"gold": 5, "silver": 3},
@@ -80,7 +80,7 @@
     "icon": "res://resources/assets/dungeon-crawl/staff/i-staff_fire.png"
   },
   "mithril_sword": {
-    "name": "미스릴 검",
+    "name": "Mithril Sword",
     "type": "weapon",
     "subtype": "sword",
     "materials": {"mithril": 6, "gold": 2},
@@ -90,7 +90,7 @@
     "icon": "res://resources/assets/dungeon-crawl/weapons/double_sword.png"
   },
   "orichalcum_blade": {
-    "name": "오리할콘 대검",
+    "name": "Orichalcum Blade",
     "type": "weapon",
     "subtype": "sword",
     "materials": {"orichalcum": 8, "mithril": 4},

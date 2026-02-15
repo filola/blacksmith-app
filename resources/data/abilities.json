@@ -2,129 +2,129 @@
   "warrior_abilities": [
     {
       "id": "warrior_shield_bash",
-      "name": "쉴드 배시",
-      "description": "몬스터에게 큰 피해를 입힌다",
+      "name": "Shield Bash",
+      "description": "Deals heavy damage to a monster",
       "class": "warrior",
       "unlock_level": 3,
       "effect": "damage_increase",
       "value": 0.2,
-      "emoji": "[검]"
+      "emoji": "[Sword]"
     },
     {
       "id": "warrior_armor_break",
-      "name": "갑옷 파괴",
-      "description": "몬스터의 방어력을 약화시킨다",
+      "name": "Armor Break",
+      "description": "Weakens the monster's defense",
       "class": "warrior",
       "unlock_level": 6,
       "effect": "enemy_defense_reduction",
       "value": 0.15,
-      "emoji": "[방패]"
+      "emoji": "[Shield]"
     },
     {
       "id": "warrior_whirlwind",
-      "name": "회전 베기",
-      "description": "모든 몬스터에게 동시에 피해를 입힌다",
+      "name": "Whirlwind",
+      "description": "Damages all monsters simultaneously",
       "class": "warrior",
       "unlock_level": 10,
       "effect": "aoe_damage",
       "value": 0.15,
-      "emoji": "[회오리]"
+      "emoji": "[Tornado]"
     }
   ],
   "rogue_abilities": [
     {
       "id": "rogue_shadow_step",
-      "name": "그림자 발걸음",
-      "description": "탐험 속도가 증가한다",
+      "name": "Shadow Step",
+      "description": "Increases exploration speed",
       "class": "rogue",
       "unlock_level": 3,
       "effect": "speed_increase",
       "value": 0.15,
-      "emoji": "[발자국]"
+      "emoji": "[Footprint]"
     },
     {
       "id": "rogue_poison_blade",
-      "name": "독 칠한 검",
-      "description": "탐험 보상 증가",
+      "name": "Poison Blade",
+      "description": "Increases exploration rewards",
       "class": "rogue",
       "unlock_level": 6,
       "effect": "reward_increase",
       "value": 0.1,
-      "emoji": "[독]"
+      "emoji": "[Poison]"
     },
     {
       "id": "rogue_backstab",
-      "name": "백스탭",
-      "description": "치명타 확률 증가",
+      "name": "Backstab",
+      "description": "Increases critical hit chance",
       "class": "rogue",
       "unlock_level": 10,
       "effect": "critical_chance",
       "value": 0.25,
-      "emoji": "[단검]"
+      "emoji": "[Dagger]"
     }
   ],
   "mage_abilities": [
     {
       "id": "mage_fireball",
-      "name": "파이어볼",
-      "description": "큰 폭발 피해를 입힌다",
+      "name": "Fireball",
+      "description": "Deals massive explosion damage",
       "class": "mage",
       "unlock_level": 3,
       "effect": "damage_increase",
       "value": 0.25,
-      "emoji": "[제련]"
+      "emoji": "[Fire]"
     },
     {
       "id": "mage_mana_shield",
-      "name": "마나 보호막",
-      "description": "체력 증가",
+      "name": "Mana Shield",
+      "description": "Increases HP",
       "class": "mage",
       "unlock_level": 6,
       "effect": "hp_increase",
       "value": 0.2,
-      "emoji": "[강화]"
+      "emoji": "[Buff]"
     },
     {
       "id": "mage_meteor_storm",
-      "name": "메테오 스톰",
-      "description": "모든 몬스터에게 연쇄 피해를 입힌다",
+      "name": "Meteor Storm",
+      "description": "Deals chain damage to all monsters",
       "class": "mage",
       "unlock_level": 10,
       "effect": "aoe_damage",
       "value": 0.2,
-      "emoji": "[번개]"
+      "emoji": "[Lightning]"
     }
   ],
   "paladin_abilities": [
     {
       "id": "paladin_holy_light",
-      "name": "성스러운 빛",
-      "description": "탐험 중 자동으로 체력을 회복한다",
+      "name": "Holy Light",
+      "description": "Automatically restores HP during exploration",
       "class": "paladin",
       "unlock_level": 3,
       "effect": "hp_regeneration",
       "value": 0.05,
-      "emoji": "[빛]"
+      "emoji": "[Light]"
     },
     {
       "id": "paladin_divine_protection",
-      "name": "신성한 보호",
-      "description": "피해 감소",
+      "name": "Divine Protection",
+      "description": "Reduces damage taken",
       "class": "paladin",
       "unlock_level": 6,
       "effect": "damage_reduction",
       "value": 0.15,
-      "emoji": "[기도]"
+      "emoji": "[Prayer]"
     },
     {
       "id": "paladin_divine_judgment",
-      "name": "신성한 심판",
-      "description": "보스 몬스터에게 추가 피해를 입힌다",
+      "name": "Divine Judgment",
+      "description": "Deals bonus damage to boss monsters",
       "class": "paladin",
       "unlock_level": 10,
       "effect": "boss_damage",
       "value": 0.3,
-      "emoji": "[번개]"
+      "emoji": "[Lightning]"
     }
   ]
 }
