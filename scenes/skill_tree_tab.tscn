@@ -1,0 +1,105 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/skill_tree_tab.gd" id="1"]
+
+[node name="SkillTreeTab" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="TopBar" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="VBox/TopBar"]
+layout_mode = 2
+text = "[스킬 트리]"
+theme_override_font_sizes/font_size = 20
+
+[node name="Spacer" type="Control" parent="VBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SkillGoldLabel" type="Label" parent="VBox/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "[보유 금화] 0 Gold"
+theme_override_font_sizes/font_size = 16
+
+[node name="Sep" type="HSeparator" parent="VBox"]
+layout_mode = 2
+
+[node name="ContentHBox" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="CanvasScroll" type="ScrollContainer" parent="VBox/ContentHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="SkillTreeCanvas" type="Control" parent="VBox/ContentHBox/CanvasScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(700, 600)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SkillInfoPanel" type="PanelContainer" parent="VBox/ContentHBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(220, 0)
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="InfoVBox" type="VBoxContainer" parent="VBox/ContentHBox/SkillInfoPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SkillName" type="Label" parent="VBox/ContentHBox/SkillInfoPanel/InfoVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "스킬 이름"
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 2
+
+[node name="Sep" type="HSeparator" parent="VBox/ContentHBox/SkillInfoPanel/InfoVBox"]
+layout_mode = 2
+
+[node name="SkillDesc" type="Label" parent="VBox/ContentHBox/SkillInfoPanel/InfoVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "스킬 설명"
+autowrap_mode = 2
+
+[node name="SkillCost" type="Label" parent="VBox/ContentHBox/SkillInfoPanel/InfoVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "비용: 0 Gold"
+
+[node name="SkillReq" type="Label" parent="VBox/ContentHBox/SkillInfoPanel/InfoVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "요구: 없음"
+autowrap_mode = 2
+
+[node name="SkillStatus" type="Label" parent="VBox/ContentHBox/SkillInfoPanel/InfoVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "상태: -"
+autowrap_mode = 2

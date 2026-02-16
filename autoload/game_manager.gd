@@ -1,5 +1,7 @@
 extends Node
 
+const GAME_VERSION: String = "v0.6.0"
+
 ## 게임 전역 상태 관리
 ## GameConfig를 통해 매직 넘버 제거, 결합도 최소화
 ## Level 1 리팩토링: 모든 상태 접근을 메서드로 통일
@@ -14,7 +16,6 @@ signal reputation_changed(amount: int)
 
 # 인벤토리 관련
 signal ore_changed(ore_id: String, amount: int)
-signal bar_changed(ore_id: String, amount: int)
 signal inventory_changed()
 signal item_crafted(item_name: String, grade: String)
 signal item_equipped(adventurer_id: String, item: Dictionary)
@@ -52,7 +53,6 @@ var inventory: Array[Dictionary] = []
 # 업그레이드
 var pickaxe_level: int = 1
 var anvil_level: int = 1
-var furnace_level: int = 1
 var auto_mine_speed: float = 0.0  # 0이면 자동채굴 없음
 
 # 숙련도 (레시피별 제작 횟수)
@@ -69,8 +69,10 @@ var adventurer_data: Dictionary = {}
 var abilities_data: Dictionary = {}
 var skills_data: Dictionary = {}
 
-# 스킬 해금 상태
-var skills_unlocked: Dictionary = {}
+# 스킬 효과 누적
+var mining_speed_bonus: float = 1.0
+var crafting_grade_bonus: float = 0.0
+var smelting_efficiency_bonus: int = 0
 
 # 시스템
 var adventure_system: AdventureSystem
@@ -116,14 +118,13 @@ func get_all_ores() -> Dictionary:
 	return ores.duplicate()
 
 
-# ----- Bar (주괴) -----
+# ----- Bars (주괴) -----
 
 ## 주괴 추가
 func add_bar(ore_id: String, amount: int = 1) -> bool:
 	if not bars.has(ore_id) or amount <= 0:
 		return false
 	bars[ore_id] += amount
-	bar_changed.emit(ore_id, bars[ore_id])
 	return true
 
 ## 주괴 제거
@@ -131,16 +132,11 @@ func remove_bar(ore_id: String, amount: int) -> bool:
 	if not bars.has(ore_id) or amount <= 0 or bars[ore_id] < amount:
 		return false
 	bars[ore_id] -= amount
-	bar_changed.emit(ore_id, bars[ore_id])
 	return true
 
 ## 주괴 수량 조회
 func get_bar_count(ore_id: String) -> int:
 	return bars.get(ore_id, 0)
-
-## 전체 주괴 현황
-func get_all_bars() -> Dictionary:
-	return bars.duplicate()
 
 
 # ----- Inventory (아이템) -----
@@ -216,13 +212,6 @@ func get_anvil_level() -> int:
 
 func set_anvil_level(level: int) -> void:
 	anvil_level = level
-
-func get_furnace_level() -> int:
-	return furnace_level
-
-func set_furnace_level(level: int) -> void:
-	furnace_level = level
-
 
 # ----- Other State Getters -----
 
@@ -316,15 +305,9 @@ func _load_data() -> void:
 	# 스킬 데이터 로드
 	var skills_file = FileAccess.open("res://resources/data/skills.json", FileAccess.READ)
 	if skills_file:
-		var raw_skills = JSON.parse_string(skills_file.get_as_text())
+		skills_data = JSON.parse_string(skills_file.get_as_text())
 		skills_file.close()
-		# _meta 키 제외하고 스킬만 저장
-		for key in raw_skills:
-			if key != "_meta":
-				skills_data[key] = raw_skills[key]
-		# 스킬 해금 상태 초기화: copper_ore만 unlocked
-		for skill_id in skills_data:
-			skills_unlocked[skill_id] = (skill_id == "copper_ore")
+		push_error("[스킬] Loaded %d skills" % skills_data.size())
 	
 	# 시스템 초기화
 	push_error("[탐험] GameManager._load_data(): Creating AdventureSystem...")
@@ -350,11 +333,11 @@ func _load_data() -> void:
 	auto_mine_speed = 0.05  # 느린 백그라운드 채굴
 
 
-## 광석 -> 주괴 제련
+## 광석 -> 주괴 제련 (스킬 효과: 제련 효율 적용)
 func smelt_ore(ore_id: String) -> bool:
 	if not ore_data.has(ore_id):
 		return false
-	var needed = ore_data[ore_id]["ore_per_bar"]
+	var needed = max(1, ore_data[ore_id]["ore_per_bar"] - smelting_efficiency_bonus)
 	if get_ore_count(ore_id) >= needed:
 		remove_ore(ore_id, needed)
 		add_bar(ore_id)
@@ -435,6 +418,13 @@ func _roll_grade(recipe_id: String) -> String:
 	chances["epic"] += mastery_bonus * GameConfig.MASTERY_EPIC_WEIGHT
 	chances["legendary"] += mastery_bonus * GameConfig.MASTERY_LEGENDARY_WEIGHT
 	chances["common"] -= mastery_bonus
+	
+	# 스킬 트리 보너스 (crafting_grade_bonus)
+	if crafting_grade_bonus > 0:
+		chances["rare"] += crafting_grade_bonus * 0.4
+		chances["epic"] += crafting_grade_bonus * 0.35
+		chances["legendary"] += crafting_grade_bonus * 0.25
+		chances["common"] -= crafting_grade_bonus
 
 	# 일반 등급이 음수가 되지 않도록 제한
 	chances["common"] = max(chances["common"], GameConfig.ANVIL_COMMON_MIN)
@@ -709,93 +699,103 @@ func get_all_class_abilities(adventurer_id: String) -> Array:
 ## ===== 스킬 시스템 =====
 
 ## 스킬 해금 가능 여부 확인
-func can_unlock_skill(skill_id: String) -> bool:
-	# 1. 스킬이 존재하는지 확인
+func can_unlock_skill(skill_id: String) -> Dictionary:
 	if not skills_data.has(skill_id):
-		return false
+		return {"can": false, "reason": "스킬이 존재하지 않습니다."}
 	
-	# 2. 이미 언락됐는지 확인
-	if skills_unlocked.get(skill_id, false):
-		return false
-	
-	# 3. requires 조건 모두 충족하는지 확인
 	var skill = skills_data[skill_id]
+	
+	if skill.get("unlocked", false):
+		return {"can": false, "reason": "이미 해금된 스킬입니다."}
+	
+	# 요구 스킬 확인
 	var requires = skill.get("requires", [])
 	for req_id in requires:
-		if not skills_unlocked.get(req_id, false):
-			return false
+		if not skills_data.has(req_id) or not skills_data[req_id].get("unlocked", false):
+			var req_name = skills_data.get(req_id, {}).get("name", req_id)
+			return {"can": false, "reason": "'%s' 스킬이 먼저 필요합니다." % req_name}
 	
-	# 4. 금화 충분한지 확인
+	# 비용 확인
 	var cost = skill.get("cost", 0)
-	if gold < cost:
-		return false
+	if cost > 0 and gold < cost:
+		return {"can": false, "reason": "금화가 부족합니다. (필요: %d, 보유: %d)" % [cost, gold]}
 	
-	return true
+	return {"can": true, "reason": ""}
 
 
 ## 스킬 해금
 func unlock_skill(skill_id: String) -> bool:
-	if not can_unlock_skill(skill_id):
+	var check = can_unlock_skill(skill_id)
+	if not check["can"]:
+		push_error("[스킬] 해금 실패: %s - %s" % [skill_id, check["reason"]])
 		return false
 	
 	var skill = skills_data[skill_id]
 	var cost = skill.get("cost", 0)
 	
-	# 금화 차감
-	remove_gold(cost)
+	# 비용 지불
+	if cost > 0:
+		remove_gold(cost)
 	
-	# 스킬 해금
-	skills_unlocked[skill_id] = true
+	# 해금 처리
+	skills_data[skill_id]["unlocked"] = true
+	
+	# 스킬 효과 적용
+	apply_skill_effect(skill_id)
+	
+	push_error("[스킬] 해금 성공: %s (%s)" % [skill_id, skill["name"]])
 	skill_unlocked.emit(skill_id)
-	
 	return true
 
 
-## 현재 해금 가능한 스킬 목록 반환
-func get_available_skills() -> Array:
-	var available: Array = []
-	for skill_id in skills_data:
-		# 이미 해금된 스킬은 제외
-		if skills_unlocked.get(skill_id, false):
-			continue
-		
-		# requires 조건이 모두 충족된 스킬만 포함
-		var skill = skills_data[skill_id]
-		var requires = skill.get("requires", [])
-		var all_met = true
-		for req_id in requires:
-			if not skills_unlocked.get(req_id, false):
-				all_met = false
-				break
-		
-		if all_met:
-			available.append(skill_id)
+## 스킬 효과 적용
+func apply_skill_effect(skill_id: String) -> void:
+	var skill = skills_data[skill_id]
+	var effect = skill.get("effect", "none")
+	var value = skill.get("value", 0)
 	
-	return available
+	match effect:
+		"mining_speed_multiplier":
+			mining_speed_bonus *= value
+			auto_mine_speed = 0.05 * mining_speed_bonus
+			push_error("[스킬 효과] 채굴 속도 보너스: x%.2f" % mining_speed_bonus)
+		
+		"unlock_ore_tier":
+			if int(value) > max_unlocked_tier:
+				max_unlocked_tier = int(value)
+				tier_unlocked.emit(int(value))
+				push_error("[스킬 효과] Tier %d 광석 해금" % int(value))
+		
+		"smelting_efficiency":
+			smelting_efficiency_bonus += int(value)
+			push_error("[스킬 효과] 제련 효율 보너스: -%d" % smelting_efficiency_bonus)
+		
+		"hire_adventurer":
+			push_error("[스킬 효과] 모험가 고용 가능")
+		
+		"unlock_dungeon_tier":
+			push_error("[스킬 효과] 던전 Tier %d 해금" % int(value))
+		
+		"crafting_grade_bonus":
+			crafting_grade_bonus += value
+			push_error("[스킬 효과] 제작 등급 보너스: +%.1f%%" % crafting_grade_bonus)
+		
+		"none":
+			pass
 
 
-## 스킬 정보 반환 (UI용)
-func get_skill_info(skill_id: String) -> Dictionary:
-	if not skills_data.has(skill_id):
-		return {}
-	var info = skills_data[skill_id].duplicate()
-	info["is_unlocked"] = skills_unlocked.get(skill_id, false)
-	info["can_unlock"] = can_unlock_skill(skill_id)
-	return info
-
-
-## 해금된 스킬 목록 반환
+## 해금된 스킬 목록
 func get_unlocked_skills() -> Array:
-	var unlocked: Array = []
-	for skill_id in skills_unlocked:
-		if skills_unlocked[skill_id]:
-			unlocked.append(skill_id)
-	return unlocked
+	var result: Array = []
+	for skill_id in skills_data:
+		if skills_data[skill_id].get("unlocked", false):
+			result.append(skill_id)
+	return result
 
 
-## 스킬 해금 여부 확인
-func is_skill_unlocked(skill_id: String) -> bool:
-	return skills_unlocked.get(skill_id, false)
+## 스킬 포인트 (사용 가능한 금화로 대체)
+func get_skill_points() -> int:
+	return gold
 
 
 ## ===== 디버그 =====

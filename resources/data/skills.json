@@ -1,0 +1,145 @@
+{
+  "basic_mining": {
+    "name": "기초 채굴",
+    "description": "구리와 주석 채굴이 가능해진다.",
+    "depth": 0,
+    "cost": 0,
+    "cost_type": "gold",
+    "requires": [],
+    "effect": "none",
+    "value": 0,
+    "unlocked": true
+  },
+  "improved_pickaxe": {
+    "name": "개량 곡괭이",
+    "description": "채굴 속도가 25% 증가한다.",
+    "depth": 1,
+    "cost": 50,
+    "cost_type": "gold",
+    "requires": ["basic_mining"],
+    "effect": "mining_speed_multiplier",
+    "value": 1.25,
+    "unlocked": false
+  },
+  "ore_appraisal": {
+    "name": "광석 감정",
+    "description": "Tier 2 광석(철, 은)이 해금된다.",
+    "depth": 1,
+    "cost": 100,
+    "cost_type": "gold",
+    "requires": ["basic_mining"],
+    "effect": "unlock_ore_tier",
+    "value": 2,
+    "unlocked": false
+  },
+  "advanced_smelting": {
+    "name": "고급 제련",
+    "description": "제련 효율이 20% 증가한다. (필요 광석 -1)",
+    "depth": 2,
+    "cost": 200,
+    "cost_type": "gold",
+    "requires": ["ore_appraisal"],
+    "effect": "smelting_efficiency",
+    "value": 1,
+    "unlocked": false
+  },
+  "master_pickaxe": {
+    "name": "장인 곡괭이",
+    "description": "채굴 속도가 50% 추가 증가한다.",
+    "depth": 2,
+    "cost": 300,
+    "cost_type": "gold",
+    "requires": ["improved_pickaxe"],
+    "effect": "mining_speed_multiplier",
+    "value": 1.5,
+    "unlocked": false
+  },
+  "recruit_adventurer": {
+    "name": "모험가 모집",
+    "description": "첫 번째 모험가를 고용할 수 있다.",
+    "depth": 2,
+    "cost": 150,
+    "cost_type": "gold",
+    "requires": ["ore_appraisal"],
+    "effect": "hire_adventurer",
+    "value": 1,
+    "unlocked": false
+  },
+  "rare_ore_mining": {
+    "name": "희귀 광석 채굴",
+    "description": "Tier 3 광석(금)이 해금된다.",
+    "depth": 3,
+    "cost": 500,
+    "cost_type": "gold",
+    "requires": ["advanced_smelting"],
+    "effect": "unlock_ore_tier",
+    "value": 3,
+    "unlocked": false
+  },
+  "dungeon_exploration": {
+    "name": "던전 탐사",
+    "description": "Tier 2 던전이 해금된다.",
+    "depth": 3,
+    "cost": 400,
+    "cost_type": "gold",
+    "requires": ["recruit_adventurer"],
+    "effect": "unlock_dungeon_tier",
+    "value": 2,
+    "unlocked": false
+  },
+  "anvil_mastery": {
+    "name": "모루 숙련",
+    "description": "제작 시 높은 등급 확률이 10% 증가한다.",
+    "depth": 3,
+    "cost": 350,
+    "cost_type": "gold",
+    "requires": ["advanced_smelting"],
+    "effect": "crafting_grade_bonus",
+    "value": 10,
+    "unlocked": false
+  },
+  "mythril_discovery": {
+    "name": "미스릴 발견",
+    "description": "Tier 4 광석(미스릴)이 해금된다.",
+    "depth": 4,
+    "cost": 1000,
+    "cost_type": "gold",
+    "requires": ["rare_ore_mining"],
+    "effect": "unlock_ore_tier",
+    "value": 4,
+    "unlocked": false
+  },
+  "deep_dungeon": {
+    "name": "심층 던전",
+    "description": "Tier 3 던전이 해금된다.",
+    "depth": 4,
+    "cost": 800,
+    "cost_type": "gold",
+    "requires": ["dungeon_exploration"],
+    "effect": "unlock_dungeon_tier",
+    "value": 3,
+    "unlocked": false
+  },
+  "legendary_forge": {
+    "name": "전설의 대장간",
+    "description": "전설 등급 제작 확률이 크게 증가한다.",
+    "depth": 5,
+    "cost": 2000,
+    "cost_type": "gold",
+    "requires": ["mythril_discovery", "anvil_mastery"],
+    "effect": "crafting_grade_bonus",
+    "value": 25,
+    "unlocked": false
+  },
+  "orichalcum_mastery": {
+    "name": "오리할콘 정복",
+    "description": "Tier 5 광석(오리할콘)이 해금된다.",
+    "depth": 5,
+    "cost": 3000,
+    "cost_type": "gold",
+    "requires": ["mythril_discovery"],
+    "effect": "unlock_ore_tier",
+    "value": 5,
+    "unlocked": false
+  }
+}

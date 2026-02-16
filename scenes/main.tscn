@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/mining_tab.tscn" id="2"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/inventory_tab.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://scenes/adventure_tab.tscn" id="6"]
 [ext_resource type="Theme" path="res://resources/themes/default_theme.tres" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/skill_tree_tab.tscn" id="8"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -100,3 +101,30 @@ layout_mode = 2
 
 [node name="AdventureTab" parent="MarginContainer/VBox/TabContainer/모험" instance=ExtResource("6")]
 layout_mode = 1
+
+[node name="스킬" type="Control" parent="MarginContainer/VBox/TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="SkillTreeTab" parent="MarginContainer/VBox/TabContainer/스킬" instance=ExtResource("8")]
+layout_mode = 1
+
+[node name="VersionLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100
+offset_top = -25
+offset_right = -10
+offset_bottom = -5
+grow_horizontal = 0
+grow_vertical = 0
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 0.6)
+theme_override_font_sizes/font_size = 12
+text = "v0.6.0"
+horizontal_alignment = 2

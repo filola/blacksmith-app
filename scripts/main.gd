@@ -13,6 +13,11 @@ func _ready() -> void:
 	GameManager.gold_changed.connect(_on_gold_changed)
 	GameManager.reputation_changed.connect(_on_reputation_changed)
 	_update_status()
+	
+	# 버전 레이블 바인딩
+	var version_label = $VersionLabel
+	if version_label:
+		version_label.text = GameManager.GAME_VERSION
 
 
 func _on_gold_changed(_amount: int) -> void:
