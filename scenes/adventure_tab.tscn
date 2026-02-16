@@ -32,7 +32,7 @@ size_flags_vertical = 2
 
 [node name="ListLabel" type="Label" parent="HSplitContainer/LeftScroll/LeftPanel"]
 layout_mode = 2
-text = "모험가 목록"
+text = "Adventurer List"
 theme_override_font_sizes/font_size = 16
 custom_minimum_size = Vector2(0, 30)
 
@@ -67,20 +67,20 @@ expand_mode = 1
 [node name="AdventurerNameLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "모험가 선택"
+text = "Select Adventurer"
 theme_override_font_sizes/font_size = 18
 
 [node name="AdventurerDescriptionLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "설명"
+text = "Description"
 custom_minimum_size = Vector2(0, 40)
 autowrap_mode = 2
 
 [node name="ExplorationStatusLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "대기 중"
+text = "Idle"
 theme_override_font_sizes/font_size = 12
 
 [node name="ExplorationProgress" type="ProgressBar" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
@@ -92,7 +92,7 @@ visible = false
 
 [node name="EquippedItemsLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
 layout_mode = 2
-text = "장착 아이템"
+text = "Equipped Items"
 theme_override_font_sizes/font_size = 12
 
 [node name="EquippedItemsContainer" type="VBoxContainer" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
@@ -102,7 +102,7 @@ custom_minimum_size = Vector2(0, 60)
 
 [node name="DungeonTierLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
 layout_mode = 2
-text = "던전 난이도"
+text = "Dungeon Tier"
 theme_override_font_sizes/font_size = 12
 
 [node name="DungeonTierSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
@@ -116,12 +116,12 @@ value = 1.0
 unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(0, 40)
-text = "[탐험] 탐험 시작!"
+text = "Start Exploration!"
 theme_override_font_sizes/font_size = 14
 
 [node name="InventoryLabel" type="Label" parent="HSplitContainer/RightPanel"]
 layout_mode = 2
-text = "인벤토리 (장착 가능)"
+text = "Inventory (Equippable)"
 theme_override_font_sizes/font_size = 12
 
 [node name="InventoryList" type="ItemList" parent="HSplitContainer/RightPanel"]

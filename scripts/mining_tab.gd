@@ -1,6 +1,6 @@
 extends Control
 
-## 채굴 탭 - 클릭해서 광석 캐기
+## Mining Tab - Click to mine ore
 
 @onready var mine_button: Button = %MineButton
 @onready var ore_list: VBoxContainer = %OreList
@@ -14,7 +14,7 @@ var mine_progress_value: float = 0.0
 var mining_time: float = 1.0
 
 func _ready() -> void:
-	# 게임 시작 시 첫 광석 선택
+	# Select first ore on game start
 	_select_random_ore()
 	_update_display()
 	_refresh_ore_list()
@@ -25,7 +25,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	# 자동 채굴
+	# Auto-mining
 	if GameManager.get_auto_mine_speed() > 0:
 		mine_progress_value += delta * GameManager.get_auto_mine_speed() * GameManager.get_mine_power()
 		if mine_progress_value >= mining_time:
@@ -39,23 +39,23 @@ func _on_mine_click() -> void:
 		_complete_mine()
 	mine_progress.value = (mine_progress_value / mining_time) * 100.0
 
-	# 클릭 피드백
+	# Click feedback
 	var tween = create_tween()
 	mine_button.scale = Vector2(0.9, 0.9)
 	tween.tween_property(mine_button, "scale", Vector2(1, 1), 0.1)
 
 
 func _complete_mine() -> void:
-	# 초과 채굴분 이월 (연타 시 progress 손실 방지)
+	# Carry over overflow (prevent progress loss on rapid clicks)
 	var overflow = mine_progress_value - mining_time
 	GameManager.add_ore(current_ore)
 	mine_progress_value = max(overflow, 0.0)
 	mine_progress.value = (mine_progress_value / mining_time) * 100.0
 
-	# 채굴 이펙트 텍스트
+	# Mining effect text
 	_spawn_float_text("+1 " + GameManager.ore_data[current_ore]["name"])
 	
-	# 다음 광석 선택 (랜덤)
+	# Select next ore (random)
 	_select_random_ore()
 	_update_display()
 
@@ -64,7 +64,7 @@ func _spawn_float_text(text: String) -> void:
 	var label = Label.new()
 	label.text = text
 	label.add_theme_color_override("font_color", Color.html(GameManager.ore_data[current_ore]["color"]))
-	# CanvasLayer 위에 올려서 탭 위치 무관하게 정확한 좌표 사용
+	# Place on CanvasLayer for accurate coordinates regardless of tab position
 	label.global_position = mine_button.global_position + Vector2(randf_range(-30, 30), -20)
 	get_tree().root.add_child(label)
 
@@ -75,11 +75,11 @@ func _spawn_float_text(text: String) -> void:
 	tween.tween_callback(label.queue_free)
 
 
-## 광석 드롭 확률 계산 (GameManager의 ORE_SPAWN_CHANCES 사용)
+## Calculate ore drop probabilities (using GameManager's ORE_SPAWN_CHANCES)
 func _calculate_ore_probabilities() -> Dictionary:
 	var probabilities: Dictionary = {}
 	
-	# GameConfig의 ORE_SPAWN_CHANCES 사용
+	# Use GameConfig's ORE_SPAWN_CHANCES
 	for tier in GameConfig.ORE_SPAWN_CHANCES:
 		if tier > GameManager.get_max_unlocked_tier():
 			continue
@@ -87,12 +87,12 @@ func _calculate_ore_probabilities() -> Dictionary:
 		for ore_id in GameConfig.ORE_SPAWN_CHANCES[tier]:
 			probabilities[ore_id] = GameConfig.ORE_SPAWN_CHANCES[tier][ore_id]
 	
-	# 디버그 로깅
+	# Debug logging
 	var total_prob = 0.0
 	for ore_id in probabilities:
 		total_prob += probabilities[ore_id]
 	
-	push_error("[통계] _calculate_ore_probabilities():")
+	push_error("[Stats] _calculate_ore_probabilities():")
 	push_error("  Available ores: %s" % probabilities.keys())
 	push_error("  Probabilities: %s" % probabilities)
 	push_error("  Total: %.1f%%" % total_prob)
@@ -100,14 +100,14 @@ func _calculate_ore_probabilities() -> Dictionary:
 	return probabilities
 
 
-## 랜덤 광석 선택 (GameManager의 확률 사용)
+## Select random ore (using GameManager's probabilities)
 func _select_random_ore() -> void:
-	# GameManager의 get_random_ore() 사용 - 이미 확률 기반 선택 구현됨
+	# Use GameManager's get_random_ore() - already implements probability-based selection
 	current_ore = GameManager.get_random_ore()
 	mining_time = GameManager.ore_data[current_ore]["base_time"]
 	mine_progress_value = 0.0
 	
-	push_error("[랜덤] Selected ore: %s (tier %d)" % [
+	push_error("[Random] Selected ore: %s (tier %d)" % [
 		GameManager.ore_data[current_ore]["name"],
 		GameManager.ore_data[current_ore]["tier"]
 	])
@@ -121,11 +121,11 @@ func _update_display() -> void:
 	mine_progress.value = 0
 
 
-## 광석 선택 UI 제거 (랜덤 드롭 사용)
+## Ore selection UI removed (using random drops)
 
 
 func _refresh_ore_list() -> void:
-	# 보유 광석 목록 표시 (선택 버튼은 제거)
+	# Display owned ore list (selection buttons removed)
 	for child in ore_list.get_children():
 		child.queue_free()
 	
@@ -139,25 +139,25 @@ func _refresh_ore_list() -> void:
 
 
 func _on_ore_changed(_ore_id: String, _amount: int) -> void:
-	# 광석 개수 업데이트
+	# Update ore count
 	_refresh_ore_list()
 
 
 func _on_tier_unlocked(_tier: int) -> void:
-	# 새 티어 언락 시 확률 업데이트
+	# Update probabilities on new tier unlock
 	_refresh_probability_list()
 
 
-## 드롭 확률 목록 업데이트
+## Update drop probability list
 func _refresh_probability_list() -> void:
-	# 기존 자식 제거
+	# Remove existing children
 	for child in prob_list.get_children():
 		child.queue_free()
 	
-	# 확률 계산
+	# Calculate probabilities
 	var probabilities = _calculate_ore_probabilities()
 	
-	# 각 광석별 확률 표시 (내림차순으로 정렬)
+	# Display each ore's probability (sorted descending)
 	var sorted_ores: Array = []
 	for ore_id in GameManager.ore_data:
 		var data = GameManager.ore_data[ore_id]
@@ -169,18 +169,18 @@ func _refresh_probability_list() -> void:
 				"color": data["color"]
 			})
 	
-	# 확률 높은 순서로 정렬
+	# Sort by probability descending
 	sorted_ores.sort_custom(func(a, b): return a["probability"] > b["probability"])
 	
-	# 디버그: 합계 확인
+	# Debug: verify total
 	var total = 0.0
 	for ore_info in sorted_ores:
 		total += ore_info["probability"]
-	push_error("[확률] _refresh_probability_list():")
-	push_error("  표시할 광석 개수: %d" % sorted_ores.size())
-	push_error("  확률 합계: %.1f%%" % total)
+	push_error("[Probability] _refresh_probability_list():")
+	push_error("  Ores to display: %d" % sorted_ores.size())
+	push_error("  Probability total: %.1f%%" % total)
 	
-	# UI 추가
+	# Add to UI
 	for ore_info in sorted_ores:
 		var label = Label.new()
 		var prob_percent = snapped(ore_info["probability"], 0.1)

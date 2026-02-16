@@ -1,6 +1,6 @@
 extends Control
 
-## 인벤토리/가게 탭 - 제작한 아이템 확인 + 판매 또는 장착
+## Inventory/Shop Tab - View crafted items + sell or equip
 
 @onready var item_list: VBoxContainer = %ItemList
 @onready var sell_all_button: Button = %SellAllButton
@@ -34,7 +34,7 @@ func _update_list() -> void:
 		var item = items[i]
 		var hbox = HBoxContainer.new()
 
-		# 아이템 아이콘
+		# Item icon
 		var item_icon = TextureRect.new()
 		var icon_path = GameManager.recipe_data.get(item["recipe_id"], {}).get("icon", "")
 		if icon_path != "" and ResourceLoader.exists(icon_path):
@@ -43,23 +43,23 @@ func _update_list() -> void:
 		item_icon.custom_minimum_size = Vector2(32, 32)
 		hbox.add_child(item_icon)
 
-		# 등급 이모지 + 이름
+		# Grade emoji + name
 		var name_label = Label.new()
 		name_label.text = "%s %s [%s]" % [item["grade_emoji"], item["name"], item["grade_name"]]
 		name_label.add_theme_color_override("font_color", Color.html(item["grade_color"]))
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		hbox.add_child(name_label)
 
-		# 가격
+		# Price
 		var price_label = Label.new()
 		price_label.text = "%dG" % item["price"]
 		price_label.custom_minimum_size.x = 80
 		hbox.add_child(price_label)
 
-		# 액션 버튼
+		# Action buttons
 		var action_hbox = HBoxContainer.new()
 		
-		# 일반 아이템 또는 유물 (장착 가능)
+		# Regular item or artifact (equippable)
 		if item.get("type") and item.get("type") in ["weapon", "armor", "accessory"]:
 			var equip_btn = Button.new()
 			equip_btn.text = "Equip"
@@ -102,14 +102,14 @@ func _on_sell_all() -> void:
 
 
 func _on_equip_item(inventory_index: int) -> void:
-	# 모험가 선택 팝업 (간단히 처리 - 첫 번째 모험가)
+	# Adventurer selection popup (simplified - first adventurer)
 	var adventurers = GameManager.get_adventurers()
 	if adventurers.is_empty():
 		sell_result.text = "No adventurers available!"
 		_flash_result()
 		return
 	
-	# 간단히 첫 번째 모험가에 장착
+	# Simply equip to first adventurer
 	var adv = adventurers[0]
 	var success = GameManager.equip_item_to_adventurer(adv.id, inventory_index)
 	
