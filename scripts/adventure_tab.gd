@@ -1,6 +1,6 @@
 extends Control
 
-## 모험가 탭 UI - Phase 3 확장: 고용, 레벨업, 특수 능력
+## Adventure Tab UI - Phase 3 expansion: Hiring, Level-up, Special Abilities
 
 @onready var adventure_list: ItemList = %AdventureList
 @onready var adventurer_name_label: Label = %AdventurerNameLabel
@@ -16,7 +16,7 @@ extends Control
 var current_selected_adventurer: String = ""
 var exploration_timer: Timer
 
-# Phase 3 UI 컴포넌트 (동적 생성)
+# Phase 3 UI components (dynamically created)
 var level_label: Label
 var exp_progress_bar: ProgressBar
 var abilities_label: Label
@@ -25,17 +25,17 @@ var hire_cost_label: Label
 
 
 func _ready() -> void:
-	push_error("[게임] AdventureTab._ready() called")
-	# 노드 검증
-	push_error("  [검색] adventure_list: %s" % ("[OK]" if adventure_list else "[X]"))
-	push_error("  [검색] start_exploration_btn: %s" % ("[OK]" if start_exploration_btn else "[X]"))
-	push_error("  [검색] inventory_list: %s" % ("[OK]" if inventory_list else "[X]"))
+	push_error("[GAME] AdventureTab._ready() called")
+	# Node validation
+	push_error("  [FIND] adventure_list: %s" % ("[OK]" if adventure_list else "[X]"))
+	push_error("  [FIND] start_exploration_btn: %s" % ("[OK]" if start_exploration_btn else "[X]"))
+	push_error("  [FIND] inventory_list: %s" % ("[OK]" if inventory_list else "[X]"))
 	
 	if not adventure_list or not start_exploration_btn or not inventory_list:
-		push_error("[X] AdventureTab: 필수 노드를 찾을 수 없습니다!")
+		push_error("[X] AdventureTab: Required nodes not found!")
 		return
 	
-	# 신호 연결
+	# Signal connections
 	GameManager.exploration_started.connect(_on_exploration_started)
 	GameManager.exploration_completed.connect(_on_exploration_completed)
 	GameManager.item_equipped.connect(_on_item_equipped)
@@ -44,11 +44,11 @@ func _ready() -> void:
 	GameManager.experience_gained.connect(_on_experience_gained)
 	GameManager.adventurer_leveled_up.connect(_on_adventurer_leveled_up)
 	
-	# UI 신호
+	# UI signals
 	adventure_list.item_selected.connect(_on_adventure_selected)
 	start_exploration_btn.pressed.connect(_on_start_exploration)
 	
-	# 탐험 타이머
+	# Exploration timer
 	exploration_timer = Timer.new()
 	add_child(exploration_timer)
 	exploration_timer.timeout.connect(_on_exploration_timer_tick)
@@ -58,31 +58,31 @@ func _ready() -> void:
 	dungeon_tier_spinbox.max_value = 5
 	dungeon_tier_spinbox.value = 1
 	
-	# 인벤토리 신호
+	# Inventory signals
 	inventory_list.item_selected.connect(_on_inventory_item_selected)
 	
-	push_error("  [호출] Calling _refresh_adventure_list()...")
+	push_error("  [CALL] Calling _refresh_adventure_list()...")
 	_refresh_adventure_list()
 	push_error("[OK] AdventureTab._ready() completed - adventure_list has %d items" % adventure_list.item_count)
 
 
 func _refresh_adventure_list() -> void:
-	push_error("[갱신] _refresh_adventure_list() START")
-	push_error("  [게임] GameManager: %s" % ("[OK]" if GameManager else "[X]"))
-	push_error("  [게임] GameManager.adventure_system: %s" % ("[OK]" if GameManager.adventure_system else "[X]"))
+	push_error("[REFRESH] _refresh_adventure_list() START")
+	push_error("  [GAME] GameManager: %s" % ("[OK]" if GameManager else "[X]"))
+	push_error("  [GAME] GameManager.adventure_system: %s" % ("[OK]" if GameManager.adventure_system else "[X]"))
 	if GameManager.adventure_system:
-		push_error("  [통계] GameManager.adventure_system.adventurers.size(): %d" % GameManager.adventure_system.adventurers.size())
+		push_error("  [STAT] GameManager.adventure_system.adventurers.size(): %d" % GameManager.adventure_system.adventurers.size())
 	
 	adventure_list.clear()
 	
 	var all_adventurers = GameManager.get_adventurers()
-	push_error("  [목록] all_adventurers.size(): %d" % all_adventurers.size())
-	push_error("  [목록] all_adventurers type: %s" % typeof(all_adventurers))
+	push_error("  [LIST] all_adventurers.size(): %d" % all_adventurers.size())
+	push_error("  [LIST] all_adventurers type: %s" % typeof(all_adventurers))
 	
 	if all_adventurers.size() == 0:
-		push_error("[주의]  WARNING: all_adventurers is empty!")
-		# 강제로 다시 로드 시도
-		push_error("[수리] Forcing GameManager.adventure_system._load_data()...")
+		push_error("[WARN]  WARNING: all_adventurers is empty!")
+		# Force reload attempt
+		push_error("[FIX] Forcing GameManager.adventure_system._load_data()...")
 		if GameManager.adventure_system:
 			GameManager.adventure_system._load_data()
 			all_adventurers = GameManager.get_adventurers()
@@ -130,11 +130,11 @@ func _update_detail_view(adv) -> void:
 	if ResourceLoader.exists(adv.portrait):
 		adventurer_portrait.texture = load(adv.portrait)
 	
-	# Phase 3: 레벨 & 경험치 표시
+	# Phase 3: Level & experience display
 	_update_level_display(adv)
 	
 	if not adv.hired:
-		# 미고용 모험가: 고용 버튼 표시
+		# Unhired adventurer: show hire button
 		_show_hire_button(adv)
 		start_exploration_btn.hide()
 		dungeon_tier_spinbox.hide()
@@ -143,7 +143,7 @@ func _update_detail_view(adv) -> void:
 		inventory_list.get_parent().hide()
 		return
 	
-	# 고용된 모험가: 일반 UI 표시
+	# Hired adventurer: show normal UI
 	if hire_button:
 		hire_button.queue_free()
 		hire_button = null
@@ -153,23 +153,23 @@ func _update_detail_view(adv) -> void:
 	equipped_items_container.get_parent().show()
 	inventory_list.get_parent().show()
 	
-	# 장착 아이템 표시
+	# Show equipped items
 	_refresh_equipped_items(adv)
 	
-	# 탐험 상태
+	# Exploration status
 	_update_exploration_status(adv)
 	
-	# 속도 배수 표시
-	var speed_text = "속도: %.2f배" % adv.get_speed_multiplier()
+	# Speed multiplier display
+	var speed_text = "Speed: x%.2f" % adv.get_speed_multiplier()
 	if exploration_status_label:
 		exploration_status_label.text = speed_text
 	
-	# 인벤토리 표시 (장착 가능한 아이템만)
+	# Show inventory (equippable items only)
 	_refresh_inventory_list()
 
 
 func _update_level_display(adv) -> void:
-	# 레벨 & 경험치 UI 업데이트
+	# Level & experience UI update
 	if not level_label:
 		level_label = Label.new()
 		adventurer_name_label.add_sibling(level_label)
@@ -179,24 +179,24 @@ func _update_level_display(adv) -> void:
 		exp_progress_bar.custom_minimum_size = Vector2(0, 20)
 		level_label.add_sibling(exp_progress_bar)
 	
-	level_label.text = "[레벨] Lv.%d (다음 레벨까지: %d)" % [adv.level, adv.get_exp_to_next_level()]
+	level_label.text = "[LV] Lv.%d (Next level: %d)" % [adv.level, adv.get_exp_to_next_level()]
 	exp_progress_bar.value = adv.get_exp_progress() * 100.0
 	
-	# Phase 3: 특수 능력 표시
+	# Phase 3: Special abilities display
 	_update_abilities_display(adv)
 
 
 func _update_abilities_display(adv) -> void:
 	if not abilities_label:
 		abilities_label = Label.new()
-		abilities_label.text = "[유물] 특수 능력"
+		abilities_label.text = "[ABILITY] Special Abilities"
 		adventurer_description_label.add_sibling(abilities_label)
 	
 	var all_abilities = GameManager.get_all_class_abilities(adv.id)
-	var abilities_text = "[유물] 특수 능력\n"
+	var abilities_text = "[ABILITY] Special Abilities\n"
 	
 	for ability in all_abilities:
-		var lock_icon = "[잠김]" if not ability.get("is_unlocked", false) else ability.get("emoji", "[강화]")
+		var lock_icon = "[LOCKED]" if not ability.get("is_unlocked", false) else ability.get("emoji", "[BUFF]")
 		var level_info = " [Lv.%d]" % ability.get("unlock_level", 1)
 		abilities_text += "%s %s%s\n" % [lock_icon, ability.get("name", "?"), level_info]
 	
@@ -212,38 +212,38 @@ func _show_hire_button(adv) -> void:
 		adventurer_name_label.add_sibling(hire_cost_label)
 	
 	var hire_cost = GameManager.get_hire_cost(adv.id)
-	hire_cost_label.text = "[금화] 고용 비용: %d Gold" % hire_cost
+	hire_cost_label.text = "[GOLD] Hire cost: %d Gold" % hire_cost
 	
 	hire_button = Button.new()
-	hire_button.text = "고용하기 (%d Gold)" % hire_cost
+	hire_button.text = "Hire (%d Gold)" % hire_cost
 	hire_button.custom_minimum_size = Vector2(0, 50)
 	hire_button.pressed.connect(func(): _on_hire_button_pressed(adv.id))
 	adventurer_name_label.add_sibling(hire_button)
 
 
 func _refresh_equipped_items(adv) -> void:
-	# 기존 UI 정리
+	# Clear existing UI
 	for child in equipped_items_container.get_children():
 		child.queue_free()
 	
-	# 장착 아이템 표시
+	# Show equipped items
 	for i in range(adv.equipped_items.size()):
 		var item = adv.equipped_items[i]
 		var hbox = HBoxContainer.new()
 		
-		# 아이템 정보
+		# Item info
 		var item_label = Label.new()
 		var speed_bonus = ""
 		if item.has("speed_bonus"):
-			speed_bonus = " [속도: ×%.2f]" % item["speed_bonus"]
-		var artifact_marker = " [유물]" if item.get("is_artifact", false) else ""
+			speed_bonus = " [Speed: x%.2f]" % item["speed_bonus"]
+		var artifact_marker = " [Artifact]" if item.get("is_artifact", false) else ""
 		item_label.text = "%s (%s)%s%s" % [item["name"], item.get("type", "?"), speed_bonus, artifact_marker]
 		item_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		hbox.add_child(item_label)
 		
-		# 해제 버튼
+		# Unequip button
 		var unequip_btn = Button.new()
-		unequip_btn.text = "해제"
+		unequip_btn.text = "Unequip"
 		unequip_btn.custom_minimum_size.x = 50
 		var item_index = i
 		unequip_btn.pressed.connect(func(): _on_unequip_item(item_index))
@@ -253,7 +253,7 @@ func _refresh_equipped_items(adv) -> void:
 	
 	if adv.equipped_items.is_empty():
 		var no_items_label = Label.new()
-		no_items_label.text = "[장착 아이템 없음]"
+		no_items_label.text = "[No equipped items]"
 		equipped_items_container.add_child(no_items_label)
 
 
@@ -263,7 +263,7 @@ func _update_exploration_status(adv) -> void:
 	
 	if adv.is_exploring:
 		exploration_progress.show()
-		exploration_status_label.text = "[탐험] 탐험중..."
+		exploration_status_label.text = "[EXPLORE] Exploring..."
 		exploration_timer.start()
 	else:
 		exploration_progress.hide()
@@ -292,7 +292,7 @@ func _on_exploration_timer_tick() -> void:
 	if exploration_progress:
 		exploration_progress.value = adv.get_exploration_progress() * 100.0
 	
-	# 완료 확인
+	# Check completion
 	var result = GameManager.check_and_complete_exploration(current_selected_adventurer)
 	if not result.is_empty():
 		_update_detail_view(adv)
@@ -300,7 +300,7 @@ func _on_exploration_timer_tick() -> void:
 
 
 func _on_exploration_started(adventurer_id: String, tier: int) -> void:
-	print("탐험 시작: %s - Tier %d" % [adventurer_id, tier])
+	print("Exploration started: %s - Tier %d" % [adventurer_id, tier])
 
 
 func _on_exploration_completed(adventurer_id: String, exploration_data: Dictionary) -> void:
@@ -309,22 +309,22 @@ func _on_exploration_completed(adventurer_id: String, exploration_data: Dictiona
 	
 	var rewards = exploration_data.get("rewards", {})
 	
-	print("탐험 완료: %s" % adventurer_id)
-	print("금화: %d" % rewards.get("gold", 0))
+	print("Exploration complete: %s" % adventurer_id)
+	print("Gold: %d" % rewards.get("gold", 0))
 	
-	# 보상 요약 출력
-	var reward_summary = "[OK] 탐험 완료!\n"
-	reward_summary += "[금화] %d Gold\n" % rewards.get("gold", 0)
-	reward_summary += "[명성] %d 경험치\n" % rewards.get("experience", 0)
+	# Reward summary output
+	var reward_summary = "[OK] Exploration complete!\n"
+	reward_summary += "[GOLD] %d Gold\n" % rewards.get("gold", 0)
+	reward_summary += "[EXP] %d Experience\n" % rewards.get("experience", 0)
 	
 	var item_count = 0
 	for ore_reward in rewards.get("items", []):
 		item_count += ore_reward.get("quantity", 0)
 	if item_count > 0:
-		reward_summary += "[유물] 광석 %d개\n" % item_count
+		reward_summary += "[ITEM] %d Ores\n" % item_count
 	
 	if rewards.get("artifacts", []).size() > 0:
-		reward_summary += "[유물] 유물 %d개!" % rewards.get("artifacts", []).size()
+		reward_summary += "[ITEM] %d Artifacts!" % rewards.get("artifacts", []).size()
 	
 	print(reward_summary)
 
@@ -361,15 +361,15 @@ func _refresh_inventory_list() -> void:
 	for i in range(inv_items.size()):
 		var item = inv_items[i]
 		
-		# 장착 가능한 아이템만 표시
+		# Show only equippable items
 		if not item.get("type") or item.get("type") not in ["weapon", "armor", "accessory"]:
 			continue
 		
 		var item_text = "%s %s" % [item.get("grade_emoji", ""), item["name"]]
 		if item.get("is_artifact", false):
-			item_text += " [유물]"
+			item_text += " [Artifact]"
 		if item.has("speed_bonus"):
-			item_text += " [속도: ×%.2f]" % item["speed_bonus"]
+			item_text += " [Speed: x%.2f]" % item["speed_bonus"]
 		
 		inventory_list.add_item(item_text)
 		inventory_list.set_item_metadata(inventory_list.item_count - 1, i)
@@ -388,24 +388,24 @@ func _on_inventory_item_selected(index: int) -> void:
 		var adv = GameManager.get_adventurer(current_selected_adventurer)
 		if adv:
 			_update_detail_view(adv)
-		print("[OK] 장착 완료!")
+		print("[OK] Item equipped!")
 
 
-## ===== Phase 3 신호 핸들러 =====
+## ===== Phase 3 signal handlers =====
 
 func _on_hire_button_pressed(adventurer_id: String) -> void:
 	var success = GameManager.hire_adventurer(adventurer_id)
 	if success:
 		var adv = GameManager.get_adventurer(adventurer_id)
-		print("[OK] %s을(를) 고용했습니다!" % adv.name)
+		print("[OK] Hired %s!" % adv.name)
 		_update_detail_view(adv)
 		_refresh_adventure_list()
 	else:
-		print("[X] 고용 실패: 골드가 부족합니다.")
+		print("[X] Hire failed: Not enough gold.")
 
 
 func _on_adventurer_hired(adventurer_id: String, cost: int) -> void:
-	print("[고용] 모험가 고용: %s (비용: %d Gold)" % [adventurer_id, cost])
+	print("[HIRE] Adventurer hired: %s (cost: %d Gold)" % [adventurer_id, cost])
 
 
 func _on_experience_gained(adventurer_id: String, amount: int) -> void:
@@ -413,7 +413,7 @@ func _on_experience_gained(adventurer_id: String, amount: int) -> void:
 		var adv = GameManager.get_adventurer(adventurer_id)
 		if adv:
 			_update_level_display(adv)
-		print("[명성] %s이(가) %d 경험치를 획득했습니다!" % [adventurer_id, amount])
+		print("[EXP] %s gained %d experience!" % [adventurer_id, amount])
 
 
 func _on_adventurer_leveled_up(adventurer_id: String, new_level: int, stat_changes: Dictionary) -> void:
@@ -426,12 +426,12 @@ func _on_adventurer_leveled_up(adventurer_id: String, new_level: int, stat_chang
 	var new_hp = stat_changes.get("new_hp", 0)
 	var new_speed = stat_changes.get("new_speed", 1.0)
 	
-	print("[축하] %s이(가) Lv.%d로 레벨업했습니다!" % [adventurer_id, new_level])
-	print("  [통계] HP: +%d (총 %d)" % [hp_increase, new_hp])
-	print("  [번개] 속도: %.2f배" % new_speed)
+	print("[LEVELUP] %s leveled up to Lv.%d!" % [adventurer_id, new_level])
+	print("  [STAT] HP: +%d (total %d)" % [hp_increase, new_hp])
+	print("  [SPEED] Speed: x%.2f" % new_speed)
 	
-	# 새 능력 해금 확인
+	# Check for newly unlocked abilities
 	if stat_changes.has("new_abilities"):
 		var new_abilities = stat_changes.get("new_abilities", [])
 		for ability_id in new_abilities:
-			print("  [유물] 새로운 능력 해금: %s" % ability_id)
+			print("  [ABILITY] New ability unlocked: %s" % ability_id)

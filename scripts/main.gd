@@ -1,14 +1,14 @@
 extends Control
 
-## 메인 화면 - 탭 전환 + 상단 리소스 바
+## Main screen - Tab switching + Top resource bar
 
 @onready var tab_container: TabContainer = %TabContainer
 @onready var gold_label: Label = %GoldLabel
 @onready var reputation_label: Label = %ReputationLabel
 
 func _ready() -> void:
-	# 한글 폰트 설정 시도
-	_setup_korean_fonts()
+	# Font setup attempt
+	_setup_fonts()
 	
 	GameManager.gold_changed.connect(_on_gold_changed)
 	GameManager.reputation_changed.connect(_on_reputation_changed)
@@ -28,21 +28,21 @@ func _update_status() -> void:
 	reputation_label.text = "Reputation: %d" % GameManager.get_reputation()
 
 
-func _setup_korean_fonts() -> void:
-	"""한글 폰트를 프로젝트의 모든 레이블과 UI 요소에 설정합니다."""
-	# Web export 환경에서도 작동하도록 기본 폰트 사용
-	# Godot 4.6에서는 시스템 폰트를 직접 사용할 수 없으므로,
-	# 대신 모든 텍스트 요소를 재귀적으로 순회하며 폰트 설정
+func _setup_fonts() -> void:
+	"""Set up fonts for all labels and UI elements in the project."""
+	# Use default font for web export compatibility
+	# In Godot 4.6, system fonts cannot be used directly,
+	# so recursively traverse all text elements and set fonts
 	_apply_fonts_recursive(self)
 
 
 func _apply_fonts_recursive(node: Node) -> void:
-	"""노드 트리를 순회하며 모든 Control에 폰트를 적용합니다."""
+	"""Traverse node tree and apply font to all Controls."""
 	if node is Label or node is Button or node is LineEdit or node is TextEdit:
-		# 이미 설정된 폰트가 없다면 기본 폰트 사용
-		# Web 환경에서는 각 노드의 theme을 기본값으로 유지
+		# If no font is already set, use default font
+		# In web environment, keep each node's theme at default
 		pass
 	
-	# 모든 자식 노드에 재귀적으로 적용
+	# Recursively apply to all child nodes
 	for child in node.get_children():
 		_apply_fonts_recursive(child)
