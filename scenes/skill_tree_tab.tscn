@@ -26,7 +26,7 @@ theme_override_constants/separation = 20
 
 [node name="Title" type="Label" parent="VBox/TopBar"]
 layout_mode = 2
-text = "[스킬 트리]"
+text = "[Skill Tree]"
 theme_override_font_sizes/font_size = 20
 
 [node name="Spacer" type="Control" parent="VBox/TopBar"]
@@ -36,7 +36,7 @@ size_flags_horizontal = 3
 [node name="SkillGoldLabel" type="Label" parent="VBox/TopBar"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "[보유 금화] 0 Gold"
+text = "[Gold] 0 Gold"
 theme_override_font_sizes/font_size = 16
 
 [node name="Sep" type="HSeparator" parent="VBox"]
@@ -74,7 +74,7 @@ theme_override_constants/separation = 8
 [node name="SkillName" type="Label" parent="VBox/ContentHBox/SkillInfoPanel/InfoVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "스킬 이름"
+text = "Skill Name"
 theme_override_font_sizes/font_size = 18
 autowrap_mode = 2
 
@@ -84,22 +84,22 @@ layout_mode = 2
 [node name="SkillDesc" type="Label" parent="VBox/ContentHBox/SkillInfoPanel/InfoVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "스킬 설명"
+text = "Skill Description"
 autowrap_mode = 2
 
 [node name="SkillCost" type="Label" parent="VBox/ContentHBox/SkillInfoPanel/InfoVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "비용: 0 Gold"
+text = "Cost: 0 Gold"
 
 [node name="SkillReq" type="Label" parent="VBox/ContentHBox/SkillInfoPanel/InfoVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "요구: 없음"
+text = "Requires: None"
 autowrap_mode = 2
 
 [node name="SkillStatus" type="Label" parent="VBox/ContentHBox/SkillInfoPanel/InfoVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "상태: -"
+text = "Status: -"
 autowrap_mode = 2

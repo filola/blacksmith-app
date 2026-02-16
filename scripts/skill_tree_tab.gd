@@ -1,6 +1,6 @@
 extends Control
 
-## 스킬 트리 탭 - 스킬 해금 및 진행 상태 표시
+## Skill Tree Tab - Displays skill unlock status and progression
 
 @onready var skill_canvas: Control = %SkillTreeCanvas
 @onready var info_panel: PanelContainer = %SkillInfoPanel
@@ -11,12 +11,12 @@ extends Control
 @onready var info_status: Label = %SkillStatus
 @onready var gold_label: Label = %SkillGoldLabel
 
-# 스킬 노드 UI 매핑
+# Skill node UI mapping
 var skill_buttons: Dictionary = {}  # skill_id → Button
 var skill_labels: Dictionary = {}   # skill_id → Label
-var connector_lines: Array = []     # 연결선 데이터
+var connector_lines: Array = []     # Connection line data
 
-# 레이아웃 상수
+# Layout constants
 const NODE_WIDTH = 140
 const NODE_HEIGHT = 50
 const DEPTH_SPACING_Y = 90
@@ -24,10 +24,10 @@ const NODE_SPACING_X = 160
 const CANVAS_OFFSET_Y = 30
 const CANVAS_OFFSET_X = 20
 
-# 색상
-const COLOR_UNLOCKED = Color(0.2, 0.8, 0.3)      # 녹색 - 해금됨
-const COLOR_AVAILABLE = Color(0.3, 0.6, 1.0)      # 파랑 - 해금 가능
-const COLOR_LOCKED = Color(0.4, 0.4, 0.4)         # 회색 - 잠김
+# Colors
+const COLOR_UNLOCKED = Color(0.2, 0.8, 0.3)      # Green - Unlocked
+const COLOR_AVAILABLE = Color(0.3, 0.6, 1.0)      # Blue - Available
+const COLOR_LOCKED = Color(0.4, 0.4, 0.4)         # Gray - Locked
 const COLOR_LINE_ACTIVE = Color(0.2, 0.8, 0.3, 0.6)
 const COLOR_LINE_INACTIVE = Color(0.4, 0.4, 0.4, 0.4)
 
@@ -51,12 +51,12 @@ func _on_skill_unlocked(_skill_id: String) -> void:
 
 
 func _update_gold_display() -> void:
-	gold_label.text = "[보유 금화] %d Gold" % GameManager.get_gold()
+	gold_label.text = "[Gold] %d Gold" % GameManager.get_gold()
 
 
-## 스킬 트리 전체 빌드
+## Build the entire skill tree
 func _build_skill_tree() -> void:
-	# 기존 버튼 제거
+	# Remove existing buttons
 	for child in skill_canvas.get_children():
 		child.queue_free()
 	skill_buttons.clear()
@@ -65,10 +65,10 @@ func _build_skill_tree() -> void:
 	
 	var skills = GameManager.skills_data
 	if skills.is_empty():
-		push_error("[스킬트리] skills_data is empty!")
+		push_error("[SkillTree] skills_data is empty!")
 		return
 	
-	# depth별 스킬 분류
+	# Classify skills by depth
 	var depth_groups: Dictionary = {}
 	for skill_id in skills:
 		var depth = skills[skill_id].get("depth", 0)
@@ -76,11 +76,11 @@ func _build_skill_tree() -> void:
 			depth_groups[depth] = []
 		depth_groups[depth].append(skill_id)
 	
-	# 정렬된 depth 키
+	# Sorted depth keys
 	var depths = depth_groups.keys()
 	depths.sort()
 	
-	# 각 depth별 스킬 노드 배치
+	# Place skill nodes per depth level
 	for depth in depths:
 		var group = depth_groups[depth]
 		var count = group.size()
@@ -93,7 +93,7 @@ func _build_skill_tree() -> void:
 			var y = depth * DEPTH_SPACING_Y + CANVAS_OFFSET_Y
 			_create_skill_node(skill_id, Vector2(x, y))
 	
-	# 연결선 데이터 생성
+	# Generate connection line data
 	for skill_id in skills:
 		var requires = skills[skill_id].get("requires", [])
 		for req_id in requires:
@@ -103,14 +103,14 @@ func _build_skill_tree() -> void:
 					"to": skill_id
 				})
 	
-	# 연결선 그리기 위해 canvas redraw 요청
+	# Request canvas redraw for connection lines
 	skill_canvas.draw.connect(_on_canvas_draw)
 	skill_canvas.queue_redraw()
 	
-	push_error("[스킬트리] Built %d skill nodes across %d depths" % [skills.size(), depths.size()])
+	push_error("[SkillTree] Built %d skill nodes across %d depths" % [skills.size(), depths.size()])
 
 
-## 개별 스킬 노드 생성
+## Create individual skill node
 func _create_skill_node(skill_id: String, pos: Vector2) -> void:
 	var skill = GameManager.skills_data[skill_id]
 	
@@ -120,7 +120,7 @@ func _create_skill_node(skill_id: String, pos: Vector2) -> void:
 	btn.text = skill["name"]
 	btn.tooltip_text = skill["description"]
 	
-	# 스타일 설정
+	# Apply style
 	_apply_button_style(btn, skill_id)
 	
 	btn.pressed.connect(_on_skill_clicked.bind(skill_id))
@@ -131,7 +131,7 @@ func _create_skill_node(skill_id: String, pos: Vector2) -> void:
 	skill_buttons[skill_id] = btn
 
 
-## 버튼 스타일 적용
+## Apply button style
 func _apply_button_style(btn: Button, skill_id: String) -> void:
 	var skill = GameManager.skills_data[skill_id]
 	var is_unlocked = skill.get("unlocked", false)
@@ -174,7 +174,7 @@ func _apply_button_style(btn: Button, skill_id: String) -> void:
 	btn.add_theme_stylebox_override("pressed", pressed_style)
 
 
-## 연결선 그리기
+## Draw connection lines
 func _on_canvas_draw() -> void:
 	for conn in connector_lines:
 		var from_btn = skill_buttons.get(conn["from"])
@@ -193,12 +193,12 @@ func _on_canvas_draw() -> void:
 			if to_skill.get("unlocked", false):
 				color = COLOR_LINE_ACTIVE
 			else:
-				color = Color(0.3, 0.6, 1.0, 0.5)  # 파란 계열 - 다음 단계
+				color = Color(0.3, 0.6, 1.0, 0.5)  # Blue - Next tier
 		
 		skill_canvas.draw_line(from_pos, to_pos, color, 2.0, true)
 
 
-## 호버 - 정보 패널 표시
+## Hover - Show info panel
 func _on_skill_hovered(skill_id: String) -> void:
 	var skill = GameManager.skills_data[skill_id]
 	
@@ -206,19 +206,19 @@ func _on_skill_hovered(skill_id: String) -> void:
 	info_desc.text = skill["description"]
 	
 	if skill.get("unlocked", false):
-		info_cost.text = "[해금됨]"
+		info_cost.text = "[Unlocked]"
 		info_cost.add_theme_color_override("font_color", COLOR_UNLOCKED)
 	else:
-		info_cost.text = "비용: %d Gold" % skill.get("cost", 0)
+		info_cost.text = "Cost: %d Gold" % skill.get("cost", 0)
 		if GameManager.get_gold() >= skill.get("cost", 0):
 			info_cost.add_theme_color_override("font_color", Color.WHITE)
 		else:
 			info_cost.add_theme_color_override("font_color", Color(1, 0.3, 0.3))
 	
-	# 요구 스킬
+	# Required skills
 	var requires = skill.get("requires", [])
 	if requires.is_empty():
-		info_req.text = "요구: 없음"
+		info_req.text = "Requires: None"
 	else:
 		var req_names: Array = []
 		for req_id in requires:
@@ -229,37 +229,37 @@ func _on_skill_hovered(skill_id: String) -> void:
 				req_names.append("[v] " + req_name)
 			else:
 				req_names.append("[x] " + req_name)
-		info_req.text = "요구: " + ", ".join(req_names)
+		info_req.text = "Requires: " + ", ".join(req_names)
 	
-	# 상태
+	# Status
 	var check = GameManager.can_unlock_skill(skill_id)
 	if skill.get("unlocked", false):
-		info_status.text = "상태: 해금 완료"
+		info_status.text = "Status: Unlocked"
 		info_status.add_theme_color_override("font_color", COLOR_UNLOCKED)
 	elif check["can"]:
-		info_status.text = "상태: 해금 가능! (클릭)"
+		info_status.text = "Status: Available! (Click)"
 		info_status.add_theme_color_override("font_color", COLOR_AVAILABLE)
 	else:
-		info_status.text = "상태: " + check["reason"]
+		info_status.text = "Status: " + check["reason"]
 		info_status.add_theme_color_override("font_color", COLOR_LOCKED)
 	
 	info_panel.visible = true
 
 
-## 호버 종료
+## Hover end
 func _on_skill_unhovered() -> void:
 	info_panel.visible = false
 
 
-## 스킬 클릭 → 해금 시도
+## Skill click - Attempt unlock
 func _on_skill_clicked(skill_id: String) -> void:
 	var result = GameManager.unlock_skill(skill_id)
 	if result:
 		_refresh_button_states()
 		skill_canvas.queue_redraw()
-		# 호버 정보 업데이트
+		# Update hover info
 		_on_skill_hovered(skill_id)
-		# 성공 피드백
+		# Success feedback
 		var btn = skill_buttons.get(skill_id)
 		if btn:
 			var tween = create_tween()
@@ -267,7 +267,7 @@ func _on_skill_clicked(skill_id: String) -> void:
 			tween.tween_property(btn, "scale", Vector2(1, 1), 0.2)
 
 
-## 버튼 상태 새로고침
+## Refresh button states
 func _refresh_button_states() -> void:
 	for skill_id in skill_buttons:
 		var btn = skill_buttons[skill_id]
