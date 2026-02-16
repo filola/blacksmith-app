@@ -99,11 +99,11 @@ func _refresh_adventure_list() -> void:
 		
 		var status = ""
 		if not adv.hired:
-			status = " [금화] 미고용"
+			status = " [Not Hired]"
 		elif adv.is_exploring:
-			status = "[탐험] 탐험중"
+			status = " [Exploring]"
 		else:
-			status = "[대기] 대기중"
+			status = " [Idle]"
 		
 		var level_info = " Lv.%d" % adv.level if adv.hired else ""
 		var item_text = "%s%s%s" % [adv.name, status, level_info]

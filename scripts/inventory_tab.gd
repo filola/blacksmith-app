@@ -21,7 +21,7 @@ func _update_list() -> void:
 
 	if GameManager.get_inventory_items().is_empty():
 		var empty = Label.new()
-		empty.text = "아이템이 없습니다. 제작 탭에서 만들어보세요!"
+		empty.text = "No items. Try crafting some!"
 		empty.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 		item_list.add_child(empty)
 		sell_all_button.disabled = true
@@ -52,7 +52,7 @@ func _update_list() -> void:
 
 		# 가격
 		var price_label = Label.new()
-		price_label.text = "[금화]%d" % item["price"]
+		price_label.text = "%dG" % item["price"]
 		price_label.custom_minimum_size.x = 80
 		hbox.add_child(price_label)
 
@@ -62,14 +62,14 @@ func _update_list() -> void:
 		# 일반 아이템 또는 유물 (장착 가능)
 		if item.get("type") and item.get("type") in ["weapon", "armor", "accessory"]:
 			var equip_btn = Button.new()
-			equip_btn.text = "장착"
+			equip_btn.text = "Equip"
 			equip_btn.custom_minimum_size.x = 60
 			var item_idx = i
 			equip_btn.pressed.connect(func(): _on_equip_item(item_idx))
 			action_hbox.add_child(equip_btn)
 		
 		var sell_btn = Button.new()
-		sell_btn.text = "판매"
+		sell_btn.text = "Sell"
 		sell_btn.custom_minimum_size.x = 60
 		var item_ref = item
 		sell_btn.pressed.connect(func(): _on_sell_item(item_ref))
@@ -86,7 +86,7 @@ func _on_sell_item(item: Dictionary) -> void:
 		return
 	var price = GameManager.sell_item(index)
 	if price > 0:
-		sell_result.text = "[금화] %d Gold 획득!" % price
+		sell_result.text = "+%d Gold!" % price
 		_flash_result()
 		_update_list()
 
@@ -96,7 +96,7 @@ func _on_sell_all() -> void:
 	while not GameManager.get_inventory_items().is_empty():
 		total += GameManager.sell_item(0)
 	if total > 0:
-		sell_result.text = "[금화] 총 %d Gold 획득!" % total
+		sell_result.text = "+%d Gold total!" % total
 		_flash_result()
 		_update_list()
 
@@ -105,7 +105,7 @@ func _on_equip_item(inventory_index: int) -> void:
 	# 모험가 선택 팝업 (간단히 처리 - 첫 번째 모험가)
 	var adventurers = GameManager.get_adventurers()
 	if adventurers.is_empty():
-		sell_result.text = "[주의] 모험가가 없습니다!"
+		sell_result.text = "No adventurers available!"
 		_flash_result()
 		return
 	
@@ -115,11 +115,11 @@ func _on_equip_item(inventory_index: int) -> void:
 	
 	if success:
 		var inv_items = GameManager.get_inventory_items()
-		sell_result.text = "[OK] %s을(를) %s에게 장착!" % [inv_items[inventory_index]["name"] if inventory_index < inv_items.size() else "아이템", adv.name]
+		sell_result.text = "Equipped %s to %s!" % [inv_items[inventory_index]["name"] if inventory_index < inv_items.size() else "item", adv.name]
 		_flash_result()
 		_update_list()
 	else:
-		sell_result.text = "[X] 장착 실패!"
+		sell_result.text = "Equip failed!"
 		_flash_result()
 
 

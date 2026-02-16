@@ -115,8 +115,8 @@ func _select_random_ore() -> void:
 
 func _update_display() -> void:
 	var data = GameManager.ore_data[current_ore]
-	mine_label.text = data["name"] + " 채굴 중"
-	power_label.text = "채굴력: %.1f" % GameManager.get_mine_power()
+	mine_label.text = "Mining: " + data["name"]
+	power_label.text = "Power: %.1f" % GameManager.get_mine_power()
 	mining_time = data["base_time"]
 	mine_progress.value = 0
 
@@ -133,7 +133,7 @@ func _refresh_ore_list() -> void:
 		var data = GameManager.ore_data[ore_id]
 		if data["tier"] <= GameManager.get_max_unlocked_tier():
 			var label = Label.new()
-			label.text = "%s: %d개" % [data["name"], GameManager.get_ore_count(ore_id)]
+			label.text = "%s: %d" % [data["name"], GameManager.get_ore_count(ore_id)]
 			label.add_theme_color_override("font_color", Color.html(data["color"]))
 			ore_list.add_child(label)
 
