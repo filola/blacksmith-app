@@ -1,0 +1,74 @@
+{
+  "cursed_ring": {
+    "id": "cursed_ring",
+    "name": "Cursed Ring",
+    "type": "accessory",
+    "subtype": "ring",
+    "description": "Exploration speed +10%",
+    "rarity": "rare",
+    "price": 100,
+    "speed_bonus": 1.1,
+    "dungeon_tier_min": 1,
+    "icon": "res://resources/assets/dungeon-crawl/items/ring1.png"
+  },
+  "golden_amulet": {
+    "id": "golden_amulet",
+    "name": "Golden Amulet",
+    "type": "accessory",
+    "subtype": "amulet",
+    "description": "Exploration speed +20%",
+    "rarity": "epic",
+    "price": 250,
+    "speed_bonus": 1.2,
+    "dungeon_tier_min": 2,
+    "icon": "res://resources/assets/dungeon-crawl/items/amulet1.png"
+  },
+  "dragon_scale": {
+    "id": "dragon_scale",
+    "name": "Dragon Scale",
+    "type": "armor",
+    "subtype": "chest",
+    "description": "Exploration speed +15%, strong defense",
+    "rarity": "epic",
+    "price": 400,
+    "speed_bonus": 1.15,
+    "dungeon_tier_min": 2,
+    "icon": "res://resources/assets/dungeon-crawl/armour/scale_mail1.png"
+  },
+  "holy_grail": {
+    "id": "holy_grail",
+    "name": "Holy Grail",
+    "type": "accessory",
+    "subtype": "cup",
+    "description": "Exploration speed +30%, healing ability",
+    "rarity": "legendary",
+    "price": 1000,
+    "speed_bonus": 1.3,
+    "dungeon_tier_min": 3,
+    "icon": "res://resources/assets/dungeon-crawl/items/cup1.png"
+  },
+  "eternal_blade": {
+    "id": "eternal_blade",
+    "name": "Eternal Blade",
+    "type": "weapon",
+    "subtype": "sword",
+    "description": "Exploration speed +25%",
+    "rarity": "legendary",
+    "price": 800,
+    "speed_bonus": 1.25,
+    "dungeon_tier_min": 3,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/demon_blade.png"
+  },
+  "shadow_cloak": {
+    "id": "shadow_cloak",
+    "name": "Shadow Cloak",
+    "type": "armor",
+    "subtype": "cloak",
+    "description": "Exploration speed +22%",
+    "rarity": "epic",
+    "price": 350,
+    "speed_bonus": 1.22,
+    "dungeon_tier_min": 2,
+    "icon": "res://resources/assets/dungeon-crawl/armour/cloak1.png"
+  }
+}

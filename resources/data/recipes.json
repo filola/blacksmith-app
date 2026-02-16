@@ -1,0 +1,102 @@
+{
+  "copper_sword": {
+    "name": "Copper Sword",
+    "type": "weapon",
+    "subtype": "sword",
+    "materials": {"copper": 3},
+    "base_price": 10,
+    "tier": 1,
+    "unlocked": true,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/short_sword1.png"
+  },
+  "copper_shield": {
+    "name": "Copper Shield",
+    "type": "armor",
+    "subtype": "shield",
+    "materials": {"copper": 4},
+    "base_price": 12,
+    "tier": 1,
+    "unlocked": true,
+    "icon": "res://resources/assets/dungeon-crawl/armour/buckler1.png"
+  },
+  "tin_dagger": {
+    "name": "Tin Dagger",
+    "type": "weapon",
+    "subtype": "dagger",
+    "materials": {"tin": 2},
+    "base_price": 8,
+    "tier": 1,
+    "unlocked": true,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/dagger.png"
+  },
+  "bronze_sword": {
+    "name": "Bronze Sword",
+    "type": "weapon",
+    "subtype": "sword",
+    "materials": {"copper": 2, "tin": 2},
+    "base_price": 25,
+    "tier": 1,
+    "unlocked": true,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/long_sword1.png"
+  },
+  "iron_sword": {
+    "name": "Iron Sword",
+    "type": "weapon",
+    "subtype": "sword",
+    "materials": {"iron": 4},
+    "base_price": 50,
+    "tier": 2,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/greatsword1.png"
+  },
+  "iron_armor": {
+    "name": "Iron Armor",
+    "type": "armor",
+    "subtype": "chest",
+    "materials": {"iron": 6},
+    "base_price": 80,
+    "tier": 2,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/armour/chain_mail1.png"
+  },
+  "silver_bow": {
+    "name": "Silver Bow",
+    "type": "weapon",
+    "subtype": "bow",
+    "materials": {"silver": 4, "iron": 2},
+    "base_price": 100,
+    "tier": 2,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/hand_axe1.png"
+  },
+  "gold_staff": {
+    "name": "Gold Staff",
+    "type": "weapon",
+    "subtype": "staff",
+    "materials": {"gold": 5, "silver": 3},
+    "base_price": 250,
+    "tier": 3,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/staff/i-staff_fire.png"
+  },
+  "mithril_sword": {
+    "name": "Mithril Sword",
+    "type": "weapon",
+    "subtype": "sword",
+    "materials": {"mithril": 6, "gold": 2},
+    "base_price": 600,
+    "tier": 4,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/double_sword.png"
+  },
+  "orichalcum_blade": {
+    "name": "Orichalcum Blade",
+    "type": "weapon",
+    "subtype": "sword",
+    "materials": {"orichalcum": 8, "mithril": 4},
+    "base_price": 1500,
+    "tier": 5,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/blessed_blade.png"
+  }
+}
