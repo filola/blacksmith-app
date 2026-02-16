@@ -14,7 +14,6 @@ signal reputation_changed(amount: int)
 
 # 인벤토리 관련
 signal ore_changed(ore_id: String, amount: int)
-signal bar_changed(ore_id: String, amount: int)
 signal inventory_changed()
 signal item_crafted(item_name: String, grade: String)
 signal item_equipped(adventurer_id: String, item: Dictionary)
@@ -41,15 +40,13 @@ var reputation: int = 0 :
 		reputation = value
 		reputation_changed.emit(reputation)
 
-# 인벤토리 - 광석, 주괴, 제작 아이템
+# 인벤토리 - 광석, 제작 아이템
 var ores: Dictionary = {}
-var bars: Dictionary = {}
 var inventory: Array[Dictionary] = []
 
 # 업그레이드
 var pickaxe_level: int = 1
 var anvil_level: int = 1
-var furnace_level: int = 1
 var auto_mine_speed: float = 0.0  # 0이면 자동채굴 없음
 
 # 숙련도 (레시피별 제작 횟수)
@@ -107,33 +104,6 @@ func get_ore_count(ore_id: String) -> int:
 ## 전체 광석 현황
 func get_all_ores() -> Dictionary:
 	return ores.duplicate()
-
-
-# ----- Bar (주괴) -----
-
-## 주괴 추가
-func add_bar(ore_id: String, amount: int = 1) -> bool:
-	if not bars.has(ore_id) or amount <= 0:
-		return false
-	bars[ore_id] += amount
-	bar_changed.emit(ore_id, bars[ore_id])
-	return true
-
-## 주괴 제거
-func remove_bar(ore_id: String, amount: int) -> bool:
-	if not bars.has(ore_id) or amount <= 0 or bars[ore_id] < amount:
-		return false
-	bars[ore_id] -= amount
-	bar_changed.emit(ore_id, bars[ore_id])
-	return true
-
-## 주괴 수량 조회
-func get_bar_count(ore_id: String) -> int:
-	return bars.get(ore_id, 0)
-
-## 전체 주괴 현황
-func get_all_bars() -> Dictionary:
-	return bars.duplicate()
 
 
 # ----- Inventory (아이템) -----
@@ -210,13 +180,6 @@ func get_anvil_level() -> int:
 func set_anvil_level(level: int) -> void:
 	anvil_level = level
 
-func get_furnace_level() -> int:
-	return furnace_level
-
-func set_furnace_level(level: int) -> void:
-	furnace_level = level
-
-
 # ----- Other State Getters -----
 
 ## 숙련도 조회
@@ -277,10 +240,9 @@ func _load_data() -> void:
 	if ore_file:
 		ore_data = JSON.parse_string(ore_file.get_as_text())
 		ore_file.close()
-		# 광석/주괴 인벤토리 초기화
+		# 광석 인벤토리 초기화
 		for ore_id in ore_data:
 			ores[ore_id] = 0
-			bars[ore_id] = 0
 
 	# 레시피 데이터 로드
 	var recipe_file = FileAccess.open("res://resources/data/recipes.json", FileAccess.READ)
@@ -323,8 +285,6 @@ func _load_data() -> void:
 		gold = GameConfig.INITIAL_GOLD
 		ores["copper"] = GameConfig.INITIAL_COPPER
 		ores["tin"] = GameConfig.INITIAL_TIN
-		bars["copper"] = GameConfig.INITIAL_COPPER_BAR
-		bars["tin"] = GameConfig.INITIAL_TIN_BAR
 	
 	# 자동 채굴 속도 초기화
 	auto_mine_speed = 0.05  # 느린 백그라운드 채굴
