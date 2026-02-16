@@ -27,6 +27,9 @@ signal adventurer_hired(adventurer_id: String, cost: int)
 signal experience_gained(adventurer_id: String, amount: int)
 signal adventurer_leveled_up(adventurer_id: String, new_level: int, stat_changes: Dictionary)
 
+# 스킬 관련
+signal skill_unlocked(skill_id: String)
+
 # 시스템 진행
 signal tier_unlocked(tier: int)
 
@@ -64,6 +67,10 @@ var recipe_data: Dictionary = {}
 var artifact_data: Dictionary = {}
 var adventurer_data: Dictionary = {}
 var abilities_data: Dictionary = {}
+var skills_data: Dictionary = {}
+
+# 스킬 해금 상태
+var skills_unlocked: Dictionary = {}
 
 # 시스템
 var adventure_system: AdventureSystem
@@ -305,6 +312,19 @@ func _load_data() -> void:
 	if abilities_file:
 		abilities_data = JSON.parse_string(abilities_file.get_as_text())
 		abilities_file.close()
+	
+	# 스킬 데이터 로드
+	var skills_file = FileAccess.open("res://resources/data/skills.json", FileAccess.READ)
+	if skills_file:
+		var raw_skills = JSON.parse_string(skills_file.get_as_text())
+		skills_file.close()
+		# _meta 키 제외하고 스킬만 저장
+		for key in raw_skills:
+			if key != "_meta":
+				skills_data[key] = raw_skills[key]
+		# 스킬 해금 상태 초기화: copper_ore만 unlocked
+		for skill_id in skills_data:
+			skills_unlocked[skill_id] = (skill_id == "copper_ore")
 	
 	# 시스템 초기화
 	push_error("[탐험] GameManager._load_data(): Creating AdventureSystem...")
@@ -684,6 +704,98 @@ func get_all_class_abilities(adventurer_id: String) -> Array:
 	if not adventure_system:
 		return []
 	return adventure_system.get_all_class_abilities(adventurer_id)
+
+
+## ===== 스킬 시스템 =====
+
+## 스킬 해금 가능 여부 확인
+func can_unlock_skill(skill_id: String) -> bool:
+	# 1. 스킬이 존재하는지 확인
+	if not skills_data.has(skill_id):
+		return false
+	
+	# 2. 이미 언락됐는지 확인
+	if skills_unlocked.get(skill_id, false):
+		return false
+	
+	# 3. requires 조건 모두 충족하는지 확인
+	var skill = skills_data[skill_id]
+	var requires = skill.get("requires", [])
+	for req_id in requires:
+		if not skills_unlocked.get(req_id, false):
+			return false
+	
+	# 4. 금화 충분한지 확인
+	var cost = skill.get("cost", 0)
+	if gold < cost:
+		return false
+	
+	return true
+
+
+## 스킬 해금
+func unlock_skill(skill_id: String) -> bool:
+	if not can_unlock_skill(skill_id):
+		return false
+	
+	var skill = skills_data[skill_id]
+	var cost = skill.get("cost", 0)
+	
+	# 금화 차감
+	remove_gold(cost)
+	
+	# 스킬 해금
+	skills_unlocked[skill_id] = true
+	skill_unlocked.emit(skill_id)
+	
+	return true
+
+
+## 현재 해금 가능한 스킬 목록 반환
+func get_available_skills() -> Array:
+	var available: Array = []
+	for skill_id in skills_data:
+		# 이미 해금된 스킬은 제외
+		if skills_unlocked.get(skill_id, false):
+			continue
+		
+		# requires 조건이 모두 충족된 스킬만 포함
+		var skill = skills_data[skill_id]
+		var requires = skill.get("requires", [])
+		var all_met = true
+		for req_id in requires:
+			if not skills_unlocked.get(req_id, false):
+				all_met = false
+				break
+		
+		if all_met:
+			available.append(skill_id)
+	
+	return available
+
+
+## 스킬 정보 반환 (UI용)
+func get_skill_info(skill_id: String) -> Dictionary:
+	if not skills_data.has(skill_id):
+		return {}
+	var info = skills_data[skill_id].duplicate()
+	info["is_unlocked"] = skills_unlocked.get(skill_id, false)
+	info["can_unlock"] = can_unlock_skill(skill_id)
+	return info
+
+
+## 해금된 스킬 목록 반환
+func get_unlocked_skills() -> Array:
+	var unlocked: Array = []
+	for skill_id in skills_unlocked:
+		if skills_unlocked[skill_id]:
+			unlocked.append(skill_id)
+	return unlocked
+
+
+## 스킬 해금 여부 확인
+func is_skill_unlocked(skill_id: String) -> bool:
+	return skills_unlocked.get(skill_id, false)
 
 
 ## ===== 디버그 =====
