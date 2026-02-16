@@ -10,7 +10,7 @@ extends Control
 
 func _ready() -> void:
 	_update_recipes()
-	GameManager.bar_changed.connect(func(_a, _b): _update_recipes())
+	GameManager.ore_changed.connect(func(_a, _b): _update_recipes())
 	GameManager.item_crafted.connect(_on_item_crafted)
 
 
@@ -46,10 +46,10 @@ func _update_recipes() -> void:
 		var mat_text = ""
 		for mat_id in recipe["materials"]:
 			var ore_data = GameManager.ore_data[mat_id]
-			var have = GameManager.get_bar_count(mat_id)
+			var have = GameManager.get_ore_count(mat_id)
 			var need = recipe["materials"][mat_id]
 			var color = "green" if have >= need else "red"
-			mat_text += "[color=%s]%s %d/%d[/color]  " % [color, ore_data["bar_name"], have, need]
+			mat_text += "[color=%s]%s %d/%d[/color]  " % [color, ore_data["name"], have, need]
 
 		var mat_label = RichTextLabel.new()
 		mat_label.bbcode_enabled = true

@@ -14,7 +14,6 @@ signal reputation_changed(amount: int)
 
 # Inventory
 signal ore_changed(ore_id: String, amount: int)
-signal bar_changed(ore_id: String, amount: int)
 signal inventory_changed()
 signal item_crafted(item_name: String, grade: String)
 signal item_equipped(adventurer_id: String, item: Dictionary)
@@ -41,9 +40,8 @@ var reputation: int = 0 :
 		reputation = value
 		reputation_changed.emit(reputation)
 
-# Inventory - ores, bars, crafted items
+# Inventory - ores, crafted items
 var ores: Dictionary = {}
-var bars: Dictionary = {}
 var inventory: Array[Dictionary] = []
 
 # Upgrades
@@ -106,29 +104,6 @@ func get_ore_count(ore_id: String) -> int:
 ## Get all ore counts
 func get_all_ores() -> Dictionary:
 	return ores.duplicate()
-
-
-# ----- Bars -----
-
-## Add bar
-func add_bar(ore_id: String, amount: int = 1) -> bool:
-	if not bars.has(ore_id) or amount <= 0:
-		return false
-	bars[ore_id] += amount
-	bar_changed.emit(ore_id, bars[ore_id])
-	return true
-
-## Remove bar
-func remove_bar(ore_id: String, amount: int) -> bool:
-	if not bars.has(ore_id) or amount <= 0 or bars[ore_id] < amount:
-		return false
-	bars[ore_id] -= amount
-	bar_changed.emit(ore_id, bars[ore_id])
-	return true
-
-## Get bar count
-func get_bar_count(ore_id: String) -> int:
-	return bars.get(ore_id, 0)
 
 
 # ----- Inventory (items) -----
@@ -265,10 +240,9 @@ func _load_data() -> void:
 	if ore_file:
 		ore_data = JSON.parse_string(ore_file.get_as_text())
 		ore_file.close()
-		# Initialize ore and bar inventories
+		# Initialize ore inventories
 		for ore_id in ore_data:
 			ores[ore_id] = 0
-			bars[ore_id] = 0
 
 	# Load recipe data
 	var recipe_file = FileAccess.open("res://resources/data/recipes.json", FileAccess.READ)
@@ -311,23 +285,9 @@ func _load_data() -> void:
 		gold = GameConfig.INITIAL_GOLD
 		ores["copper"] = GameConfig.INITIAL_COPPER
 		ores["tin"] = GameConfig.INITIAL_TIN
-		bars["copper"] = GameConfig.INITIAL_COPPER_BAR
-		bars["tin"] = GameConfig.INITIAL_TIN_BAR
 	
 	# Auto mine speed init
 	auto_mine_speed = 0.05  # slow background mining
-
-
-## Smelt ore -> bar
-func smelt_ore(ore_id: String) -> bool:
-	if not ore_data.has(ore_id):
-		return false
-	var needed = ore_data[ore_id]["ore_per_bar"]
-	if get_ore_count(ore_id) >= needed:
-		remove_ore(ore_id, needed)
-		add_bar(ore_id)
-		return true
-	return false
 
 
 ## Check if recipe can be crafted
@@ -338,7 +298,7 @@ func can_craft(recipe_id: String) -> bool:
 	if not recipe.get("unlocked", false):
 		return false
 	for mat_id in recipe["materials"]:
-		if get_bar_count(mat_id) < recipe["materials"][mat_id]:
+		if get_ore_count(mat_id) < recipe["materials"][mat_id]:
 			return false
 	return true
 
@@ -352,7 +312,7 @@ func craft_item(recipe_id: String) -> Dictionary:
 
 	# Consume materials
 	for mat_id in recipe["materials"]:
-		remove_bar(mat_id, recipe["materials"][mat_id])
+		remove_ore(mat_id, recipe["materials"][mat_id])
 
 	# Determine grade
 	var grade = _roll_grade(recipe_id)
