@@ -1,6 +1,6 @@
 extends Control
 
-## 제련 탭 - 광석을 주괴로
+## Smelting Tab - Ores to bars
 
 @onready var ore_list: VBoxContainer = %SmeltOreList
 @onready var result_label: Label = %SmeltResultLabel
@@ -22,7 +22,7 @@ func _update_list() -> void:
 
 		var hbox = HBoxContainer.new()
 
-		# 광석 아이콘
+		# Ore icon
 		var ore_icon = TextureRect.new()
 		var ore_icon_path = data.get("ore_icon", "")
 		if ore_icon_path != "" and ResourceLoader.exists(ore_icon_path):
@@ -31,12 +31,12 @@ func _update_list() -> void:
 		ore_icon.custom_minimum_size = Vector2(32, 32)
 		hbox.add_child(ore_icon)
 
-		# 화살표
+		# Arrow
 		var arrow = Label.new()
 		arrow.text = " -> "
 		hbox.add_child(arrow)
 
-		# 주괴 아이콘
+		# Bar icon
 		var bar_icon = TextureRect.new()
 		var bar_icon_path = data.get("bar_icon", "")
 		if bar_icon_path != "" and ResourceLoader.exists(bar_icon_path):
@@ -46,7 +46,7 @@ func _update_list() -> void:
 		hbox.add_child(bar_icon)
 
 		var info = Label.new()
-		info.text = "%s: %d개 -> %s: %d개 (필요: %d)" % [
+		info.text = "%s: %d -> %s: %d (Need: %d)" % [
 			data["name"], GameManager.get_ore_count(ore_id),
 			data["bar_name"], GameManager.get_bar_count(ore_id),
 			data["ore_per_bar"]
@@ -56,14 +56,14 @@ func _update_list() -> void:
 		hbox.add_child(info)
 
 		var btn = Button.new()
-		btn.text = "제련"
+		btn.text = "Smelt"
 		btn.disabled = GameManager.get_ore_count(ore_id) < data["ore_per_bar"]
 		btn.pressed.connect(_on_smelt.bind(ore_id))
 		hbox.add_child(btn)
 
-		# 전부 제련 버튼
+		# Smelt all button
 		var btn_all = Button.new()
-		btn_all.text = "전부"
+		btn_all.text = "All"
 		btn_all.disabled = GameManager.get_ore_count(ore_id) < data["ore_per_bar"]
 		btn_all.pressed.connect(_on_smelt_all.bind(ore_id))
 		hbox.add_child(btn_all)
@@ -74,7 +74,7 @@ func _update_list() -> void:
 func _on_smelt(ore_id: String) -> void:
 	if GameManager.smelt_ore(ore_id):
 		var data = GameManager.ore_data[ore_id]
-		result_label.text = "[OK] %s 1개 제련 완료!" % data["bar_name"]
+		result_label.text = "[OK] Smelted 1 %s!" % data["bar_name"]
 		_flash_result()
 
 
@@ -84,7 +84,7 @@ func _on_smelt_all(ore_id: String) -> void:
 		count += 1
 	if count > 0:
 		var data = GameManager.ore_data[ore_id]
-		result_label.text = "[OK] %s %d개 제련 완료!" % [data["bar_name"], count]
+		result_label.text = "[OK] Smelted %d %s!" % [count, data["bar_name"]]
 		_flash_result()
 
 

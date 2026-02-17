@@ -1,10 +1,10 @@
 extends Node
 
-## 모험가 시스템 - Phase 3 확장: 레벨업, 경험치, 특수 능력
+## Adventure System - Phase 3 Expansion: Level-up, Experience, Special Abilities
 
 class_name AdventureSystem
 
-# 레벨업 경험치 필요량 (레벨당)
+# Experience required per level
 const EXP_PER_LEVEL = {
 	1: 0,
 	2: 100,
@@ -23,7 +23,7 @@ const EXP_PER_LEVEL = {
 	15: 6000
 }
 
-# 모험가 클래스
+# Adventurer class
 class Adventurer:
 	var id: String
 	var name: String
@@ -33,23 +33,23 @@ class Adventurer:
 	var base_speed: float
 	var portrait: String
 	
-	# 런타임 상태
+	# Runtime state
 	var current_hp: int
 	var is_exploring: bool = false
 	var exploration_start_time: float = 0.0
-	var exploration_duration: float = 0.0  # 초 단위
+	var exploration_duration: float = 0.0  # in seconds
 	var current_dungeon_tier: int = 1
 	
-	# 레벨 & 경험치
+	# Level & Experience
 	var level: int = 1
 	var experience: int = 0
 	var hired: bool = false
 	
-	# 장착 아이템
-	var equipped_items: Array[Dictionary] = []  # 최대 3개 (무기, 갑옷, 악세서리)
+	# Equipped items
+	var equipped_items: Array[Dictionary] = []  # max 3 (weapon, armor, accessory)
 	
-	# 해금된 능력
-	var unlocked_abilities: Array[String] = []  # 능력 ID 배열
+	# Unlocked abilities
+	var unlocked_abilities: Array[String] = []  # ability ID array
 	
 	func _init(p_id: String, p_name: String, p_description: String, p_class: String, p_hp: int, p_speed: float, p_portrait: String, p_level: int = 1, p_exp: int = 0, p_hired: bool = false) -> void:
 		id = p_id
@@ -64,7 +64,7 @@ class Adventurer:
 		experience = p_exp
 		hired = p_hired
 	
-	## 현재 탐험 속도 배수 계산 (장착 아이템 포함)
+	## Calculate current exploration speed multiplier (including equipped items)
 	func get_speed_multiplier() -> float:
 		var multiplier = base_speed
 		for item in equipped_items:
@@ -72,24 +72,24 @@ class Adventurer:
 				multiplier *= item["speed_bonus"]
 		return multiplier
 	
-	## 탐험 시간 계산 (초 단위)
+	## Calculate exploration time (in seconds)
 	func calculate_exploration_time(dungeon_tier: int) -> float:
-		# 기본 시간: 난이도별 30초 ~ 180초
+		# Base time: 30s ~ 180s depending on difficulty
 		var base_time = 30.0 + (dungeon_tier - 1) * 30.0
 		
-		# 속도 배수 적용 (높을수록 빨라짐)
+		# Apply speed multiplier (higher = faster)
 		var speed_mult = get_speed_multiplier()
 		return base_time / speed_mult
 	
-	## 현재 레벨에서 다음 레벨까지 필요한 경험치
+	## Experience needed from current level to next level
 	func get_exp_to_next_level() -> int:
 		if not EXP_PER_LEVEL.has(level + 1):
-			return 999999  # 최대 레벨 도달
+			return 999999  # Max level reached
 		var next_level_exp = EXP_PER_LEVEL[level + 1]
 		var current_level_exp = EXP_PER_LEVEL.get(level, 0)
 		return next_level_exp - current_level_exp
 	
-	## 현재 레벨에서의 경험치 진행률 (0.0 ~ 1.0)
+	## Experience progress at current level (0.0 ~ 1.0)
 	func get_exp_progress() -> float:
 		var current_level_exp = EXP_PER_LEVEL.get(level, 0)
 		var next_level_exp = EXP_PER_LEVEL.get(level + 1, 999999)
@@ -102,37 +102,37 @@ class Adventurer:
 		
 		return float(exp_in_level) / float(exp_needed)
 	
-	## 경험치 추가 및 레벨업 가능 수 반환 (실제 레벨 변경 X, 개수만 반환)
+	## Add experience and return number of possible level-ups (no actual level change, count only)
 	func add_experience(amount: int) -> int:
 		experience += amount
-		push_error("[명성] Adventurer.add_experience(%d): total exp now %d" % [amount, experience])
+		push_error("[EXP] Adventurer.add_experience(%d): total exp now %d" % [amount, experience])
 		
-		# 도달 가능한 모든 레벨 업을 카운팅 (실제 레벨 변경 없이)
+		# Count all reachable level-ups (without actual level change)
 		var levels_gained = 0
 		var next_level = level + 1
 		while EXP_PER_LEVEL.has(next_level) and experience >= EXP_PER_LEVEL[next_level]:
 			levels_gained += 1
 			next_level += 1
 		
-		push_error("  [통계] Levels available to gain: %d" % levels_gained)
-		# 한 번에 올라간 레벨 수 반환 (0 = 레벨업 없음, 1+ = 레벨업 수)
+		push_error("  [Stats] Levels available to gain: %d" % levels_gained)
+		# Return number of levels gained at once (0 = no level-up, 1+ = level-up count)
 		return levels_gained
 	
-	## 레벨업 처리
+	## Process level-up
 	func level_up() -> Dictionary:
 		if not EXP_PER_LEVEL.has(level + 1):
 			push_error("  [X] level_up(): Max level reached!")
-			return {}  # 최대 레벨 도달
+			return {}  # Max level reached
 		
 		level += 1
-		push_error("  [확률] level_up(): Now level %d" % level)
+		push_error("  [LevelUp] level_up(): Now level %d" % level)
 		
-		# 스텟 상승
-		var hp_increase = 10 + (level - 1) * 2  # 레벨마다 2씩 증가
+		# Stat increases
+		var hp_increase = 10 + (level - 1) * 2  # +2 per level
 		base_hp += hp_increase
 		current_hp = base_hp
 		
-		var speed_increase = 0.02  # 레벨마다 2% 증가
+		var speed_increase = 0.02  # +2% per level
 		base_speed *= (1.0 + speed_increase)
 		
 		return {
@@ -142,9 +142,9 @@ class Adventurer:
 			"new_speed": base_speed
 		}
 	
-	## 아이템 장착
+	## Equip item
 	func equip_item(item: Dictionary) -> bool:
-		# 같은 슬롯의 기존 아이템 제거
+		# Remove existing item in same slot
 		var item_type = item.get("type", "")
 		var item_subtype = item.get("subtype", "")
 		
@@ -153,14 +153,14 @@ class Adventurer:
 				equipped_items.remove_at(i)
 				break
 		
-		# 최대 3개 제한 (무기 1, 갑옷 1, 악세서리 1)
+		# Max 3 items (weapon 1, armor 1, accessory 1)
 		if equipped_items.size() >= 3:
 			equipped_items.pop_back()
 		
 		equipped_items.append(item)
 		return true
 	
-	## 아이템 해제
+	## Unequip item
 	func unequip_item(item_index: int) -> Dictionary:
 		if item_index < 0 or item_index >= equipped_items.size():
 			return {}
@@ -168,7 +168,7 @@ class Adventurer:
 		equipped_items.remove_at(item_index)
 		return item
 	
-	## 탐험 시작
+	## Start exploration
 	func start_exploration(tier: int) -> void:
 		if is_exploring:
 			return
@@ -177,20 +177,20 @@ class Adventurer:
 		exploration_start_time = Time.get_ticks_msec() / 1000.0
 		exploration_duration = calculate_exploration_time(tier)
 	
-	## 탐험 진행률 (0.0 ~ 1.0)
+	## Exploration progress (0.0 ~ 1.0)
 	func get_exploration_progress() -> float:
 		if not is_exploring:
 			return 0.0
 		var elapsed = (Time.get_ticks_msec() / 1000.0) - exploration_start_time
 		return minf(elapsed / exploration_duration, 1.0)
 	
-	## 탐험 완료 확인
+	## Check exploration completion
 	func is_exploration_complete() -> bool:
 		if not is_exploring:
 			return false
 		return get_exploration_progress() >= 1.0
 	
-	## 탐험 완료 처리
+	## Process exploration completion
 	func finish_exploration() -> Dictionary:
 		if not is_exploring:
 			return {}
@@ -206,7 +206,7 @@ class Adventurer:
 		return result
 
 
-# 모험가 관리
+# Adventurer management
 var adventurers: Dictionary[String, Adventurer] = {}
 var adventurer_data: Dictionary = {}
 var abilities_data: Dictionary = {}
@@ -218,19 +218,19 @@ func _ready() -> void:
 
 
 func _load_data() -> void:
-	push_error("[검색] AdventureSystem._load_data() START - adventurers.size(): %d" % adventurers.size())
+	push_error("[Search] AdventureSystem._load_data() START - adventurers.size(): %d" % adventurers.size())
 	
-	# 이미 로드된 경우 스킵 (중복 로드 방지)
+	# Skip if already loaded (prevent duplicate loading)
 	if not adventurers.is_empty() and not adventurer_data.is_empty():
-		push_error("[건너뜀]  AdventureSystem._load_data(): Already loaded, skipping")
+		push_error("[Skip] AdventureSystem._load_data(): Already loaded, skipping")
 		return
 	
-	# TEST: 하드코딩된 모험가 1명으로 테스트 (초기 검증용)
-	push_error("[테스트] TEST MODE: 하드코딩된 모험가 추가 (검증용)")
+	# TEST: Hardcoded 1 adventurer for testing (initial verification)
+	push_error("[Test] TEST MODE: Adding hardcoded adventurer (verification)")
 	var test_adv = Adventurer.new(
 		"test_adventurer",
-		"테스트 전사",
-		"하드코딩된 테스트 모험가",
+		"Test Warrior",
+		"Hardcoded test adventurer",
 		"warrior",
 		100,
 		1.0,
@@ -240,14 +240,14 @@ func _load_data() -> void:
 		false
 	)
 	adventurers["test_adventurer"] = test_adv
-	push_error("[OK] TEST: 테스트 모험가 추가 완료 - 현재 adventurers.size(): %d" % adventurers.size())
+	push_error("[OK] TEST: Test adventurer added - current adventurers.size(): %d" % adventurers.size())
 	
-	# 모험가 데이터 로드
+	# Load adventurer data
 	var adventurer_file = FileAccess.open("res://resources/data/adventurers.json", FileAccess.READ)
 	if adventurer_file:
-		push_error("[파일] Successfully opened adventurers.json")
+		push_error("[File] Successfully opened adventurers.json")
 		var json_text = adventurer_file.get_as_text()
-		push_error("[문서] JSON content length: %d chars" % json_text.length())
+		push_error("[Doc] JSON content length: %d chars" % json_text.length())
 		
 		var parsed = JSON.parse_string(json_text)
 		push_error("  Parsed type: %s" % typeof(parsed))
@@ -257,7 +257,7 @@ func _load_data() -> void:
 		
 		if parsed != null and parsed is Dictionary:
 			adventurer_data = parsed
-			push_error("[유물] Successfully assigned adventurer_data: %d entries" % adventurer_data.size())
+			push_error("[Data] Successfully assigned adventurer_data: %d entries" % adventurer_data.size())
 		else:
 			push_error("[X] Failed to parse JSON as Dictionary! Got: %s" % typeof(parsed))
 			adventurer_file.close()
@@ -265,11 +265,11 @@ func _load_data() -> void:
 		
 		adventurer_file.close()
 		
-		# 초기 모험가 생성
+		# Create initial adventurers
 		var created_count = 0
 		for adv_id in adventurer_data:
 			var data = adventurer_data[adv_id]
-			push_error("  [추가] Creating adventurer: %s (name: %s)" % [adv_id, data.get("name", "?")])
+			push_error("  [Add] Creating adventurer: %s (name: %s)" % [adv_id, data.get("name", "?")])
 			
 			# Validate data
 			if not data.has("name"):
@@ -301,32 +301,32 @@ func _load_data() -> void:
 			created_count += 1
 			push_error("    [OK] Successfully created, total adventurers now: %d" % adventurers.size())
 		
-		push_error("[OK] AdventureSystem: 생성된 모험가: %d명 (final dict size: %d)" % [created_count, adventurers.size()])
+		push_error("[OK] AdventureSystem: Created adventurers: %d (final dict size: %d)" % [created_count, adventurers.size()])
 	else:
-		push_error("[X] AdventureSystem: adventurers.json 파일을 찾을 수 없습니다!")
+		push_error("[X] AdventureSystem: Could not find adventurers.json!")
 	
-	# 능력 데이터 로드
+	# Load abilities data
 	var abilities_file = FileAccess.open("res://resources/data/abilities.json", FileAccess.READ)
 	if abilities_file:
-		push_error("[파일] Successfully opened abilities.json")
+		push_error("[File] Successfully opened abilities.json")
 		var abilities_text = abilities_file.get_as_text()
 		var parsed_abilities = JSON.parse_string(abilities_text)
 		
 		if parsed_abilities != null and parsed_abilities is Dictionary:
 			abilities_data = parsed_abilities
-			push_error("[유물] Successfully loaded abilities_data with %d classes" % abilities_data.size())
+			push_error("[Data] Successfully loaded abilities_data with %d classes" % abilities_data.size())
 		else:
 			push_error("[X] Failed to parse abilities.json!")
 		
 		abilities_file.close()
 		
-		# 초기 능력 해금 (레벨 1에서 해금되는 능력 찾기)
+		# Unlock initial abilities (abilities unlocked at level 1)
 		_unlock_initial_abilities()
 	else:
-		push_error("[주의]  Could not open abilities.json - continuing without abilities")
+		push_error("[Warning] Could not open abilities.json - continuing without abilities")
 
 
-## 초기 능력 해금 (모든 모험가의 레벨 1 능력)
+## Unlock initial abilities (level 1 abilities for all adventurers)
 func _unlock_initial_abilities() -> void:
 	for adv_id in adventurers:
 		var adv = adventurers[adv_id]
@@ -339,7 +339,7 @@ func _unlock_initial_abilities() -> void:
 					adv.unlocked_abilities.append(ability_id)
 
 
-## 모험가 클래스별 능력 조회
+## Get abilities by adventurer class
 func _get_class_abilities(character_class: String) -> Array:
 	var class_key = character_class + "_abilities"
 	if abilities_data.has(class_key):
@@ -350,18 +350,18 @@ func _get_class_abilities(character_class: String) -> Array:
 		else:
 			push_error("  [X] _get_class_abilities(%s): NOT an Array! Type: %s" % [character_class, typeof(result)])
 			return []
-	push_error("  [주의]  _get_class_abilities(%s): Key not found in abilities_data" % character_class)
+	push_error("  [Warning] _get_class_abilities(%s): Key not found in abilities_data" % character_class)
 	return []
 
 
-## 모험가 획득
+## Get adventurer
 func get_adventurer(adventurer_id: String) -> Adventurer:
 	return adventurers.get(adventurer_id)
 
 
-## 모든 모험가 획득
+## Get all adventurers
 func get_all_adventurers() -> Array[Adventurer]:
-	push_error("[검색] get_all_adventurers() called")
+	push_error("[Search] get_all_adventurers() called")
 	push_error("  adventurers.size() = %d" % adventurers.size())
 	push_error("  adventurers.values().size() = %d" % adventurers.values().size())
 	
@@ -375,7 +375,7 @@ func get_all_adventurers() -> Array[Adventurer]:
 	return result
 
 
-## 고용된 모험가만 획득
+## Get hired adventurers only
 func get_hired_adventurers() -> Array[Adventurer]:
 	var result: Array[Adventurer] = []
 	for adv in adventurers.values():
@@ -384,7 +384,7 @@ func get_hired_adventurers() -> Array[Adventurer]:
 	return result
 
 
-## 미고용 모험가 획득
+## Get unhired adventurers
 func get_available_adventurers() -> Array[Adventurer]:
 	var result: Array[Adventurer] = []
 	for adv in adventurers.values():
@@ -393,7 +393,7 @@ func get_available_adventurers() -> Array[Adventurer]:
 	return result
 
 
-## 모험가 고용
+## Hire adventurer
 func hire_adventurer(adventurer_id: String) -> bool:
 	var adv = get_adventurer(adventurer_id)
 	if not adv or adv.hired:
@@ -403,7 +403,7 @@ func hire_adventurer(adventurer_id: String) -> bool:
 	return true
 
 
-## 모험가에게 아이템 장착
+## Equip item to adventurer
 func equip_to_adventurer(adventurer_id: String, item: Dictionary) -> bool:
 	var adv = get_adventurer(adventurer_id)
 	if not adv:
@@ -411,7 +411,7 @@ func equip_to_adventurer(adventurer_id: String, item: Dictionary) -> bool:
 	return adv.equip_item(item)
 
 
-## 모험가에서 아이템 해제
+## Unequip item from adventurer
 func unequip_from_adventurer(adventurer_id: String, item_index: int) -> Dictionary:
 	var adv = get_adventurer(adventurer_id)
 	if not adv:
@@ -419,7 +419,7 @@ func unequip_from_adventurer(adventurer_id: String, item_index: int) -> Dictiona
 	return adv.unequip_item(item_index)
 
 
-## 모험가 탐험 시작
+## Start adventurer exploration
 func start_adventure(adventurer_id: String, dungeon_tier: int) -> bool:
 	var adv = get_adventurer(adventurer_id)
 	if not adv or adv.is_exploring:
@@ -428,7 +428,7 @@ func start_adventure(adventurer_id: String, dungeon_tier: int) -> bool:
 	return true
 
 
-## 모험가 탐험 완료 확인
+## Check adventurer exploration completion
 func check_exploration_complete(adventurer_id: String) -> bool:
 	var adv = get_adventurer(adventurer_id)
 	if not adv:
@@ -436,7 +436,7 @@ func check_exploration_complete(adventurer_id: String) -> bool:
 	return adv.is_exploration_complete()
 
 
-## 경험치 추가 및 레벨업 확인
+## Add experience and check level-up
 func add_experience(adventurer_id: String, amount: int) -> int:
 	var adv = get_adventurer(adventurer_id)
 	if not adv:
@@ -445,7 +445,7 @@ func add_experience(adventurer_id: String, amount: int) -> int:
 	return adv.add_experience(amount)
 
 
-## 레벨업 처리
+## Process level-up
 func level_up(adventurer_id: String) -> Dictionary:
 	var adv = get_adventurer(adventurer_id)
 	if not adv:
@@ -453,7 +453,7 @@ func level_up(adventurer_id: String) -> Dictionary:
 	
 	var level_up_result = adv.level_up()
 	
-	# 새 레벨에서 해금되는 능력 확인
+	# Check for abilities unlocked at new level
 	var class_abilities = _get_class_abilities(adv.character_class)
 	var new_abilities: Array[String] = []
 	for ability in class_abilities:
@@ -468,7 +468,7 @@ func level_up(adventurer_id: String) -> Dictionary:
 	return level_up_result
 
 
-## 모험가의 해금된 능력 조회
+## Get adventurer's unlocked abilities
 func get_unlocked_abilities(adventurer_id: String) -> Array[Dictionary]:
 	var adv = get_adventurer(adventurer_id)
 	if not adv:
@@ -477,14 +477,14 @@ func get_unlocked_abilities(adventurer_id: String) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	var class_abilities = _get_class_abilities(adv.character_class)
 	
-	# abilities를 ID로 인덱싱하기 위해 맵 생성
+	# Create map for indexing abilities by ID
 	var ability_map: Dictionary = {}
 	for ability in class_abilities:
 		var ability_id = ability.get("id", "")
 		if not ability_id.is_empty():
 			ability_map[ability_id] = ability
 	
-	# 해금된 능력만 결과에 추가
+	# Add only unlocked abilities to result
 	for ability_id in adv.unlocked_abilities:
 		if ability_map.has(ability_id):
 			result.append(ability_map[ability_id])
@@ -492,7 +492,7 @@ func get_unlocked_abilities(adventurer_id: String) -> Array[Dictionary]:
 	return result
 
 
-## 모험가의 모든 클래스 능력 조회 (잠금 상태 포함)
+## Get all class abilities for adventurer (including locked status)
 func get_all_class_abilities(adventurer_id: String) -> Array[Dictionary]:
 	var adv = get_adventurer(adventurer_id)
 	if not adv:
@@ -509,9 +509,9 @@ func get_all_class_abilities(adventurer_id: String) -> Array[Dictionary]:
 	return result
 
 
-## ===== 디버그 헬퍼 메서드 =====
+## ===== Debug Helper Methods =====
 
-## 현재 상태 진단
+## Current state diagnostics
 func get_debug_info() -> Dictionary:
 	var info = {
 		"adventurers_count": adventurers.size(),

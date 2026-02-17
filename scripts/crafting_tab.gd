@@ -1,6 +1,6 @@
 extends Control
 
-## 제작 탭 - 무기/방어구 제작 (랜덤 등급!)
+## Crafting Tab - Craft weapons/armor (random grade!)
 
 @onready var recipe_list: VBoxContainer = %RecipeList
 @onready var craft_result: VBoxContainer = %CraftResult
@@ -25,7 +25,7 @@ func _update_recipes() -> void:
 
 		var hbox = HBoxContainer.new()
 
-		# 아이템 아이콘
+		# Item icon
 		var item_icon = TextureRect.new()
 		var icon_path = recipe.get("icon", "")
 		if icon_path != "" and ResourceLoader.exists(icon_path):
@@ -34,7 +34,7 @@ func _update_recipes() -> void:
 		item_icon.custom_minimum_size = Vector2(48, 48)
 		hbox.add_child(item_icon)
 
-		# 레시피 정보
+		# Recipe info
 		var info = VBoxContainer.new()
 		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
@@ -59,32 +59,32 @@ func _update_recipes() -> void:
 		mat_label.scroll_active = false
 		info.add_child(mat_label)
 
-		# 숙련도 표시
+		# Mastery display
 		var craft_count = GameManager.get_mastery_count(recipe_id)
 		if craft_count > 0:
 			var mastery_label = Label.new()
-			mastery_label.text = "숙련도: %d회 제작" % craft_count
+			mastery_label.text = "Mastery: %d crafts" % craft_count
 			mastery_label.add_theme_font_size_override("font_size", 12)
 			mastery_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 			info.add_child(mastery_label)
 
 		hbox.add_child(info)
 
-		# 기본 가격
+		# Base price
 		var price_label = Label.new()
-		price_label.text = "[금화]%d~" % recipe["base_price"]
+		price_label.text = "[GOLD]%d~" % recipe["base_price"]
 		price_label.custom_minimum_size.x = 80
 		hbox.add_child(price_label)
 
-		# 제작 버튼
+		# Craft button
 		var btn = Button.new()
-		btn.text = "[제작] 제작"
+		btn.text = "Craft"
 		btn.custom_minimum_size.x = 100
 		btn.disabled = not GameManager.can_craft(recipe_id)
 		btn.pressed.connect(_on_craft.bind(recipe_id))
 		hbox.add_child(btn)
 
-		# 구분선
+		# Separator
 		var sep = HSeparator.new()
 
 		recipe_list.add_child(hbox)
@@ -96,14 +96,14 @@ func _on_craft(recipe_id: String) -> void:
 	if item.is_empty():
 		return
 
-	# 결과 표시
+	# Show result
 	craft_result.visible = true
 	result_name.text = item["name"]
 	result_grade.text = "%s %s" % [item["grade_emoji"], item["grade_name"]]
 	result_grade.add_theme_color_override("font_color", Color.html(item["grade_color"]))
-	result_price.text = "판매가: [금화]%d" % item["price"]
+	result_price.text = "Sell Price: [GOLD]%d" % item["price"]
 
-	# 등급별 이펙트
+	# Grade effects
 	_play_craft_effect(item["grade"])
 
 	_update_recipes()
@@ -118,10 +118,10 @@ func _play_craft_effect(grade: String) -> void:
 
 	match grade:
 		"legendary":
-			# 전설! 화면 흔들림 + 금빛
+			# Legendary! Screen shake + golden glow
 			craft_result.modulate = Color(1.0, 0.8, 0.0)
 			tween.tween_property(craft_result, "modulate", Color.WHITE, 1.5)
-			# 흔들림
+			# Shake
 			var original_pos = craft_result.position
 			for i in range(10):
 				tween.tween_property(craft_result, "position",

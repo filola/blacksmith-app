@@ -22,7 +22,7 @@ theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="VBox"]
 layout_mode = 2
-text = "[제작] 제작소"
+text = "Crafting"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 24
 
@@ -33,7 +33,7 @@ visible = false
 
 [node name="ResultTitle" type="Label" parent="VBox/CraftResult"]
 layout_mode = 2
-text = "제작 결과:"
+text = "Craft Result:"
 theme_override_font_sizes/font_size = 14
 
 [node name="ResultName" type="Label" parent="VBox/CraftResult"]

@@ -12,8 +12,8 @@ extends Control
 @onready var gold_label: Label = %SkillGoldLabel
 
 # Skill node UI mapping
-var skill_buttons: Dictionary = {}  # skill_id → Button
-var skill_labels: Dictionary = {}   # skill_id → Label
+var skill_buttons: Dictionary = {}  # skill_id -> Button
+var skill_labels: Dictionary = {}   # skill_id -> Label
 var connector_lines: Array = []     # Connection line data
 
 # Layout constants
