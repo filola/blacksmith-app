@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1771205338|1646664';
+const CACHE_VERSION = '1771284107|2085831';
 /** @type {string} */
 const CACHE_PREFIX = 'Blacksmith-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
