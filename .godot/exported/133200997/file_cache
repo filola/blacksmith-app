@@ -1,0 +1,8 @@
+res://resources/themes/default_theme.tres::07be953f59c098709921c96aab92affd::1771224077::res://.godot/exported/133200997/export-aa08e65f39ce90993930749e836551c1-default_theme.res
+res://scenes/adventure_tab.tscn::6b45587458a612b48b7c17afe43d65d3::1771225972::res://.godot/exported/133200997/export-53909b53175578acca4c9cbedd9191a6-adventure_tab.scn
+res://scenes/crafting_tab.tscn::fc438a9901d0e33de6eba1dad61036d2::1771225972::res://.godot/exported/133200997/export-eca14b9cf73454584aa732c7b74002cc-crafting_tab.scn
+res://scenes/inventory_tab.tscn::3fe5c5db2cbb57e23fd5a13590418332::1771225972::res://.godot/exported/133200997/export-7cfc344f30e5dce2948cd5eb51c31c65-inventory_tab.scn
+res://scenes/main.tscn::9c35dbf49737757e04077b21cf9c7dd7::1771283903::res://.godot/exported/133200997/export-3ad5c15c4f3250da0cc7c1af1770d85f-main.scn
+res://scenes/mining_tab.tscn::197a2888467dded17126c928332954c7::1771225972::res://.godot/exported/133200997/export-60e46249a471d1bac4a74cb1617ae5e4-mining_tab.scn
+res://scenes/skill_tree_tab.tscn::5a9aec479f8236b724e4c5bceabdf832::1771284069::res://.godot/exported/133200997/export-b473c3a0156ba098ecc3ef5ed733ecc2-skill_tree_tab.scn
+res://scenes/smelting_tab.tscn::7c9741e1e6dc53a53cadae47485c1988::1771225972::res://.godot/exported/133200997/export-c53e8e31ae2feb53fb2f8ceaccc45220-smelting_tab.scn
