@@ -1,6 +1,6 @@
 extends Control
 
-## Smelting Tab - Ores to bars
+## Smelting Tab - Ore refining
 
 @onready var ore_list: VBoxContainer = %SmeltOreList
 @onready var result_label: Label = %SmeltResultLabel
@@ -8,7 +8,6 @@ extends Control
 func _ready() -> void:
 	_update_list()
 	GameManager.ore_changed.connect(func(_a, _b): _update_list())
-	GameManager.bar_changed.connect(func(_a, _b): _update_list())
 
 
 func _update_list() -> void:
@@ -46,9 +45,8 @@ func _update_list() -> void:
 		hbox.add_child(bar_icon)
 
 		var info = Label.new()
-		info.text = "%s: %d -> %s: %d (Need: %d)" % [
+		info.text = "%s: %d (Smelt cost: %d)" % [
 			data["name"], GameManager.get_ore_count(ore_id),
-			data["bar_name"], GameManager.get_bar_count(ore_id),
 			data["ore_per_bar"]
 		]
 		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL

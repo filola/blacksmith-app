@@ -45,9 +45,8 @@ var reputation: int = 0 :
 		reputation = value
 		reputation_changed.emit(reputation)
 
-# Inventory - ores, bars, crafted items
+# Inventory - ores, crafted items
 var ores: Dictionary = {}
-var bars: Dictionary = {}
 var inventory: Array[Dictionary] = []
 
 # Upgrades
@@ -117,26 +116,6 @@ func get_ore_count(ore_id: String) -> int:
 func get_all_ores() -> Dictionary:
 	return ores.duplicate()
 
-
-# ----- Bars -----
-
-## Add bar
-func add_bar(ore_id: String, amount: int = 1) -> bool:
-	if not bars.has(ore_id) or amount <= 0:
-		return false
-	bars[ore_id] += amount
-	return true
-
-## Remove bar
-func remove_bar(ore_id: String, amount: int) -> bool:
-	if not bars.has(ore_id) or amount <= 0 or bars[ore_id] < amount:
-		return false
-	bars[ore_id] -= amount
-	return true
-
-## Get bar count
-func get_bar_count(ore_id: String) -> int:
-	return bars.get(ore_id, 0)
 
 
 # ----- Inventory -----
@@ -276,7 +255,6 @@ func _load_data() -> void:
 		# Initialize ore/bar inventory
 		for ore_id in ore_data:
 			ores[ore_id] = 0
-			bars[ore_id] = 0
 
 	# Load recipe data
 	var recipe_file = FileAccess.open("res://resources/data/recipes.json", FileAccess.READ)
@@ -324,10 +302,8 @@ func _load_data() -> void:
 	# Initial test resources (first run)
 	if ores.get("copper", 0) == 0:
 		gold = GameConfig.INITIAL_GOLD
-		ores["copper"] = GameConfig.INITIAL_COPPER
-		ores["tin"] = GameConfig.INITIAL_TIN
-		bars["copper"] = GameConfig.INITIAL_COPPER_BAR
-		bars["tin"] = GameConfig.INITIAL_TIN_BAR
+		ores["copper"] = GameConfig.INITIAL_COPPER + GameConfig.INITIAL_COPPER_BAR
+		ores["tin"] = GameConfig.INITIAL_TIN + GameConfig.INITIAL_TIN_BAR
 	
 	# Initialize auto mine speed
 	auto_mine_speed = 0.05  # slow background mining
@@ -340,7 +316,7 @@ func smelt_ore(ore_id: String) -> bool:
 	var needed = max(1, ore_data[ore_id]["ore_per_bar"] - smelting_efficiency_bonus)
 	if get_ore_count(ore_id) >= needed:
 		remove_ore(ore_id, needed)
-		add_bar(ore_id)
+		add_ore(ore_id, 1)
 		return true
 	return false
 
@@ -353,7 +329,7 @@ func can_craft(recipe_id: String) -> bool:
 	if not recipe.get("unlocked", false):
 		return false
 	for mat_id in recipe["materials"]:
-		if get_bar_count(mat_id) < recipe["materials"][mat_id]:
+		if get_ore_count(mat_id) < recipe["materials"][mat_id]:
 			return false
 	return true
 
@@ -367,7 +343,7 @@ func craft_item(recipe_id: String) -> Dictionary:
 
 	# Consume materials
 	for mat_id in recipe["materials"]:
-		remove_bar(mat_id, recipe["materials"][mat_id])
+		remove_ore(mat_id, recipe["materials"][mat_id])
 
 	# Determine grade
 	var grade = _roll_grade(recipe_id)
