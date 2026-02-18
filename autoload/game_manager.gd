@@ -357,6 +357,7 @@ func craft_item(recipe_id: String) -> Dictionary:
 		"subtype": recipe.get("subtype", ""),
 		"grade": grade,
 		"grade_name": grade_info["name"],
+		"grade_emoji": "[%s]" % grade_info["name"],
 		"grade_color": grade_info["color"],
 		"price": int(recipe["base_price"] * grade_info["multiplier"]),
 		"tier": recipe["tier"],

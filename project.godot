@@ -30,7 +30,7 @@ window/stretch/aspect="expand"
 
 [gui]
 
-theme_custom_colors/font_color = Color(1, 1, 1, 1)
+theme_custom_colors/font_color=Color(1, 1, 1, 1)
 
 [rendering]
 
