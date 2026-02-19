@@ -5,7 +5,6 @@ extends Control
 @onready var mine_button: Button = %MineButton
 @onready var ore_list: VBoxContainer = %OreList
 @onready var mine_progress: ProgressBar = %MineProgress
-@onready var mine_label: Label = %MineLabel
 @onready var power_label: Label = %PowerLabel
 @onready var prob_list: VBoxContainer = %ProbList
 
@@ -115,7 +114,6 @@ func _select_random_ore() -> void:
 
 func _update_display() -> void:
 	var data = GameManager.ore_data[current_ore]
-	mine_label.text = "Mining " + data["name"]
 	power_label.text = "Mining Power: %.1f" % GameManager.get_mine_power()
 	mining_time = data["base_time"]
 	mine_progress.value = 0
