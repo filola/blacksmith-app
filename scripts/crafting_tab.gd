@@ -49,7 +49,7 @@ func _update_recipes() -> void:
 			var have = GameManager.get_ore_count(mat_id)
 			var need = recipe["materials"][mat_id]
 			var color = "green" if have >= need else "red"
-			mat_text += "[color=%s]%s %d/%d[/color]  " % [color, ore_data["bar_name"], have, need]
+			mat_text += "[color=%s]%s %d/%d[/color]  " % [color, ore_data.get("name", mat_id), have, need]
 
 		var mat_label = RichTextLabel.new()
 		mat_label.bbcode_enabled = true
