@@ -1,6 +1,6 @@
 extends Node
 
-const GAME_VERSION: String = "v0.6.0"
+const GAME_VERSION: String = "v0.6.9"
 
 ## Global game state management
 ## Remove magic numbers via GameConfig, minimize coupling
