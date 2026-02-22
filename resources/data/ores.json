@@ -6,10 +6,7 @@
     "base_sell_price": 10,
     "crafting_xp": 5,
     "color": "#b87333",
-    "bar_name": "Copper Bar",
-    "ore_per_bar": 3,
-    "ore_icon": "res://resources/assets/dungeon-crawl/ores/copper_ore.png",
-    "bar_icon": "res://resources/assets/dungeon-crawl/bars/copper_bar.png"
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/copper_ore.png"
   },
   "tin": {
     "name": "Tin Ore",
@@ -18,10 +15,7 @@
     "base_sell_price": 15,
     "crafting_xp": 7,
     "color": "#d3d3d3",
-    "bar_name": "Tin Bar",
-    "ore_per_bar": 3,
-    "ore_icon": "res://resources/assets/dungeon-crawl/ores/tin_ore.png",
-    "bar_icon": "res://resources/assets/dungeon-crawl/bars/tin_bar.png"
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/tin_ore.png"
   },
   "iron": {
     "name": "Iron Ore",
@@ -30,10 +24,7 @@
     "base_sell_price": 25,
     "crafting_xp": 10,
     "color": "#a0a0a0",
-    "bar_name": "Iron Bar",
-    "ore_per_bar": 5,
-    "ore_icon": "res://resources/assets/dungeon-crawl/ores/iron_ore.png",
-    "bar_icon": "res://resources/assets/dungeon-crawl/bars/iron_bar.png"
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/iron_ore.png"
   },
   "silver": {
     "name": "Silver Ore",
@@ -42,10 +33,7 @@
     "base_sell_price": 35,
     "crafting_xp": 14,
     "color": "#c0c0c0",
-    "bar_name": "Silver Bar",
-    "ore_per_bar": 5,
-    "ore_icon": "res://resources/assets/dungeon-crawl/ores/silver_ore.png",
-    "bar_icon": "res://resources/assets/dungeon-crawl/bars/silver_bar.png"
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/silver_ore.png"
   },
   "gold": {
     "name": "Gold Ore",
@@ -54,10 +42,7 @@
     "base_sell_price": 50,
     "crafting_xp": 20,
     "color": "#ffd700",
-    "bar_name": "Gold Bar",
-    "ore_per_bar": 8,
-    "ore_icon": "res://resources/assets/dungeon-crawl/ores/gold_ore.png",
-    "bar_icon": "res://resources/assets/dungeon-crawl/bars/gold_bar.png"
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/gold_ore.png"
   },
   "mithril": {
     "name": "Mithril Ore",
@@ -66,10 +51,7 @@
     "base_sell_price": 75,
     "crafting_xp": 30,
     "color": "#4fc3f7",
-    "bar_name": "Mithril Bar",
-    "ore_per_bar": 10,
-    "ore_icon": "res://resources/assets/dungeon-crawl/ores/mithril_ore.png",
-    "bar_icon": "res://resources/assets/dungeon-crawl/bars/mithril_bar.png"
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/mithril_ore.png"
   },
   "orichalcum": {
     "name": "Orichalcum Ore",
@@ -78,9 +60,6 @@
     "base_sell_price": 100,
     "crafting_xp": 50,
     "color": "#ff6f00",
-    "bar_name": "Orichalcum Bar",
-    "ore_per_bar": 15,
-    "ore_icon": "res://resources/assets/dungeon-crawl/ores/orichalcum_ore.png",
-    "bar_icon": "res://resources/assets/dungeon-crawl/bars/orichalcum_bar.png"
+    "ore_icon": "res://resources/assets/dungeon-crawl/ores/orichalcum_ore.png"
   }
 }

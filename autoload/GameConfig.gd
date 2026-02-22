@@ -12,12 +12,6 @@ const PICKAXE_POWER_PER_LEVEL = 0.5  # Increase per level
 
 
 # ============================================
-# Smelting System (currently only 1:1 smelting)
-# ============================================
-# Managed via ore_per_bar in ore_data.json
-
-
-# ============================================
 # Anvil Enhancement System
 # ============================================
 const ANVIL_BONUS_PER_LEVEL = 0.5  # Bonus percent per level
@@ -72,10 +66,8 @@ const TIER_DEFAULT = 1
 # Initial Resources (first run)
 # ============================================
 const INITIAL_GOLD = 100
-const INITIAL_COPPER = 10
-const INITIAL_TIN = 5
-const INITIAL_COPPER_BAR = 3
-const INITIAL_TIN_BAR = 2
+const INITIAL_COPPER = 13
+const INITIAL_TIN = 7
 
 
 # ============================================

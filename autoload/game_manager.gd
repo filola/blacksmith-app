@@ -71,7 +71,6 @@ var skills_data: Dictionary = {}
 # Cumulative skill effects
 var mining_speed_bonus: float = 1.0
 var crafting_grade_bonus: float = 0.0
-var smelting_efficiency_bonus: int = 0
 
 # Systems
 var adventure_system: AdventureSystem
@@ -252,7 +251,7 @@ func _load_data() -> void:
 	if ore_file:
 		ore_data = JSON.parse_string(ore_file.get_as_text())
 		ore_file.close()
-		# Initialize ore/bar inventory
+		# Initialize ore inventory
 		for ore_id in ore_data:
 			ores[ore_id] = 0
 
@@ -302,23 +301,11 @@ func _load_data() -> void:
 	# Initial test resources (first run)
 	if ores.get("copper", 0) == 0:
 		gold = GameConfig.INITIAL_GOLD
-		ores["copper"] = GameConfig.INITIAL_COPPER + GameConfig.INITIAL_COPPER_BAR
-		ores["tin"] = GameConfig.INITIAL_TIN + GameConfig.INITIAL_TIN_BAR
+		ores["copper"] = GameConfig.INITIAL_COPPER
+		ores["tin"] = GameConfig.INITIAL_TIN
 	
 	# Initialize auto mine speed
 	auto_mine_speed = 0.05  # slow background mining
-
-
-## Smelt ore to bar (skill effect: smelting efficiency applied)
-func smelt_ore(ore_id: String) -> bool:
-	if not ore_data.has(ore_id):
-		return false
-	var needed = max(1, ore_data[ore_id]["ore_per_bar"] - smelting_efficiency_bonus)
-	if get_ore_count(ore_id) >= needed:
-		remove_ore(ore_id, needed)
-		add_ore(ore_id, 1)
-		return true
-	return false
 
 
 ## Check if crafting is possible
@@ -742,10 +729,6 @@ func apply_skill_effect(skill_id: String) -> void:
 				max_unlocked_tier = int(value)
 				tier_unlocked.emit(int(value))
 				push_error("[SkillFX] Tier %d ore unlocked" % int(value))
-		
-		"smelting_efficiency":
-			smelting_efficiency_bonus += int(value)
-			push_error("[SkillFX] Smelting efficiency bonus: -%d" % smelting_efficiency_bonus)
 		
 		"hire_adventurer":
 			push_error("[SkillFX] Adventurer hiring enabled")

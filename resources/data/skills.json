@@ -32,17 +32,6 @@
     "value": 2,
     "unlocked": false
   },
-  "advanced_smelting": {
-    "name": "Advanced Smelting",
-    "description": "Smelting efficiency increased by 20%. (Required ore -1)",
-    "depth": 2,
-    "cost": 200,
-    "cost_type": "gold",
-    "requires": ["ore_appraisal"],
-    "effect": "smelting_efficiency",
-    "value": 1,
-    "unlocked": false
-  },
   "master_pickaxe": {
     "name": "Master Pickaxe",
     "description": "Mining speed increased by an additional 50%.",
@@ -71,7 +60,7 @@
     "depth": 3,
     "cost": 500,
     "cost_type": "gold",
-    "requires": ["advanced_smelting"],
+    "requires": ["ore_appraisal"],
     "effect": "unlock_ore_tier",
     "value": 3,
     "unlocked": false
@@ -93,7 +82,7 @@
     "depth": 3,
     "cost": 350,
     "cost_type": "gold",
-    "requires": ["advanced_smelting"],
+    "requires": ["ore_appraisal"],
     "effect": "crafting_grade_bonus",
     "value": 10,
     "unlocked": false
