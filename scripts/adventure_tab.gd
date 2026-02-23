@@ -43,6 +43,7 @@ func _ready() -> void:
 	GameManager.adventurer_hired.connect(_on_adventurer_hired)
 	GameManager.experience_gained.connect(_on_experience_gained)
 	GameManager.adventurer_leveled_up.connect(_on_adventurer_leveled_up)
+	GameManager.game_loaded.connect(_on_game_loaded)
 	
 	# UI signals
 	adventure_list.item_selected.connect(_on_adventure_selected)
@@ -435,3 +436,12 @@ func _on_adventurer_leveled_up(adventurer_id: String, new_level: int, stat_chang
 		var new_abilities = stat_changes.get("new_abilities", [])
 		for ability_id in new_abilities:
 			print("  [ABILITY] New ability unlocked: %s" % ability_id)
+
+
+func _on_game_loaded() -> void:
+	_refresh_adventure_list()
+	if current_selected_adventurer.is_empty():
+		return
+	var adv = GameManager.get_adventurer(current_selected_adventurer)
+	if adv:
+		_update_detail_view(adv)

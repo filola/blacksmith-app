@@ -1,6 +1,7 @@
 extends Node
 
 const GAME_VERSION: String = "v0.6.9"
+const SAVE_KEY: String = "blacksmith_save"
 
 ## Global game state management
 ## Remove magic numbers via GameConfig, minimize coupling
@@ -33,6 +34,8 @@ signal skill_unlocked(skill_id: String)
 
 # System progression
 signal tier_unlocked(tier: int)
+signal game_saved
+signal game_loaded
 
 # Currency
 var gold: int = 0 :
@@ -75,6 +78,7 @@ var crafting_grade_bonus: float = 0.0
 # Systems
 var adventure_system: AdventureSystem
 var dungeon: Dungeon
+var auto_save_timer: Timer
 
 
 # ===============================================
@@ -242,6 +246,7 @@ func get_random_ore() -> String:
 func _ready() -> void:
 	push_error("[Game] GameManager._ready() called")
 	_load_data()
+	_setup_auto_save()
 	push_error("[Game] GameManager._ready() completed")
 
 
@@ -297,15 +302,26 @@ func _load_data() -> void:
 	
 	dungeon = Dungeon.new()
 	add_child(dungeon)
-	
-	# Initial test resources (first run)
-	if ores.get("copper", 0) == 0:
-		gold = GameConfig.INITIAL_GOLD
-		ores["copper"] = GameConfig.INITIAL_COPPER
-		ores["tin"] = GameConfig.INITIAL_TIN
-	
-	# Initialize auto mine speed
+
+	_initialize_game_state()
+
+
+func _initialize_game_state() -> void:
+	# Initialize baseline auto mine speed before loading save.
 	auto_mine_speed = 0.05  # slow background mining
+
+	# Load persisted state first if available.
+	if load_game():
+		return
+
+	# No save data: initialize first-run resources.
+	gold = GameConfig.INITIAL_GOLD
+	if ores.has("copper"):
+		ores["copper"] = GameConfig.INITIAL_COPPER
+		ore_changed.emit("copper", ores["copper"])
+	if ores.has("tin"):
+		ores["tin"] = GameConfig.INITIAL_TIN
+		ore_changed.emit("tin", ores["tin"])
 
 
 ## Check if crafting is possible
@@ -756,6 +772,205 @@ func get_unlocked_skills() -> Array:
 ## Skill points (using gold as substitute)
 func get_skill_points() -> int:
 	return gold
+
+
+## ===== Save / Load =====
+
+func save_game() -> bool:
+	var save_data := {
+		"save_version": "1.0",
+		"GAME_VERSION": GAME_VERSION,
+		"game_version": GAME_VERSION,
+		"gold": gold,
+		"reputation": reputation,
+		"ores": ores.duplicate(true),
+		"inventory": inventory.duplicate(true),
+		"pickaxe_level": pickaxe_level,
+		"anvil_level": anvil_level,
+		"auto_mine_speed": auto_mine_speed,
+		"mastery": mastery.duplicate(true),
+		"max_unlocked_tier": max_unlocked_tier,
+		"skill_unlocks": _get_skill_unlock_state(),
+		"adventure_state": _get_adventure_save_state(),
+		"mining_speed_bonus": mining_speed_bonus,
+		"crafting_grade_bonus": crafting_grade_bonus
+	}
+
+	var json_string := JSON.stringify(save_data)
+	if json_string.is_empty():
+		push_warning("[Save] Failed to serialize save data.")
+		return false
+
+	if not OS.has_feature("web"):
+		push_warning("[Save] localStorage unavailable on non-web platform.")
+		return false
+
+	var escaped_json := JSON.stringify(json_string)
+	if escaped_json.is_empty():
+		push_warning("[Save] Failed to prepare localStorage payload.")
+		return false
+
+	JavaScriptBridge.eval("localStorage.setItem('%s', %s);" % [SAVE_KEY, escaped_json])
+	game_saved.emit()
+	return true
+
+
+func load_game() -> bool:
+	if not OS.has_feature("web"):
+		push_warning("[Load] localStorage unavailable on non-web platform.")
+		return false
+
+	var raw_save = JavaScriptBridge.eval("localStorage.getItem('%s');" % SAVE_KEY)
+	if raw_save == null:
+		return false
+
+	var save_json: String = str(raw_save)
+	if save_json.is_empty() or save_json == "null":
+		return false
+
+	var parsed = JSON.parse_string(save_json)
+	if parsed == null or not (parsed is Dictionary):
+		push_warning("[Load] Failed to parse save data JSON.")
+		return false
+
+	var save_data: Dictionary = parsed
+	_restore_from_save_data(save_data)
+	return true
+
+
+func reset_game() -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("localStorage.removeItem('%s');" % SAVE_KEY)
+	else:
+		push_warning("[Reset] localStorage unavailable on non-web platform.")
+
+	get_tree().reload_current_scene()
+
+
+func _setup_auto_save() -> void:
+	if not OS.has_feature("web"):
+		return
+
+	auto_save_timer = Timer.new()
+	auto_save_timer.name = "AutoSaveTimer"
+	auto_save_timer.wait_time = 60.0
+	auto_save_timer.one_shot = false
+	auto_save_timer.autostart = true
+	auto_save_timer.timeout.connect(save_game)
+	add_child(auto_save_timer)
+
+
+func _get_skill_unlock_state() -> Dictionary:
+	var unlocked_skills: Dictionary = {}
+	for skill_id in skills_data:
+		unlocked_skills[skill_id] = bool(skills_data[skill_id].get("unlocked", false))
+	return unlocked_skills
+
+
+func _get_adventure_save_state() -> Dictionary:
+	var state: Dictionary = {}
+	if not adventure_system:
+		return state
+
+	for adv_id in adventure_system.adventurers:
+		var adv = adventure_system.adventurers[adv_id]
+		state[adv_id] = {
+			"level": adv.level,
+			"experience": adv.experience,
+			"hired": adv.hired,
+			"equipped_items": adv.equipped_items.duplicate(true),
+			"unlocked_abilities": adv.unlocked_abilities.duplicate(),
+			"is_exploring": adv.is_exploring,
+			"exploration_start_time": adv.exploration_start_time,
+			"exploration_duration": adv.exploration_duration,
+			"current_dungeon_tier": adv.current_dungeon_tier
+		}
+
+	return state
+
+
+func _restore_from_save_data(save_data: Dictionary) -> void:
+	gold = int(save_data.get("gold", gold))
+	reputation = int(save_data.get("reputation", reputation))
+	pickaxe_level = int(save_data.get("pickaxe_level", pickaxe_level))
+	anvil_level = int(save_data.get("anvil_level", anvil_level))
+	auto_mine_speed = float(save_data.get("auto_mine_speed", auto_mine_speed))
+	max_unlocked_tier = max(int(save_data.get("max_unlocked_tier", max_unlocked_tier)), 1)
+	mining_speed_bonus = float(save_data.get("mining_speed_bonus", mining_speed_bonus))
+	crafting_grade_bonus = float(save_data.get("crafting_grade_bonus", crafting_grade_bonus))
+
+	var saved_ores = save_data.get("ores", {})
+	for ore_id in ores:
+		ores[ore_id] = 0
+	if saved_ores is Dictionary:
+		for ore_id in saved_ores:
+			ores[ore_id] = int(saved_ores[ore_id])
+
+	inventory.clear()
+	var saved_inventory = save_data.get("inventory", [])
+	if saved_inventory is Array:
+		for item in saved_inventory:
+			if item is Dictionary:
+				inventory.append((item as Dictionary).duplicate(true))
+
+	var saved_mastery = save_data.get("mastery", {})
+	mastery = saved_mastery.duplicate(true) if saved_mastery is Dictionary else {}
+
+	var skill_unlocks = save_data.get("skill_unlocks", {})
+	if skill_unlocks is Dictionary:
+		for skill_id in skills_data:
+			var unlocked = bool(skill_unlocks.get(skill_id, false))
+			skills_data[skill_id]["unlocked"] = unlocked
+
+	var adventure_state = save_data.get("adventure_state", {})
+	_restore_adventure_state(adventure_state)
+
+	for ore_id in ores:
+		ore_changed.emit(ore_id, ores[ore_id])
+	inventory_changed.emit()
+	tier_unlocked.emit(max_unlocked_tier)
+	for skill_id in skills_data:
+		if skills_data[skill_id].get("unlocked", false):
+			skill_unlocked.emit(skill_id)
+
+	game_loaded.emit()
+
+
+func _restore_adventure_state(adventure_state) -> void:
+	if not adventure_system or not (adventure_state is Dictionary):
+		return
+
+	for adv_id in adventure_state:
+		var adv = adventure_system.get_adventurer(adv_id)
+		if not adv:
+			continue
+
+		var adv_state = adventure_state[adv_id]
+		if not (adv_state is Dictionary):
+			continue
+
+		adv.level = int(adv_state.get("level", adv.level))
+		adv.experience = int(adv_state.get("experience", adv.experience))
+		adv.hired = bool(adv_state.get("hired", adv.hired))
+		adv.equipped_items = []
+		var equipped_items = adv_state.get("equipped_items", [])
+		if equipped_items is Array:
+			for item in equipped_items:
+				if item is Dictionary:
+					adv.equipped_items.append((item as Dictionary).duplicate(true))
+		adv.unlocked_abilities = _to_string_array(adv_state.get("unlocked_abilities", []))
+		adv.is_exploring = bool(adv_state.get("is_exploring", false))
+		adv.exploration_start_time = float(adv_state.get("exploration_start_time", 0.0))
+		adv.exploration_duration = float(adv_state.get("exploration_duration", 0.0))
+		adv.current_dungeon_tier = int(adv_state.get("current_dungeon_tier", 1))
+
+
+func _to_string_array(value) -> Array[String]:
+	var result: Array[String] = []
+	if value is Array:
+		for entry in value:
+			result.append(str(entry))
+	return result
 
 
 ## ===== Debug =====
