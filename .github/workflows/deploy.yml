@@ -19,7 +19,7 @@ jobs:
       - name: Extract version from game_manager.gd
         id: version
         run: |
-          VERSION=$(grep -oP 'GAME_VERSION.*"\K[^"]+' autoload/game_manager.gd)
+          VERSION=$(grep -oP '^const GAME_VERSION.*"\K[^"]+' autoload/game_manager.gd)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Detected version: $VERSION"
 
