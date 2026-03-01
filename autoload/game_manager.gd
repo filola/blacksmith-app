@@ -1,6 +1,6 @@
 extends Node
 
-const GAME_VERSION: String = "v0.6.9"
+const GAME_VERSION: String = "v0.7.0"
 const SAVE_KEY: String = "blacksmith_save"
 
 ## Global game state management

@@ -4,12 +4,46 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write
+  pages: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from game_manager.gd
+        id: version
+        run: |
+          VERSION=$(grep -oP 'GAME_VERSION.*"\K[^"]+' autoload/game_manager.gd)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Detected version: $VERSION"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Find previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -n "$PREV_TAG" ]; then
+            echo "Previous tag: $PREV_TAG"
+            CHANGELOG=$(git log "${PREV_TAG}..HEAD" --pretty=format:"- %s (%h)" --no-merges)
+          else
+            echo "No previous tag found, using last 20 commits"
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges -20)
+          fi
+
+          # Write changelog to file (multi-line safe)
+          echo "$CHANGELOG" > changelog.txt
+          echo "Changelog:"
+          cat changelog.txt
+
       - name: Download Godot 4.6
         run: |
           curl -sL -o Godot_v4.6-stable_linux.x86_64.zip https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_linux.x86_64.zip
@@ -18,93 +52,73 @@ jobs:
 
       - name: Download Godot Export Templates
         run: |
-          echo "📥 Downloading Godot 4.6 export templates..."
+          echo "Downloading Godot 4.6 export templates..."
           curl -sL -o Godot_v4.6-stable_export_templates.tpz https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_export_templates.tpz
-          
-          # Create export templates directory
+
           TEMPLATES_DIR="$HOME/.local/share/godot/export_templates/4.6.stable"
           mkdir -p "$TEMPLATES_DIR"
-          
-          echo "📦 Extracting templates (this may take ~30s)..."
+
           TEMP_DIR=$(mktemp -d)
-          
-          # .tpz is a ZIP file containing a templates/ subdirectory
           unzip -q Godot_v4.6-stable_export_templates.tpz -d "$TEMP_DIR"
-          
-          echo "📂 Extracted contents:"
-          ls -la "$TEMP_DIR/" | head -10
-          
-          # Move templates to the correct location
+
           if [ -d "$TEMP_DIR/templates" ]; then
-            echo "✓ Found templates/ subdirectory, moving contents..."
             mv "$TEMP_DIR/templates"/* "$TEMPLATES_DIR/"
           else
-            echo "⚠ No templates/ subdirectory found, moving all files..."
             mv "$TEMP_DIR"/* "$TEMPLATES_DIR/" 2>/dev/null || true
           fi
-          
-          # Cleanup
           rm -rf "$TEMP_DIR"
-          
-          # Verify installation with detailed output
-          echo ""
-          echo "✓ Export templates installed at: $TEMPLATES_DIR"
-          echo "📄 Directory contents:"
-          ls -la "$TEMPLATES_DIR/" | head -20
-          
-          # Check for critical web templates
-          if [ -f "$TEMPLATES_DIR/web/index.html" ]; then
-            echo "✅ Found web/index.html!"
-          else
-            echo "❌ WARNING: web/index.html not found"
-            echo "   Available files in web/:"
-            ls -la "$TEMPLATES_DIR/web/" 2>/dev/null || echo "   (web/ directory does not exist)"
-          fi
 
-      - name: Verify Export Templates
-        run: |
-          echo "Checking export templates structure:"
-          find ~/.local/share/godot/export_templates/4.6.stable -type f -name "*.zip" | head -20
-          echo ""
-          echo "Full directory structure:"
-          ls -R ~/.local/share/godot/export_templates/4.6.stable | head -50
+          echo "Export templates installed at: $TEMPLATES_DIR"
+          ls -la "$TEMPLATES_DIR/" | head -20
 
       - name: Export to HTML5
         run: |
           mkdir -p build/web
-          
-          echo "🏗️ Starting Godot HTML5 export..."
-          echo "📋 Godot binary: ./Godot_v4.6-stable_linux.x86_64"
-          echo "📋 Export templates dir: $HOME/.local/share/godot/export_templates/4.6.stable/"
-          echo ""
-          
-          # Run export with verbose output
+
           ./Godot_v4.6-stable_linux.x86_64 --headless --export-release "Web" build/web/index.html 2>&1 | tee export.log
-          
+
           EXPORT_STATUS=$?
-          
-          echo ""
-          echo "📊 Export Status: $EXPORT_STATUS"
-          
           if [ $EXPORT_STATUS -ne 0 ]; then
-            echo "❌ Export FAILED"
-            echo ""
-            echo "📄 Full export log:"
+            echo "Export FAILED"
             cat export.log
-            echo ""
-            echo "🔍 Debugging info:"
-            echo "   - Templates dir contents:"
-            ls -la "$HOME/.local/share/godot/export_templates/4.6.stable/" || echo "     (templates dir not found)"
             exit 1
-          else
-            echo "✅ Export SUCCEEDED"
-            echo ""
-            echo "📦 Build output:"
-            ls -lh build/web/
           fi
+
+          echo "Export SUCCEEDED"
+          ls -lh build/web/
+
+      - name: Inject version into HTML
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          VERSION_DIV='<div style="position:fixed;bottom:4px;right:8px;font-size:11px;color:rgba(255,255,255,0.3);font-family:monospace;pointer-events:none;z-index:9999;">'"$VERSION"'</div>'
+
+          sed -i "s|</body>|${VERSION_DIV}</body>|" build/web/index.html
+          echo "Injected version $VERSION into index.html"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: build/web
+
+      - name: Create git tag
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "Tag $VERSION already exists, skipping"
+          else
+            git tag "$VERSION"
+            git push origin "$VERSION"
+            echo "Created and pushed tag: $VERSION"
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
+          body_path: changelog.txt
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
