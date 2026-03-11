@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/mining_tab.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/assets/dungeon-crawl/adventurers/warrior.png" id="2"]
+[ext_resource type="Texture2D" path="res://resources/assets/dungeon-crawl/weapons/hand_axe1.png" id="3"]
 
 [node name="MiningTab" type="Control"]
 layout_mode = 3
@@ -27,52 +29,167 @@ size_flags_stretch_ratio = 4.0
 
 [node name="LeftVBox" type="VBoxContainer" parent="HSplit/LeftPanel"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 
-[node name="AnimationArea" type="Panel" parent="HSplit/LeftPanel/LeftVBox"]
+[node name="MineArea" type="Panel" parent="HSplit/LeftPanel/LeftVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-custom_minimum_size = Vector2(0, 200)
-tooltip_text = "Blacksmith animation placeholder"
+custom_minimum_size = Vector2(0, 280)
 
-[node name="PlaceholderLabel" type="Label" parent="HSplit/LeftPanel/LeftVBox/AnimationArea"]
+[node name="MinerSprite" type="TextureRect" parent="HSplit/LeftPanel/LeftVBox/MineArea"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -80.0
-offset_top = -12.0
-offset_right = 80.0
-offset_bottom = 12.0
+offset_left = -120.0
+offset_top = -32.0
+offset_right = -56.0
+offset_bottom = 32.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "⚒ Blacksmith ⚒"
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PickaxeSprite" type="TextureRect" parent="HSplit/LeftPanel/LeftVBox/MineArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -48.0
+offset_right = -16.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BubbleLabel" type="Label" parent="HSplit/LeftPanel/LeftVBox/MineArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -68.0
+offset_right = -40.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+text = ""
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 
-[node name="MineProgress" type="ProgressBar" parent="HSplit/LeftPanel/LeftVBox"]
+[node name="RockButton" type="TextureButton" parent="HSplit/LeftPanel/LeftVBox/MineArea"]
 unique_name_in_owner = true
-layout_mode = 2
-custom_minimum_size = Vector2(0, 30)
-value = 0.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -48.0
+offset_top = -48.0
+offset_right = 48.0
+offset_bottom = 48.0
+grow_horizontal = 2
+grow_vertical = 2
+ignore_texture_size = true
+stretch_mode = 4
 
-[node name="MineButton" type="Button" parent="HSplit/LeftPanel/LeftVBox"]
+[node name="RockHP" type="ProgressBar" parent="HSplit/LeftPanel/LeftVBox/MineArea"]
 unique_name_in_owner = true
-layout_mode = 2
-custom_minimum_size = Vector2(0, 80)
-text = "⛏ Mine!"
-theme_override_font_sizes/font_size = 32
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -60.0
+offset_top = 10.0
+offset_right = 60.0
+offset_bottom = 26.0
+grow_horizontal = 2
+value = 100.0
+show_percentage = false
 
-[node name="PowerLabel" type="Label" parent="HSplit/LeftPanel/LeftVBox"]
+[node name="OreIcon" type="TextureRect" parent="HSplit/LeftPanel/LeftVBox/MineArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -80.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 50.0
+grow_horizontal = 0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="OreNameLabel" type="Label" parent="HSplit/LeftPanel/LeftVBox/MineArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -120.0
+offset_top = 52.0
+offset_right = -10.0
+offset_bottom = 72.0
+grow_horizontal = 0
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 13
+
+[node name="EventLabel" type="Label" parent="HSplit/LeftPanel/LeftVBox/MineArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = -60.0
+offset_right = 150.0
+offset_bottom = -30.0
+grow_horizontal = 2
+text = ""
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+
+[node name="InfoBar" type="HBoxContainer" parent="HSplit/LeftPanel/LeftVBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="PowerLabel" type="Label" parent="HSplit/LeftPanel/LeftVBox/InfoBar"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Mining Power: 1.0"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 14
+
+[node name="ComboLabel" type="Label" parent="HSplit/LeftPanel/LeftVBox/InfoBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(1, 0.6, 0.2, 1)
+
+[node name="AutoMineLabel" type="Label" parent="HSplit/LeftPanel/LeftVBox/InfoBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.5, 0.8, 1, 1)
 
 [node name="RightPanel" type="PanelContainer" parent="HSplit"]
 layout_mode = 2
