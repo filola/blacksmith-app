@@ -54,11 +54,10 @@ const TIER_UNLOCK_CONDITIONS = {
 	2: {"min_adventurers": 2, "min_level": 3},
 	3: {"min_adventurers": 3, "min_level": 5},
 	4: {"min_adventurers": 4, "min_level": 7},
-	5: {"min_adventurers": 5, "min_level": 10},
-	6: {"min_adventurers": 6, "min_level": 12}
+	5: {"min_adventurers": 5, "min_level": 10}
 }
 
-const TIER_MAX = 6
+const TIER_MAX = 5
 const TIER_DEFAULT = 1
 
 
@@ -88,6 +87,62 @@ const BASE_GRADE_CHANCES = {
 	"epic": 4.0,
 	"legendary": 1.0
 }
+
+
+# ============================================
+# Adventurer Class Ore Bonuses
+# ============================================
+const CLASS_ORE_BONUS = {"warrior": 1.2, "paladin": 1.1, "rogue": 1.0, "mage": 1.0}
+const PICKAXE_ORE_BONUS_PER_LEVEL = 0.1
+
+# Exploration time formula: BASE + (tier - 1) * PER_TIER
+const EXPLORATION_BASE_TIME = 45.0
+const EXPLORATION_TIME_PER_TIER = 30.0
+
+
+# ============================================
+# Equipment Stat System
+# ============================================
+# Base stats per equipment subtype
+const EQUIPMENT_BASE_STATS = {
+	# Weapons → attack_power
+	"sword":  {"attack_power": 5, "speed_bonus": 1.0},
+	"axe":    {"attack_power": 7, "speed_bonus": 0.95},
+	"dagger": {"attack_power": 3, "speed_bonus": 1.10},
+	"spear":  {"attack_power": 6, "speed_bonus": 1.0},
+	"staff":  {"attack_power": 4, "speed_bonus": 1.05},
+	# Armor → defense
+	"chest":  {"defense": 6, "speed_bonus": 0.95},
+	"shield": {"defense": 4, "speed_bonus": 0.98},
+}
+
+# Tier multiplier for base stats (higher tier materials = stronger gear)
+const EQUIPMENT_TIER_MULTIPLIER = {1: 1.0, 2: 1.5, 3: 2.2, 4: 3.0, 5: 4.5}
+
+# Grade multiplier for stats (better roll = stronger item)
+const EQUIPMENT_GRADE_MULTIPLIER = {
+	"common": 1.0, "uncommon": 1.3, "rare": 1.6, "epic": 2.0, "legendary": 3.0
+}
+
+# Dungeon combat: how equipment stats translate to bonuses
+const ATTACK_GOLD_BONUS_PER_POINT = 0.02      # +2% gold per attack point
+const ATTACK_ORE_BONUS_PER_POINT = 0.015       # +1.5% ore per attack point
+const DEFENSE_EXP_BONUS_PER_POINT = 0.02       # +2% exp per defense point
+const DEFENSE_SPEED_BONUS_PER_POINT = 0.01     # +1% speed per defense point
+
+
+# ============================================
+# Party Dungeon System
+# ============================================
+const MAX_PARTY_SIZE = 4
+const MIN_PARTY_SIZE = 1
+
+# Dungeon material drop settings per tier
+const DUNGEON_MATERIAL_DROP_CHANCE = {1: 0.6, 2: 0.5, 3: 0.45, 4: 0.4, 5: 0.35}
+const DUNGEON_MATERIAL_MIN_QTY = {1: 1, 2: 1, 3: 1, 4: 1, 5: 1}
+const DUNGEON_MATERIAL_MAX_QTY = {1: 3, 2: 2, 3: 2, 4: 2, 5: 2}
+# Party size bonus: more members = more material drops
+const PARTY_SIZE_MATERIAL_BONUS = {1: 1.0, 2: 1.3, 3: 1.6, 4: 2.0}
 
 
 # ============================================

@@ -45,11 +45,16 @@ func _update_recipes() -> void:
 
 		var mat_text = ""
 		for mat_id in recipe["materials"]:
-			var ore_data = GameManager.ore_data[mat_id]
+			var mat_name = mat_id
+			# Look up name from ore_data or dungeon_materials_data
+			if GameManager.ore_data.has(mat_id):
+				mat_name = GameManager.ore_data[mat_id].get("name", mat_id)
+			elif GameManager.dungeon_materials_data.has(mat_id):
+				mat_name = GameManager.dungeon_materials_data[mat_id].get("name", mat_id)
 			var have = GameManager.get_ore_count(mat_id)
 			var need = recipe["materials"][mat_id]
 			var color = "green" if have >= need else "red"
-			mat_text += "[color=%s]%s %d/%d[/color]  " % [color, ore_data.get("name", mat_id), have, need]
+			mat_text += "[color=%s]%s %d/%d[/color]  " % [color, mat_name, have, need]
 
 		var mat_label = RichTextLabel.new()
 		mat_label.bbcode_enabled = true
@@ -101,7 +106,13 @@ func _on_craft(recipe_id: String) -> void:
 	result_name.text = item["name"]
 	result_grade.text = "%s %s" % [item["grade_emoji"], item["grade_name"]]
 	result_grade.add_theme_color_override("font_color", Color.html(item["grade_color"]))
-	result_price.text = "Sell Price: [GOLD]%d" % item["price"]
+	var stats_parts: Array[String] = []
+	if item.get("attack_power", 0) > 0:
+		stats_parts.append("ATK +%d" % item["attack_power"])
+	if item.get("defense", 0) > 0:
+		stats_parts.append("DEF +%d" % item["defense"])
+	var stats_str = " | " + ", ".join(stats_parts) if not stats_parts.is_empty() else ""
+	result_price.text = "Sell: [GOLD]%d%s" % [item["price"], stats_str]
 
 	# Grade effects
 	_play_craft_effect(item["grade"])

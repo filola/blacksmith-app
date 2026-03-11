@@ -43,9 +43,14 @@ func _update_list() -> void:
 		item_icon.custom_minimum_size = Vector2(32, 32)
 		hbox.add_child(item_icon)
 
-		# Grade emoji + name
+		# Grade emoji + name + stats
 		var name_label = Label.new()
-		name_label.text = "%s %s [%s]" % [item["grade_emoji"], item["name"], item["grade_name"]]
+		var stat_str = ""
+		if item.get("attack_power", 0) > 0:
+			stat_str += " ATK+%d" % item["attack_power"]
+		if item.get("defense", 0) > 0:
+			stat_str += " DEF+%d" % item["defense"]
+		name_label.text = "%s %s [%s]%s" % [item["grade_emoji"], item["name"], item["grade_name"], stat_str]
 		name_label.add_theme_color_override("font_color", Color.html(item["grade_color"]))
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		hbox.add_child(name_label)

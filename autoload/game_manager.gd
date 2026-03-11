@@ -25,6 +25,8 @@ signal item_unequipped(adventurer_id: String, item: Dictionary)
 # Adventure
 signal exploration_started(adventurer_id: String, tier: int)
 signal exploration_completed(adventurer_id: String, rewards: Dictionary)
+signal party_exploration_started(party_id: String, dungeon_id: String)
+signal party_exploration_completed(party_id: String, rewards: Dictionary)
 signal adventurer_hired(adventurer_id: String, cost: int)
 signal experience_gained(adventurer_id: String, amount: int)
 signal adventurer_leveled_up(adventurer_id: String, new_level: int, stat_changes: Dictionary)
@@ -70,14 +72,16 @@ var artifact_data: Dictionary = {}
 var adventurer_data: Dictionary = {}
 var abilities_data: Dictionary = {}
 var skills_data: Dictionary = {}
+var dungeon_data: Dictionary = {}
+var dungeon_materials_data: Dictionary = {}
 
 # Cumulative skill effects
 var mining_speed_bonus: float = 1.0
 var crafting_grade_bonus: float = 0.0
 
 # Systems
-var adventure_system: AdventureSystem
-var dungeon: Dungeon
+var adventure_system  # AdventureSystem
+var dungeon  # Dungeon
 var auto_save_timer: Timer
 
 
@@ -289,18 +293,31 @@ func _load_data() -> void:
 	if skills_file:
 		skills_data = JSON.parse_string(skills_file.get_as_text())
 		skills_file.close()
-		push_error("[Skill] Loaded %d skills" % skills_data.size())
-	
+
+	# Load dungeon data
+	var dungeon_file = FileAccess.open("res://resources/data/dungeons.json", FileAccess.READ)
+	if dungeon_file:
+		dungeon_data = JSON.parse_string(dungeon_file.get_as_text())
+		dungeon_file.close()
+
+	# Load dungeon materials and merge into ores dict
+	var dm_file = FileAccess.open("res://resources/data/dungeon_materials.json", FileAccess.READ)
+	if dm_file:
+		dungeon_materials_data = JSON.parse_string(dm_file.get_as_text())
+		dm_file.close()
+		for mat_id in dungeon_materials_data:
+			ores[mat_id] = 0  # Initialize dungeon material inventory
+
 	# System initialization
 	push_error("[Adventure] GameManager._load_data(): Creating AdventureSystem...")
-	adventure_system = AdventureSystem.new()
+	adventure_system = preload("res://scripts/adventure_system.gd").new()
 	push_error("[Adventure] GameManager._load_data(): Adding AdventureSystem as child...")
 	add_child(adventure_system)
 	push_error("[Adventure] GameManager._load_data(): Calling adventure_system._load_data()...")
 	adventure_system._load_data()
 	push_error("[Adventure] GameManager._load_data(): adventure_system initialized with %d adventurers" % adventure_system.adventurers.size())
 	
-	dungeon = Dungeon.new()
+	dungeon = preload("res://scripts/dungeon.gd").new()
 	add_child(dungeon)
 
 	_initialize_game_state()
@@ -322,6 +339,14 @@ func _initialize_game_state() -> void:
 	if ores.has("tin"):
 		ores["tin"] = GameConfig.INITIAL_TIN
 		ore_changed.emit("tin", ores["tin"])
+
+
+## Unlock all recipes at or below the given tier
+func _unlock_recipes_for_tier(tier: int) -> void:
+	for recipe_id in recipe_data:
+		var recipe = recipe_data[recipe_id]
+		if recipe.get("tier", 99) <= tier and not recipe.get("unlocked", false):
+			recipe_data[recipe_id]["unlocked"] = true
 
 
 ## Check if crafting is possible
@@ -353,19 +378,33 @@ func craft_item(recipe_id: String) -> Dictionary:
 	var grade_info = GameConfig.GRADES[grade]
 
 	# Create item
+	var subtype = recipe.get("subtype", "")
+	var tier = recipe["tier"]
 	var item = {
 		"recipe_id": recipe_id,
 		"name": recipe["name"],
 		"type": recipe["type"],
-		"subtype": recipe.get("subtype", ""),
+		"subtype": subtype,
 		"grade": grade,
 		"grade_name": grade_info["name"],
 		"grade_emoji": "[%s]" % grade_info["name"],
 		"grade_color": grade_info["color"],
 		"price": int(recipe["base_price"] * grade_info["multiplier"]),
-		"tier": recipe["tier"],
+		"tier": tier,
 		"is_artifact": false  # normal item
 	}
+
+	# Apply equipment stats from GameConfig tables
+	var base_stats = GameConfig.EQUIPMENT_BASE_STATS.get(subtype, {})
+	var tier_mult = GameConfig.EQUIPMENT_TIER_MULTIPLIER.get(tier, 1.0)
+	var grade_mult = GameConfig.EQUIPMENT_GRADE_MULTIPLIER.get(grade, 1.0)
+
+	if base_stats.has("attack_power"):
+		item["attack_power"] = int(base_stats["attack_power"] * tier_mult * grade_mult)
+	if base_stats.has("defense"):
+		item["defense"] = int(base_stats["defense"] * tier_mult * grade_mult)
+	if base_stats.has("speed_bonus"):
+		item["speed_bonus"] = base_stats["speed_bonus"]
 
 	add_item(item)
 
@@ -495,6 +534,101 @@ func unequip_item_from_adventurer(adventurer_id: String, item_index: int) -> boo
 	return true
 
 
+## ===== Party Dungeon System =====
+
+## Get all dungeon definitions
+func get_dungeons() -> Dictionary:
+	return dungeon_data
+
+## Get dungeon material info
+func get_dungeon_material_info(mat_id: String) -> Dictionary:
+	return dungeon_materials_data.get(mat_id, {})
+
+## Check if a dungeon is unlocked
+func is_dungeon_unlocked(dungeon_id: String) -> bool:
+	var dg = dungeon_data.get(dungeon_id, {})
+	return max_unlocked_tier >= dg.get("unlock_tier", 99)
+
+## Start party exploration
+func start_party_exploration(dungeon_id: String, member_ids: Array[String]) -> String:
+	if not adventure_system or not dungeon:
+		return ""
+	if member_ids.size() < GameConfig.MIN_PARTY_SIZE or member_ids.size() > GameConfig.MAX_PARTY_SIZE:
+		return ""
+	if not is_dungeon_unlocked(dungeon_id):
+		return ""
+
+	var dg = dungeon_data.get(dungeon_id, {})
+	var tier = dg.get("tier", 1)
+	var party = adventure_system.create_and_start_party(dungeon_id, member_ids, tier)
+	if not party:
+		return ""
+
+	party_exploration_started.emit(party.id, dungeon_id)
+	return party.id
+
+
+## Check and complete party exploration
+func check_and_complete_party_exploration(party_id: String) -> Dictionary:
+	if not adventure_system or not dungeon:
+		return {}
+
+	var party = adventure_system.get_party(party_id)
+	if not party or not party.is_exploration_complete():
+		return {}
+
+	var result = adventure_system.finish_party_exploration(party_id)
+	if result.is_empty():
+		return {}
+
+	var dg = dungeon_data.get(result["dungeon_id"], {})
+	var tier = dg.get("tier", 1)
+	var member_ids = result["member_ids"]
+
+	# Aggregate party stats
+	var total_attack = adventure_system.get_party_attack_power(member_ids)
+	var total_defense = adventure_system.get_party_defense(member_ids)
+	var total_level = 0
+	var all_ability_bonuses = {}
+	for mid in member_ids:
+		var adv = adventure_system.get_adventurer(mid)
+		if adv:
+			total_level += adv.level
+			var bonuses = _get_ability_bonuses(adv)
+			for key in bonuses:
+				all_ability_bonuses[key] = all_ability_bonuses.get(key, 0.0) + bonuses[key]
+	var avg_level = total_level / member_ids.size()
+
+	# Generate party rewards
+	var rewards = dungeon.generate_party_rewards(
+		result["dungeon_id"], avg_level,
+		total_attack, total_defense, member_ids.size(),
+		pickaxe_level, all_ability_bonuses)
+
+	# Apply rewards
+	add_gold(rewards["gold"])
+
+	for ore_reward in rewards.get("items", []):
+		add_ore(ore_reward["ore_id"], ore_reward["quantity"])
+
+	# Apply dungeon exclusive materials (stored in ores dict)
+	for mat_reward in rewards.get("dungeon_materials", []):
+		add_ore(mat_reward["material_id"], mat_reward["quantity"])
+
+	for artifact in rewards.get("artifacts", []):
+		add_item(artifact)
+
+	# Give EXP to all party members
+	for mid in member_ids:
+		_process_experience(mid, rewards.get("experience", 0))
+
+	_check_tier_unlock()
+
+	result["rewards"] = rewards
+	party_exploration_completed.emit(party_id, rewards)
+	return result
+
+
 ## Start adventurer exploration
 func start_exploration(adventurer_id: String, dungeon_tier: int) -> bool:
 	if not adventure_system:
@@ -523,8 +657,16 @@ func check_and_complete_exploration(adventurer_id: String) -> Dictionary:
 	if exploration_data.is_empty():
 		return {}
 	
+	# Gather equipment stats and ability bonuses
+	var attack_power = adv.get_total_attack_power()
+	var defense = adv.get_total_defense()
+	var ability_bonuses = _get_ability_bonuses(adv)
+
 	# Generate rewards
-	var rewards = dungeon.generate_rewards(adv.current_dungeon_tier, adv.level)
+	var rewards = dungeon.generate_rewards(
+		adv.current_dungeon_tier, adv.level,
+		adv.character_class, pickaxe_level,
+		attack_power, defense, ability_bonuses)
 	
 	# Apply rewards
 	add_gold(rewards["gold"])
@@ -593,6 +735,21 @@ func get_hire_cost(adventurer_id: String) -> int:
 	return data.get("hire_cost", GameConfig.ADVENTURER_HIRE_COST_DEFAULT)
 
 
+## Collect ability bonuses from adventurer's unlocked abilities
+func _get_ability_bonuses(adv) -> Dictionary:
+	var bonuses = {}
+	if not adventure_system:
+		return bonuses
+
+	var abilities = adventure_system.get_unlocked_abilities(adv.id)
+	for ability in abilities:
+		var effect = ability.get("effect", "")
+		var value = ability.get("value", 0.0)
+		if not effect.is_empty():
+			bonuses[effect] = bonuses.get(effect, 0.0) + value
+	return bonuses
+
+
 ## Process experience and level-up
 func _process_experience(adventurer_id: String, amount: int) -> void:
 	if not adventure_system:
@@ -630,22 +787,18 @@ func _check_tier_unlock() -> void:
 	for tier in GameConfig.TIER_UNLOCK_CONDITIONS:
 		if max_unlocked_tier >= tier:
 			continue
-		
+
 		var condition = GameConfig.TIER_UNLOCK_CONDITIONS[tier]
-		
-		# Condition 1: Check required adventurer count
-		if hired_adventurers.size() < condition["min_adventurers"]:
-			continue
-		
-		# Condition 2: Check minimum level
-		var meets_level = true
+
+		# Count adventurers meeting the level requirement
+		var qualifying_count = 0
 		for adv in hired_adventurers:
-			if adv.level < condition["min_level"]:
-				meets_level = false
-				break
-		
-		if meets_level:
+			if adv.level >= condition["min_level"]:
+				qualifying_count += 1
+
+		if qualifying_count >= condition["min_adventurers"]:
 			max_unlocked_tier = tier
+			_unlock_recipes_for_tier(tier)
 			tier_unlocked.emit(tier)
 
 
@@ -924,6 +1077,9 @@ func _restore_from_save_data(save_data: Dictionary) -> void:
 
 	var adventure_state = save_data.get("adventure_state", {})
 	_restore_adventure_state(adventure_state)
+
+	# Unlock recipes based on restored tier
+	_unlock_recipes_for_tier(max_unlocked_tier)
 
 	for ore_id in ores:
 		ore_changed.emit(ore_id, ores[ore_id])

@@ -36,7 +36,7 @@
     "hire_cost": 280,
     "level": 1,
     "experience": 0,
-    "hired": true
+    "hired": false
   },
   "adventurer_4": {
     "id": "adventurer_4",
@@ -49,7 +49,7 @@
     "hire_cost": 300,
     "level": 1,
     "experience": 0,
-    "hired": true
+    "hired": false
   },
   "adventurer_5": {
     "id": "adventurer_5",

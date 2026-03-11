@@ -29,6 +29,16 @@
     "unlocked": true,
     "icon": "res://resources/assets/dungeon-crawl/weapons/dagger.png"
   },
+  "tin_spear": {
+    "name": "Tin Spear",
+    "type": "weapon",
+    "subtype": "spear",
+    "materials": {"tin": 3},
+    "base_price": 14,
+    "tier": 1,
+    "unlocked": true,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/spear2.png"
+  },
   "bronze_sword": {
     "name": "Bronze Sword",
     "type": "weapon",
@@ -39,25 +49,66 @@
     "unlocked": true,
     "icon": "res://resources/assets/dungeon-crawl/weapons/long_sword1.png"
   },
+  "bronze_armor": {
+    "name": "Bronze Armor",
+    "type": "armor",
+    "subtype": "chest",
+    "materials": {"copper": 3, "tin": 3},
+    "base_price": 30,
+    "tier": 1,
+    "unlocked": true,
+    "icon": "res://resources/assets/dungeon-crawl/armour/chain_mail1.png"
+  },
+
   "iron_sword": {
     "name": "Iron Sword",
     "type": "weapon",
     "subtype": "sword",
-    "materials": {"iron": 4},
+    "materials": {"iron": 4, "goblin_tooth": 1},
     "base_price": 50,
     "tier": 2,
     "unlocked": false,
     "icon": "res://resources/assets/dungeon-crawl/weapons/greatsword1.png"
   },
+  "iron_axe": {
+    "name": "Iron Axe",
+    "type": "weapon",
+    "subtype": "axe",
+    "materials": {"iron": 3, "copper": 2, "goblin_tooth": 1},
+    "base_price": 45,
+    "tier": 2,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/battle_axe1.png"
+  },
   "iron_armor": {
     "name": "Iron Armor",
     "type": "armor",
     "subtype": "chest",
-    "materials": {"iron": 6},
+    "materials": {"iron": 6, "cave_moss": 2},
     "base_price": 80,
     "tier": 2,
     "unlocked": false,
-    "icon": "res://resources/assets/dungeon-crawl/armour/chain_mail1.png"
+    "icon": "res://resources/assets/dungeon-crawl/armour/plate_mail1.png"
+  },
+  "steel_shield": {
+    "name": "Steel Shield",
+    "type": "armor",
+    "subtype": "shield",
+    "materials": {"iron": 4, "tin": 2, "cave_moss": 1},
+    "base_price": 70,
+    "tier": 2,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/armour/large_shield1.png"
+  },
+  "silver_dagger": {
+    "name": "Silver Dagger",
+    "type": "weapon",
+    "subtype": "dagger",
+    "materials": {"silver": 3},
+    "base_price": 60,
+    "tier": 2,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/dagger.png"
   },
   "silver_bow": {
     "name": "Silver Bow",
@@ -69,34 +120,127 @@
     "unlocked": false,
     "icon": "res://resources/assets/dungeon-crawl/weapons/hand_axe1.png"
   },
+
+  "gold_sword": {
+    "name": "Gold Sword",
+    "type": "weapon",
+    "subtype": "sword",
+    "materials": {"gold": 4, "iron": 3, "dragon_fang": 2},
+    "base_price": 200,
+    "tier": 3,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/demon_blade.png"
+  },
   "gold_staff": {
     "name": "Gold Staff",
     "type": "weapon",
     "subtype": "staff",
-    "materials": {"gold": 5, "silver": 3},
+    "materials": {"gold": 5, "silver": 3, "fire_crystal": 2},
     "base_price": 250,
     "tier": 3,
     "unlocked": false,
     "icon": "res://resources/assets/dungeon-crawl/staff/i-staff_fire.png"
   },
+  "arcane_staff": {
+    "name": "Arcane Staff",
+    "type": "weapon",
+    "subtype": "staff",
+    "materials": {"silver": 4, "gold": 2},
+    "base_price": 180,
+    "tier": 3,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/staff/i-staff_earth.png"
+  },
+  "gold_armor": {
+    "name": "Gold Armor",
+    "type": "armor",
+    "subtype": "chest",
+    "materials": {"gold": 5, "iron": 4, "fire_crystal": 2},
+    "base_price": 300,
+    "tier": 3,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/armour/plate_mail1.png"
+  },
+  "gold_shield": {
+    "name": "Gold Shield",
+    "type": "armor",
+    "subtype": "shield",
+    "materials": {"gold": 4, "silver": 2},
+    "base_price": 220,
+    "tier": 3,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/armour/large_shield2.png"
+  },
+
   "mithril_sword": {
     "name": "Mithril Sword",
     "type": "weapon",
     "subtype": "sword",
-    "materials": {"mithril": 6, "gold": 2},
+    "materials": {"mithril": 6, "gold": 2, "frost_shard": 3},
     "base_price": 600,
     "tier": 4,
     "unlocked": false,
     "icon": "res://resources/assets/dungeon-crawl/weapons/double_sword.png"
   },
+  "mithril_spear": {
+    "name": "Mithril Spear",
+    "type": "weapon",
+    "subtype": "spear",
+    "materials": {"mithril": 4, "iron": 3},
+    "base_price": 450,
+    "tier": 4,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/weapons/trident1.png"
+  },
+  "mithril_armor": {
+    "name": "Mithril Armor",
+    "type": "armor",
+    "subtype": "chest",
+    "materials": {"mithril": 5, "gold": 3, "ice_essence": 3},
+    "base_price": 500,
+    "tier": 4,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/armour/shield1_elven.png"
+  },
+  "mithril_shield": {
+    "name": "Mithril Shield",
+    "type": "armor",
+    "subtype": "shield",
+    "materials": {"mithril": 4, "silver": 3},
+    "base_price": 400,
+    "tier": 4,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/armour/large_shield3.png"
+  },
+
   "orichalcum_blade": {
     "name": "Orichalcum Blade",
     "type": "weapon",
     "subtype": "sword",
-    "materials": {"orichalcum": 8, "mithril": 4},
+    "materials": {"orichalcum": 8, "mithril": 4, "shadow_fragment": 4},
     "base_price": 1500,
     "tier": 5,
     "unlocked": false,
     "icon": "res://resources/assets/dungeon-crawl/weapons/blessed_blade.png"
+  },
+  "orichalcum_staff": {
+    "name": "Orichalcum Staff",
+    "type": "weapon",
+    "subtype": "staff",
+    "materials": {"orichalcum": 5, "gold": 4, "void_crystal": 3},
+    "base_price": 1000,
+    "tier": 5,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/staff/i-staff_power.png"
+  },
+  "orichalcum_armor": {
+    "name": "Orichalcum Armor",
+    "type": "armor",
+    "subtype": "chest",
+    "materials": {"orichalcum": 6, "mithril": 3, "celestial_ore": 3},
+    "base_price": 1200,
+    "tier": 5,
+    "unlocked": false,
+    "icon": "res://resources/assets/dungeon-crawl/armour/shield2_kite.png"
   }
 }
