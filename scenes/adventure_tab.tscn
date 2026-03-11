@@ -11,121 +11,143 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="HSplitContainer" type="HSplitContainer" parent="."]
+[node name="MainVBox" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-split_offset = 200
+theme_override_constants/separation = 8
 
-[node name="LeftScroll" type="ScrollContainer" parent="HSplitContainer"]
+[node name="DungeonMapLabel" type="Label" parent="MainVBox"]
 layout_mode = 2
-custom_minimum_size = Vector2(150, 0)
-
-[node name="LeftPanel" type="VBoxContainer" parent="HSplitContainer/LeftScroll"]
-layout_mode = 2
-theme_override_constants/separation = 10
-size_flags_horizontal = 2
-size_flags_vertical = 2
-
-[node name="ListLabel" type="Label" parent="HSplitContainer/LeftScroll/LeftPanel"]
-layout_mode = 2
-text = "Adventurers"
-theme_override_font_sizes/font_size = 16
-custom_minimum_size = Vector2(0, 30)
-
-[node name="AdventureList" type="ItemList" parent="HSplitContainer/LeftScroll/LeftPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-custom_minimum_size = Vector2(150, 200)
-
-[node name="RightPanel" type="VBoxContainer" parent="HSplitContainer"]
-layout_mode = 2
-theme_override_constants/separation = 15
-
-[node name="DetailPanel" type="PanelContainer" parent="HSplitContainer/RightPanel"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="DetailScroll" type="ScrollContainer" parent="HSplitContainer/RightPanel/DetailPanel"]
-layout_mode = 2
-
-[node name="DetailVBox" type="VBoxContainer" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll"]
-layout_mode = 2
-theme_override_constants/separation = 10
-size_flags_horizontal = 2
-
-[node name="AdventurerPortrait" type="TextureRect" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-custom_minimum_size = Vector2(0, 80)
-expand_mode = 1
-
-[node name="AdventurerNameLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Select Adventurer"
+text = "Dungeon Map"
 theme_override_font_sizes/font_size = 18
 
-[node name="AdventurerDescriptionLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
+[node name="DungeonScroll" type="ScrollContainer" parent="MainVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 90)
+vertical_scroll_mode = 0
+
+[node name="DungeonList" type="HBoxContainer" parent="MainVBox/DungeonScroll"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Description"
-custom_minimum_size = Vector2(0, 40)
+theme_override_constants/separation = 10
+
+[node name="HSplitContainer" type="HSplitContainer" parent="MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 300
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainVBox/HSplitContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DungeonInfoPanel" type="PanelContainer" parent="MainVBox/HSplitContainer/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DungeonInfoVBox" type="VBoxContainer" parent="MainVBox/HSplitContainer/LeftPanel/DungeonInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="DungeonNameLabel" type="Label" parent="MainVBox/HSplitContainer/LeftPanel/DungeonInfoPanel/DungeonInfoVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Select a Dungeon"
+theme_override_font_sizes/font_size = 16
+
+[node name="DungeonDescLabel" type="Label" parent="MainVBox/HSplitContainer/LeftPanel/DungeonInfoPanel/DungeonInfoVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
 autowrap_mode = 2
 
-[node name="ExplorationStatusLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
+[node name="DungeonDropsLabel" type="Label" parent="MainVBox/HSplitContainer/LeftPanel/DungeonInfoPanel/DungeonInfoVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Idle"
+text = ""
 theme_override_font_sizes/font_size = 12
 
-[node name="ExplorationProgress" type="ProgressBar" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
+[node name="PartyLabel" type="Label" parent="MainVBox/HSplitContainer/LeftPanel"]
+layout_mode = 2
+text = "Party Formation"
+theme_override_font_sizes/font_size = 14
+
+[node name="PartySlotsContainer" type="VBoxContainer" parent="MainVBox/HSplitContainer/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 120)
+
+[node name="PartyStatsLabel" type="Label" parent="MainVBox/HSplitContainer/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ATK: 0  |  DEF: 0  |  Speed: x1.00"
+theme_override_font_sizes/font_size = 12
+
+[node name="ExplorationProgress" type="ProgressBar" parent="MainVBox/HSplitContainer/LeftPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(0, 20)
-value = 0.0
 visible = false
 
-[node name="EquippedItemsLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
-layout_mode = 2
-text = "Equipped Items"
-theme_override_font_sizes/font_size = 12
-
-[node name="EquippedItemsContainer" type="VBoxContainer" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
+[node name="ExplorationStatusLabel" type="Label" parent="MainVBox/HSplitContainer/LeftPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(0, 60)
-
-[node name="DungeonTierLabel" type="Label" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
-layout_mode = 2
-text = "Dungeon Difficulty"
+text = ""
 theme_override_font_sizes/font_size = 12
 
-[node name="DungeonTierSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
+[node name="BattleLogScroll" type="ScrollContainer" parent="MainVBox/HSplitContainer/LeftPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-min_value = 1.0
-max_value = 5.0
-value = 1.0
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 100)
+visible = false
 
-[node name="StartExplorationBtn" type="Button" parent="HSplitContainer/RightPanel/DetailPanel/DetailScroll/DetailVBox"]
+[node name="BattleLog" type="RichTextLabel" parent="MainVBox/HSplitContainer/LeftPanel/BattleLogScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_active = false
+fit_content = true
+
+[node name="StartExplorationBtn" type="Button" parent="MainVBox/HSplitContainer/LeftPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(0, 40)
 text = "Start Exploration!"
 theme_override_font_sizes/font_size = 14
+disabled = true
 
-[node name="InventoryLabel" type="Label" parent="HSplitContainer/RightPanel"]
+[node name="RightPanel" type="VBoxContainer" parent="MainVBox/HSplitContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AdventurerLabel" type="Label" parent="MainVBox/HSplitContainer/RightPanel"]
+layout_mode = 2
+text = "Adventurers"
+theme_override_font_sizes/font_size = 14
+
+[node name="AdventurerScroll" type="ScrollContainer" parent="MainVBox/HSplitContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AdventurerListContainer" type="VBoxContainer" parent="MainVBox/HSplitContainer/RightPanel/AdventurerScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="InventoryLabel" type="Label" parent="MainVBox/HSplitContainer/RightPanel"]
 layout_mode = 2
 text = "Inventory (Equippable)"
 theme_override_font_sizes/font_size = 12
 
-[node name="InventoryList" type="ItemList" parent="HSplitContainer/RightPanel"]
+[node name="InventoryList" type="ItemList" parent="MainVBox/HSplitContainer/RightPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 2
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 80)
