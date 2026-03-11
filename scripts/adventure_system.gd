@@ -5,22 +5,24 @@ extends Node
 class_name AdventureSystem
 
 # Experience required per level
+# Linear-ish XP curve: gap grows gently (+75 every 2 levels)
+# Ensures ~3 dungeon runs per level at every tier (consistent growth feel)
 const EXP_PER_LEVEL = {
 	1: 0,
-	2: 100,
-	3: 250,
-	4: 450,
-	5: 700,
-	6: 1000,
-	7: 1350,
-	8: 1750,
-	9: 2200,
-	10: 2700,
-	11: 3250,
-	12: 3850,
-	13: 4500,
-	14: 5200,
-	15: 6000
+	2: 250,     # gap 250
+	3: 500,     # gap 250
+	4: 825,     # gap 325
+	5: 1150,    # gap 325
+	6: 1550,    # gap 400
+	7: 1950,    # gap 400
+	8: 2425,    # gap 475
+	9: 2900,    # gap 475
+	10: 3450,   # gap 550
+	11: 4000,   # gap 550
+	12: 4625,   # gap 625
+	13: 5250,   # gap 625
+	14: 5950,   # gap 700
+	15: 6650    # gap 700
 }
 
 # Adventurer class
@@ -72,14 +74,30 @@ class Adventurer:
 				multiplier *= item["speed_bonus"]
 		return multiplier
 	
+	## Total attack power from equipped weapons
+	func get_total_attack_power() -> int:
+		var total = 0
+		for item in equipped_items:
+			total += item.get("attack_power", 0)
+		return total
+
+	## Total defense from equipped armor
+	func get_total_defense() -> int:
+		var total = 0
+		for item in equipped_items:
+			total += item.get("defense", 0)
+		return total
+
 	## Calculate exploration time (in seconds)
 	func calculate_exploration_time(dungeon_tier: int) -> float:
-		# Base time: 30s ~ 180s depending on difficulty
-		var base_time = 30.0 + (dungeon_tier - 1) * 30.0
-		
-		# Apply speed multiplier (higher = faster)
+		var base_time = GameConfig.EXPLORATION_BASE_TIME + (dungeon_tier - 1) * GameConfig.EXPLORATION_TIME_PER_TIER
+
+		# Apply speed multiplier (equipment speed_bonus + base_speed)
 		var speed_mult = get_speed_multiplier()
-		return base_time / speed_mult
+
+		# Defense reduces exploration time (better armor = safer = faster clear)
+		var defense_speed = 1.0 + get_total_defense() * GameConfig.DEFENSE_SPEED_BONUS_PER_POINT
+		return base_time / (speed_mult * defense_speed)
 	
 	## Experience needed from current level to next level
 	func get_exp_to_next_level() -> int:
@@ -206,10 +224,36 @@ class Adventurer:
 		return result
 
 
+# Party class for group dungeon exploration
+class Party:
+	var id: String
+	var dungeon_id: String
+	var member_ids: Array[String]
+	var is_exploring: bool = false
+	var exploration_start_time: float = 0.0
+	var exploration_duration: float = 0.0
+
+	func _init(p_id: String, p_dungeon_id: String, p_members: Array[String]) -> void:
+		id = p_id
+		dungeon_id = p_dungeon_id
+		member_ids = p_members
+
+	func get_exploration_progress() -> float:
+		if not is_exploring:
+			return 0.0
+		var elapsed = (Time.get_ticks_msec() / 1000.0) - exploration_start_time
+		return minf(elapsed / exploration_duration, 1.0)
+
+	func is_exploration_complete() -> bool:
+		return is_exploring and get_exploration_progress() >= 1.0
+
+
 # Adventurer management
 var adventurers: Dictionary[String, Adventurer] = {}
 var adventurer_data: Dictionary = {}
 var abilities_data: Dictionary = {}
+var active_parties: Dictionary = {}  # party_id -> Party
+var _party_counter: int = 0
 
 func _ready() -> void:
 	push_error("[OK] AdventureSystem._ready() called")
@@ -507,6 +551,98 @@ func get_all_class_abilities(adventurer_id: String) -> Array[Dictionary]:
 		result.append(ability_with_lock)
 	
 	return result
+
+
+## ===== Party System =====
+
+## Create a party and start dungeon exploration
+func create_and_start_party(dungeon_id: String, member_ids: Array[String], dungeon_tier: int) -> Party:
+	# Validate members
+	for mid in member_ids:
+		var adv = get_adventurer(mid)
+		if not adv or not adv.hired or adv.is_exploring:
+			return null
+
+	_party_counter += 1
+	var party_id = "party_%d" % _party_counter
+	var party = Party.new(party_id, dungeon_id, member_ids)
+
+	# Calculate party exploration time (average speed)
+	var total_speed = 0.0
+	var total_defense = 0
+	for mid in member_ids:
+		var adv = get_adventurer(mid)
+		total_speed += adv.get_speed_multiplier()
+		total_defense += adv.get_total_defense()
+	var avg_speed = total_speed / member_ids.size()
+	var defense_speed = 1.0 + total_defense * GameConfig.DEFENSE_SPEED_BONUS_PER_POINT
+
+	var base_time = GameConfig.EXPLORATION_BASE_TIME + (dungeon_tier - 1) * GameConfig.EXPLORATION_TIME_PER_TIER
+	party.exploration_duration = base_time / (avg_speed * defense_speed)
+	party.exploration_start_time = Time.get_ticks_msec() / 1000.0
+	party.is_exploring = true
+
+	# Mark all members as exploring
+	for mid in member_ids:
+		var adv = get_adventurer(mid)
+		adv.is_exploring = true
+		adv.current_dungeon_tier = dungeon_tier
+
+	active_parties[party_id] = party
+	return party
+
+
+## Finish party exploration, free members
+func finish_party_exploration(party_id: String) -> Dictionary:
+	if not active_parties.has(party_id):
+		return {}
+	var party = active_parties[party_id]
+	if not party.is_exploration_complete():
+		return {}
+
+	# Free members
+	for mid in party.member_ids:
+		var adv = get_adventurer(mid)
+		if adv:
+			adv.is_exploring = false
+
+	var result = {
+		"party_id": party_id,
+		"dungeon_id": party.dungeon_id,
+		"member_ids": party.member_ids
+	}
+	active_parties.erase(party_id)
+	return result
+
+
+## Get party total attack power
+func get_party_attack_power(member_ids: Array) -> int:
+	var total = 0
+	for mid in member_ids:
+		var adv = get_adventurer(mid)
+		if adv:
+			total += adv.get_total_attack_power()
+	return total
+
+
+## Get party total defense
+func get_party_defense(member_ids: Array) -> int:
+	var total = 0
+	for mid in member_ids:
+		var adv = get_adventurer(mid)
+		if adv:
+			total += adv.get_total_defense()
+	return total
+
+
+## Get active party by ID
+func get_party(party_id: String) -> Party:
+	return active_parties.get(party_id)
+
+
+## Get all active parties
+func get_active_parties() -> Array:
+	return active_parties.values()
 
 
 ## ===== Debug Helper Methods =====

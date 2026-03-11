@@ -1,0 +1,57 @@
+{
+  "goblin_cave": {
+    "id": "goblin_cave",
+    "name": "Goblin Cave",
+    "tier": 1,
+    "description": "A damp cave overrun by goblins. Good for beginners.",
+    "exclusive_materials": ["goblin_tooth", "cave_moss"],
+    "min_party_power": 0,
+    "unlock_tier": 1,
+    "icon": "res://resources/assets/dungeon-crawl/dungeon/cobble_blood1.png",
+    "monster_icon": "res://resources/assets/dungeon-crawl/monsters/azure_jelly.png"
+  },
+  "dragons_lair": {
+    "id": "dragons_lair",
+    "name": "Dragon's Lair",
+    "tier": 2,
+    "description": "A scorching cavern where young dragons dwell.",
+    "exclusive_materials": ["dragon_fang", "fire_crystal"],
+    "min_party_power": 15,
+    "unlock_tier": 2,
+    "icon": "res://resources/assets/dungeon-crawl/dungeon/lava0.png",
+    "monster_icon": "res://resources/assets/dungeon-crawl/monsters/dragon.png"
+  },
+  "frost_citadel": {
+    "id": "frost_citadel",
+    "name": "Frost Citadel",
+    "tier": 3,
+    "description": "A fortress encased in eternal ice.",
+    "exclusive_materials": ["frost_shard", "ice_essence"],
+    "min_party_power": 40,
+    "unlock_tier": 3,
+    "icon": "res://resources/assets/dungeon-crawl/dungeon/ice0.png",
+    "monster_icon": "res://resources/assets/dungeon-crawl/monsters/storm_dragon.png"
+  },
+  "shadow_abyss": {
+    "id": "shadow_abyss",
+    "name": "Shadow Abyss",
+    "tier": 4,
+    "description": "Darkness itself takes form in this abyss.",
+    "exclusive_materials": ["shadow_fragment", "void_crystal"],
+    "min_party_power": 80,
+    "unlock_tier": 4,
+    "icon": "res://resources/assets/dungeon-crawl/dungeon/brick_dark0.png",
+    "monster_icon": "res://resources/assets/dungeon-crawl/monsters/iron_dragon.png"
+  },
+  "celestial_tower": {
+    "id": "celestial_tower",
+    "name": "Celestial Tower",
+    "tier": 5,
+    "description": "A tower reaching beyond the stars.",
+    "exclusive_materials": ["celestial_ore", "star_dust"],
+    "min_party_power": 140,
+    "unlock_tier": 5,
+    "icon": "res://resources/assets/dungeon-crawl/dungeon/marble_floor1.png",
+    "monster_icon": "res://resources/assets/dungeon-crawl/monsters/golden_dragon.png"
+  }
+}

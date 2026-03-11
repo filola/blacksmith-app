@@ -1,0 +1,82 @@
+{
+  "goblin_tooth": {
+    "name": "Goblin Tooth",
+    "tier": 1,
+    "color": "#8b7355",
+    "source": "goblin_cave",
+    "is_dungeon_material": true,
+    "icon": "res://resources/assets/dungeon-crawl/potions/brown.png"
+  },
+  "cave_moss": {
+    "name": "Cave Moss",
+    "tier": 1,
+    "color": "#6b8e23",
+    "source": "goblin_cave",
+    "is_dungeon_material": true,
+    "icon": "res://resources/assets/dungeon-crawl/potions/emerald.png"
+  },
+  "dragon_fang": {
+    "name": "Dragon Fang",
+    "tier": 2,
+    "color": "#ff4444",
+    "source": "dragons_lair",
+    "is_dungeon_material": true,
+    "icon": "res://resources/assets/dungeon-crawl/potions/ruby.png"
+  },
+  "fire_crystal": {
+    "name": "Fire Crystal",
+    "tier": 2,
+    "color": "#ff6600",
+    "source": "dragons_lair",
+    "is_dungeon_material": true,
+    "icon": "res://resources/assets/dungeon-crawl/potions/orange.png"
+  },
+  "frost_shard": {
+    "name": "Frost Shard",
+    "tier": 3,
+    "color": "#87ceeb",
+    "source": "frost_citadel",
+    "is_dungeon_material": true,
+    "icon": "res://resources/assets/dungeon-crawl/potions/cyan.png"
+  },
+  "ice_essence": {
+    "name": "Ice Essence",
+    "tier": 3,
+    "color": "#b0e0e6",
+    "source": "frost_citadel",
+    "is_dungeon_material": true,
+    "icon": "res://resources/assets/dungeon-crawl/potions/brilliant_blue.png"
+  },
+  "shadow_fragment": {
+    "name": "Shadow Fragment",
+    "tier": 4,
+    "color": "#4a0080",
+    "source": "shadow_abyss",
+    "is_dungeon_material": true,
+    "icon": "res://resources/assets/dungeon-crawl/potions/dark.png"
+  },
+  "void_crystal": {
+    "name": "Void Crystal",
+    "tier": 4,
+    "color": "#1a0033",
+    "source": "shadow_abyss",
+    "is_dungeon_material": true,
+    "icon": "res://resources/assets/dungeon-crawl/potions/black.png"
+  },
+  "celestial_ore": {
+    "name": "Celestial Ore",
+    "tier": 5,
+    "color": "#fffacd",
+    "source": "celestial_tower",
+    "is_dungeon_material": true,
+    "icon": "res://resources/assets/dungeon-crawl/potions/silver.png"
+  },
+  "star_dust": {
+    "name": "Star Dust",
+    "tier": 5,
+    "color": "#ffefd5",
+    "source": "celestial_tower",
+    "is_dungeon_material": true,
+    "icon": "res://resources/assets/dungeon-crawl/potions/white.png"
+  }
+}
